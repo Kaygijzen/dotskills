@@ -32,6 +32,13 @@ Skills installed as a plugin get a namespace, so `/grill-spec` becomes `/dotskil
 | `hello-skill` | Greets the user and confirms the dotskills setup is working. | `/hello-skill`, or automatically when the user says "hello skill", asks to test their dotskills install, or invokes /hello-skill. |
 <!-- skills-table:end -->
 
+### Requirements
+
+`grill-spec` needs [OpenSpec](https://github.com/Fission-AI/OpenSpec):
+
+- The `openspec` CLI on your `PATH`: `npm install -g @fission-ai/openspec@latest`
+- `openspec init` run in the project you're specifying. This creates `openspec/` and installs the `openspec-explore` and `openspec-propose` skills that `grill-spec` invokes.
+
 ## Repo layout
 
 ```
