@@ -1,0 +1,14 @@
+{
+  "name": "dotskills",
+  "description": "Personal Claude Code skills",
+  "owner": {
+    "name": "Kaygijzen"
+  },
+  "plugins": [
+    {
+      "name": "dotskills",
+      "source": "./",
+      "description": "All skills in this repo's skills/ folder"
+    }
+  ]
+}
