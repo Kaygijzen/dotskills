@@ -1,6 +1,6 @@
 # dotskills
 
-[![validate](https://github.com/<github-user>/dotskills/actions/workflows/validate.yml/badge.svg)](https://github.com/<github-user>/dotskills/actions/workflows/validate.yml)
+[![validate](https://github.com/Kaygijzen/dotskills/actions/workflows/validate.yml/badge.svg)](https://github.com/Kaygijzen/dotskills/actions/workflows/validate.yml)
 
 My personal collection of [Claude Code skills](https://code.claude.com/docs/en/skills), versioned like dotfiles.
 
@@ -9,7 +9,7 @@ My personal collection of [Claude Code skills](https://code.claude.com/docs/en/s
 On a machine where you edit the skills, run:
 
 ```bash
-git clone https://github.com/<github-user>/dotskills.git
+git clone https://github.com/Kaygijzen/dotskills.git
 cd dotskills
 ./install.sh
 ```
@@ -17,7 +17,7 @@ cd dotskills
 On any other machine, install through the plugin marketplace. Run these in a Claude Code session:
 
 ```
-/plugin marketplace add <github-user>/dotskills
+/plugin marketplace add Kaygijzen/dotskills
 /plugin install dotskills@dotskills
 ```
 
