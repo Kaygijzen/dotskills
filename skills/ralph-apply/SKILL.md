@@ -39,8 +39,9 @@ Run these checks and report them as a short list. Stop at the first hard failure
 The loop runs headless, so every command an iteration needs must be pre-approved.
 
 1. Read `AGENTS.md` / `CLAUDE.md` (and `openspec/config.yaml`) for the project's verification commands: lint, analyze, unit tests, database tests, codegen.
-2. Build the list as `Bash(<cmd>:*)` entries, for example `Bash(flutter:*),Bash(dart:*),Bash(supabase:*)` or `Bash(npm run:*),Bash(npx tsc:*)`. The script always adds `git add`, `git commit`, `git status`, `git diff` and `openspec`.
-3. Show the list to the user. Never add broad entries such as `Bash(*)`, `Bash(rm:*)`, `Bash(git push:*)` or `Bash(curl:*)`.
+2. Build the list as `Bash(<cmd>:*)` entries, for example `Bash(flutter:*),Bash(dart:*),Bash(supabase:*)` or `Bash(npm run:*),Bash(npx tsc:*)`. The script always adds `git add`, `git commit`, `git status`, `git diff` and `openspec`. When `rtk` is installed, it also adds the `rtk git ...` forms of those git commands.
+3. If a PreToolUse hook rewrites commands (for example rtk turns `curl ...` into `rtk curl ...`), the rewritten command must be allowed too, or the headless session can't run it. Check with `printf '{"hook_event_name":"PreToolUse","tool_name":"Bash","tool_input":{"command":"<cmd>"}}' | rtk hook claude` and add the rewritten form for each project command it changes.
+4. Show the list to the user. Never add broad entries such as `Bash(*)`, `Bash(rm:*)`, `Bash(git push:*)` or `Bash(curl:*)`.
 
 ## 3. Hand over
 

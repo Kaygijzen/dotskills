@@ -50,6 +50,11 @@ fi
 remaining="$(open_tasks)"
 max="${2:-$((remaining + 5))}"
 allowed="Bash(git add:*),Bash(git commit:*),Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(openspec:*),Read,Edit,Write,Glob,Grep"
+# A PreToolUse hook from rtk rewrites git commands to `rtk git ...`, which the
+# rules above don't match, so allow the rewritten forms too.
+if command -v rtk >/dev/null; then
+  allowed="$allowed,Bash(rtk git add:*),Bash(rtk git commit:*),Bash(rtk git status:*),Bash(rtk git diff:*),Bash(rtk git log:*)"
+fi
 [[ -n "${RALPH_ALLOWED_TOOLS:-}" ]] && allowed="$allowed,$RALPH_ALLOWED_TOOLS"
 
 claude_args=(-p --permission-mode acceptEdits --allowedTools "$allowed" --max-turns "${RALPH_MAX_TURNS:-60}")
