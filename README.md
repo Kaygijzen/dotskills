@@ -30,6 +30,7 @@ Skills installed as a plugin get a namespace, so `/grill-spec` becomes `/dotskil
 | --- | --- | --- |
 | `grill-spec` | Grill the user until intent is shared, then generate a complete OpenSpec change (proposal, delta specs, design, tasks) and review it with fresh-context sub-agents before handing it to a coding agent. | `/grill-spec` only (never auto-invoked) |
 | `hello-skill` | Greets the user and confirms the dotskills setup is working. | `/hello-skill`, or automatically when the user says "hello skill", asks to test their dotskills install, or invokes /hello-skill. |
+| `ralph-apply` | Apply an approved OpenSpec change with a Ralph loop - a bash loop that runs a fresh headless Claude session per task, so context never piles up. | `/ralph-apply` only (never auto-invoked) |
 <!-- skills-table:end -->
 
 ### Requirements
@@ -38,6 +39,12 @@ Skills installed as a plugin get a namespace, so `/grill-spec` becomes `/dotskil
 
 - The `openspec` CLI on your `PATH`: `npm install -g @fission-ai/openspec@latest`
 - `openspec init` run in the project you're specifying. This creates `openspec/` and installs the `openspec-explore` and `openspec-propose` skills that `grill-spec` invokes.
+
+`ralph-apply` needs the same OpenSpec setup, plus:
+
+- The `claude` CLI on your `PATH`. The loop runs `claude -p` once per task.
+- An approved change on its own branch or worktree. The script refuses to run on `main` or `master`.
+- The loop itself runs in a terminal: `/ralph-apply <change>` checks the change and prints the exact `scripts/ralph.sh` command to run.
 
 ## Repo layout
 
