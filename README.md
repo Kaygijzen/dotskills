@@ -6,7 +6,7 @@ My personal collection of [Claude Code skills](https://code.claude.com/docs/en/s
 
 ## Quick start
 
-On a machine where you edit the skills, run:
+**Install from a clone** (macOS, Linux or WSL). You get skill names without a prefix (like `/grill-spec`), plus a working copy you can edit:
 
 ```bash
 git clone https://github.com/Kaygijzen/dotskills.git
@@ -14,7 +14,7 @@ cd dotskills
 ./install.sh
 ```
 
-On Windows, clone onto a local drive (not a `\\wsl$` path) and run this in PowerShell instead:
+On Windows? The recommended install is: open WSL, then go back to the bash instructions above. Your agent will thank you, because it speaks bash, not `Get-ChildItem`. Still here? Fine. Clone onto a local drive (not a `\\wsl$` path) and run this in PowerShell:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\install.ps1
@@ -22,14 +22,14 @@ powershell -ExecutionPolicy Bypass -File .\install.ps1
 
 `install.sh` also asks whether to install two command-line tools if they're missing: the [OpenSpec](https://github.com/Fission-AI/OpenSpec) CLI, which `grill-spec` needs, and [rtk](https://github.com/rtk-ai/rtk), an optional hook that cuts the tokens Bash output uses. `install.ps1` does the same. Both are optional and nothing is installed without a yes.
 
-On any other machine, install through the plugin marketplace. Run these in a Claude Code session:
+**Or install as a plugin** if you'd rather not keep a clone. Run these in a Claude Code session:
 
 ```
 /plugin marketplace add Kaygijzen/dotskills
 /plugin install dotskills@dotskills
 ```
 
-Skills installed as a plugin get a namespace, so `/grill-spec` becomes `/dotskills:grill-spec`.
+Plugin skills get a namespace, so `/grill-spec` becomes `/dotskills:grill-spec`. To pull updates, run `/plugin marketplace update dotskills`.
 
 ## Skills
 
