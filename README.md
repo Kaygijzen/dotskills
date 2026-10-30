@@ -37,7 +37,7 @@ Skills installed as a plugin get a namespace, so `/grill-spec` becomes `/dotskil
 
 `grill-spec` needs [OpenSpec](https://github.com/Fission-AI/OpenSpec):
 
-- The `openspec` CLI on your `PATH`: `npm install -g @fission-ai/openspec@latest`
+- The `openspec` CLI on your `PATH`. If it's missing, `./install.sh` offers to run `npm install -g @fission-ai/openspec@latest` for you. Pass `--with-openspec` to install it without the prompt, or `--no-openspec` to skip the question.
 - `openspec init` run in the project you're specifying. This creates `openspec/` and installs the `openspec-explore` and `openspec-propose` skills that `grill-spec` invokes.
 
 `ralph-apply` needs the same OpenSpec setup, plus:
