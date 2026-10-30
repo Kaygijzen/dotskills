@@ -8,9 +8,13 @@
 #   ./install.sh --uninstall      remove every symlink that points into this repo
 #   ./install.sh --uninstall NAME remove only the named skills' symlinks
 #   ./install.sh --check          validate every SKILL.md (same as scripts/validate.sh)
+#   ./install.sh --with-openspec  also install the OpenSpec CLI without asking
+#   ./install.sh --no-openspec    never ask about the OpenSpec CLI
 #
 # Set CLAUDE_SKILLS_DIR to link somewhere other than ~/.claude/skills.
 # Existing folders or foreign symlinks with the same name are never touched.
+# If the openspec CLI (needed by grill-spec) is missing, install asks whether to
+# install it with npm; without a terminal to ask on, it only prints a hint.
 
 set -euo pipefail
 
@@ -19,7 +23,7 @@ SRC_DIR="$REPO_DIR/skills"
 DEST_DIR="${CLAUDE_SKILLS_DIR:-$HOME/.claude/skills}"
 
 usage() {
-  sed -n '2,13s/^# \{0,1\}//p' "$0"
+  sed -n '2,17s/^# \{0,1\}//p' "$0"
 }
 
 # True if $1 is a symlink this script created, i.e. it points into $SRC_DIR.
@@ -89,6 +93,39 @@ install() {
   return $failed
 }
 
+OPENSPEC_PKG="@fission-ai/openspec@latest"
+
+# $1 is ask, yes or no.
+install_openspec() {
+  local choice="$1" reply
+
+  if command -v openspec >/dev/null 2>&1; then
+    echo "ok      openspec $(openspec --version 2>/dev/null || echo '(version unknown)')"
+    return 0
+  fi
+  [[ "$choice" == no ]] && return 0
+
+  if [[ "$choice" == ask ]]; then
+    if [[ ! -t 0 ]]; then
+      echo "note    openspec not found; grill-spec needs it. Rerun with --with-openspec or run: npm install -g $OPENSPEC_PKG"
+      return 0
+    fi
+    read -r -p "OpenSpec CLI not found (grill-spec needs it). Install with npm now? [y/N] " reply
+    [[ "$reply" =~ ^[Yy]([Ee][Ss])?$ ]] || { echo "skip    openspec"; return 0; }
+  fi
+
+  if ! command -v npm >/dev/null 2>&1; then
+    echo "WARN    openspec: npm not found; install Node.js, then run: npm install -g $OPENSPEC_PKG"
+    return 1
+  fi
+  if npm install -g "$OPENSPEC_PKG"; then
+    echo "installed openspec $(openspec --version 2>/dev/null || true)"
+  else
+    echo "WARN    openspec: npm install failed (a permissions error usually means npm's global prefix needs sudo or a user-owned prefix)"
+    return 1
+  fi
+}
+
 uninstall() {
   local name link removed=0
   [[ -d "$DEST_DIR" ]] || { echo "Nothing to remove: $DEST_DIR does not exist"; return 0; }
@@ -117,13 +154,15 @@ uninstall() {
 }
 
 main() {
-  local mode=install
+  local mode=install openspec=ask
   local -a names=()
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --uninstall) mode=uninstall ;;
       --check)     mode=check ;;
+      --with-openspec) openspec=yes ;;
+      --no-openspec)   openspec=no ;;
       -h|--help)   usage; return 0 ;;
       -*)          echo "Unknown option: $1" >&2; usage >&2; return 2 ;;
       *)           names+=("${1%/}") ;;
@@ -132,7 +171,12 @@ main() {
   done
 
   case "$mode" in
-    install)   install ${names[@]+"${names[@]}"} ;;
+    install)
+      local failed=0
+      install ${names[@]+"${names[@]}"} || failed=1
+      install_openspec "$openspec" || failed=1
+      return $failed
+      ;;
     uninstall) uninstall ${names[@]+"${names[@]}"} ;;
     check)     "$REPO_DIR/scripts/validate.sh" ${names[@]+"${names[@]}"} ;;
   esac
