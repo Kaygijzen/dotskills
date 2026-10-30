@@ -94,16 +94,53 @@ install() {
 }
 
 OPENSPEC_PKG="@fission-ai/openspec@latest"
+# From the package's engines field: npm view @fission-ai/openspec engines
+OPENSPEC_MIN_NODE="20.19.0"
+
+# True if version $1 >= version $2 (both MAJOR.MINOR.PATCH, optional leading v).
+version_ge() {
+  local -a a b
+  local i
+  IFS=. read -r -a a <<<"${1#v}"
+  IFS=. read -r -a b <<<"${2#v}"
+  for i in 0 1 2; do
+    (( ${a[i]:-0} > ${b[i]:-0} )) && return 0
+    (( ${a[i]:-0} < ${b[i]:-0} )) && return 1
+  done
+  return 0
+}
+
+# Prints why openspec can't be installed with npm here, or nothing if it can.
+openspec_blocker() {
+  local node_version
+  if ! command -v node >/dev/null 2>&1 || ! command -v npm >/dev/null 2>&1; then
+    echo "Node.js/npm not found; install Node.js $OPENSPEC_MIN_NODE or newer"
+    return
+  fi
+  node_version="$(node --version)"
+  if ! version_ge "$node_version" "$OPENSPEC_MIN_NODE"; then
+    echo "Node.js $node_version is too old; OpenSpec needs $OPENSPEC_MIN_NODE or newer"
+  fi
+}
 
 # $1 is ask, yes or no.
 install_openspec() {
-  local choice="$1" reply
+  local choice="$1" reply blocker
 
   if command -v openspec >/dev/null 2>&1; then
     echo "ok      openspec $(openspec --version 2>/dev/null || echo '(version unknown)')"
     return 0
   fi
   [[ "$choice" == no ]] && return 0
+
+  # Check prerequisites before asking, so we never offer an install that can't work.
+  # Only a run that explicitly asked for openspec (--with-openspec) fails on this.
+  blocker="$(openspec_blocker)"
+  if [[ -n "$blocker" ]]; then
+    echo "WARN    openspec not found (grill-spec needs it): $blocker, then run: npm install -g $OPENSPEC_PKG"
+    [[ "$choice" == yes ]] && return 1
+    return 0
+  fi
 
   if [[ "$choice" == ask ]]; then
     if [[ ! -t 0 ]]; then
@@ -114,10 +151,6 @@ install_openspec() {
     [[ "$reply" =~ ^[Yy]([Ee][Ss])?$ ]] || { echo "skip    openspec"; return 0; }
   fi
 
-  if ! command -v npm >/dev/null 2>&1; then
-    echo "WARN    openspec: npm not found; install Node.js, then run: npm install -g $OPENSPEC_PKG"
-    return 1
-  fi
   if npm install -g "$OPENSPEC_PKG"; then
     echo "installed openspec $(openspec --version 2>/dev/null || true)"
   else
