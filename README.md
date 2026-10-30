@@ -45,7 +45,7 @@ Plugin skills get a namespace, so `/grill-spec` becomes `/dotskills:grill-spec`.
 
 `grill-spec` needs [OpenSpec](https://github.com/Fission-AI/OpenSpec):
 
-- The `openspec` CLI on your `PATH`. If it's missing, `./install.sh` offers to run `npm install -g @fission-ai/openspec@latest` for you. Pass `--with-openspec` to install it without the prompt, or `--no-openspec` to skip the question.
+- The `openspec` CLI on your `PATH`. If it's missing, `./install.sh` (or `install.ps1` on Windows) offers to run `npm install -g @fission-ai/openspec@latest` for you. Pass `--with-openspec` (`-WithOpenSpec`) to install it without the prompt, or `--no-openspec` (`-NoOpenSpec`) to skip the question.
 - `openspec init` run in the project you're specifying. This creates `openspec/` and installs the `openspec-explore` and `openspec-propose` skills that `grill-spec` invokes.
 
 `ralph-apply` needs the same OpenSpec setup, plus:
@@ -121,7 +121,7 @@ dotskills/
 | `./install.sh --no-rtk` | Skips the rtk questions. |
 | `./install.sh --help` | Prints usage. |
 
-Without a terminal to answer on (CI, piped input), the script never installs OpenSpec or rtk. It only prints how to do it yourself.
+Without a terminal to answer on (CI, piped input), neither script installs OpenSpec or rtk unless you pass the matching `--with-…` / `-With…` option, and neither runs `rtk init -g`, since it can ask its own questions. In those cases the script prints how to do it yourself.
 
 On Windows, `install.ps1` takes the same options as PowerShell switches: `-Uninstall`, `-Check`, `-WithOpenSpec`, `-NoOpenSpec`, `-WithRtk`, `-NoRtk` and `-Help`. It differs from `install.sh` in three ways:
 
