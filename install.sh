@@ -15,6 +15,7 @@
 #
 # Set CLAUDE_SKILLS_DIR to link somewhere other than ~/.claude/skills.
 # Existing folders or foreign symlinks with the same name are never touched.
+# On Windows, use install.ps1 instead.
 # If the openspec CLI (needed by grill-spec) is missing, install asks whether to
 # install it with npm; likewise for rtk (token-saving Bash hook), installed with
 # its official script. Without a terminal to ask on, both only print a hint.
@@ -26,7 +27,7 @@ SRC_DIR="$REPO_DIR/skills"
 DEST_DIR="${CLAUDE_SKILLS_DIR:-$HOME/.claude/skills}"
 
 usage() {
-  sed -n '2,20s/^# \{0,1\}//p' "$0"
+  sed -n '2,21s/^# \{0,1\}//p' "$0"
 }
 
 # True if $1 is a symlink this script created, i.e. it points into $SRC_DIR.
