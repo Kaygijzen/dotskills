@@ -14,6 +14,14 @@ cd dotskills
 ./install.sh
 ```
 
+On Windows, clone onto a local drive (not a `\\wsl$` path) and run this in PowerShell instead:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install.ps1
+```
+
+`install.sh` also asks whether to install two command-line tools if they're missing: the [OpenSpec](https://github.com/Fission-AI/OpenSpec) CLI, which `grill-spec` needs, and [rtk](https://github.com/rtk-ai/rtk), an optional hook that cuts the tokens Bash output uses. `install.ps1` does the same. Both are optional and nothing is installed without a yes.
+
 On any other machine, install through the plugin marketplace. Run these in a Claude Code session:
 
 ```
@@ -52,6 +60,7 @@ Skills installed as a plugin get a namespace, so `/grill-spec` becomes `/dotskil
 dotskills/
 ├── skills/<name>/SKILL.md        one folder per skill, plus any supporting files
 ├── install.sh                    symlinks skills into ~/.claude/skills
+├── install.ps1                   the same for Windows, using junctions
 ├── scripts/validate.sh           checks every SKILL.md's frontmatter
 ├── scripts/update-readme.sh      rebuilds the skills table above
 ├── scripts/frontmatter.sh        frontmatter parser shared by the two scripts
@@ -106,7 +115,19 @@ dotskills/
 | `./install.sh --uninstall` | Removes every symlink that points into this repo. |
 | `./install.sh --uninstall grill-spec` | Removes only the named skills' symlinks. |
 | `./install.sh --check` | Validates every `SKILL.md`. This does the same as `scripts/validate.sh`. |
+| `./install.sh --with-openspec` | Installs the OpenSpec CLI with npm if it's missing, without asking. Needs Node.js 20.19.0 or newer. |
+| `./install.sh --no-openspec` | Skips the OpenSpec question. |
+| `./install.sh --with-rtk` | Installs rtk if it's missing and runs `rtk init -g`, without asking. |
+| `./install.sh --no-rtk` | Skips the rtk questions. |
 | `./install.sh --help` | Prints usage. |
+
+Without a terminal to answer on (CI, piped input), the script never installs OpenSpec or rtk. It only prints how to do it yourself.
+
+On Windows, `install.ps1` takes the same options as PowerShell switches: `-Uninstall`, `-Check`, `-WithOpenSpec`, `-NoOpenSpec`, `-WithRtk`, `-NoRtk` and `-Help`. It differs from `install.sh` in three ways:
+
+- It links with directory junctions, which need no admin rights or Developer Mode. Junctions can't point at network paths, so the repo has to be on a local drive. If junctions fail, it falls back to a symlink, which needs Developer Mode.
+- It installs rtk with `winget install rtk-ai.rtk` instead of rtk's shell script.
+- `-Check` runs `scripts/validate.sh`, so it needs bash from Git Bash or WSL.
 
 To link into a different folder, set `CLAUDE_SKILLS_DIR`:
 

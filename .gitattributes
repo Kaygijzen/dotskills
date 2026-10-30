@@ -1,0 +1,2 @@
+# Keep LF in shell scripts so they still run in bash after a Windows checkout.
+*.sh text eol=lf
