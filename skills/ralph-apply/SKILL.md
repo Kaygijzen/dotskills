@@ -55,7 +55,7 @@ Resolve `<skill-dir>` to this skill's real folder (run `cd "$(dirname <this SKIL
 
 Then tell them:
 - **Max iterations** defaults to the number of open tasks + 5.
-- **Optional env vars:** `RALPH_MODEL` picks a model for the iterations, and `RALPH_MAX_TURNS` caps the turns per iteration (default 60).
+- **Optional env vars:** `RALPH_MODEL` picks the model for the iterations (default `sonnet`; set `RALPH_MODEL=opus` for a change with hard tasks), and `RALPH_MAX_TURNS` caps the turns per iteration (default 60).
 - **Logs** for each iteration go to `.ralph/<change>/iter-N.log`.
 - **When it stops** on a `.ralph-stop`, run `/ralph-apply <change>` again: preflight step 6 handles the question, then the loop resumes where it left off.
 - **When all tasks are ticked,** do the manual checks the loop skips (for example a simulator or browser walkthrough), then run `/opsx:archive <change>`.
