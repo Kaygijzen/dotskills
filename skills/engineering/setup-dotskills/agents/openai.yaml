@@ -1,0 +1,5 @@
+interface:
+  display_name: "Setup dotskills"
+  short_description: "Configure a repo for dotskills"
+policy:
+  allow_implicit_invocation: false

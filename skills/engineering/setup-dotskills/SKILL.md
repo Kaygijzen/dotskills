@@ -1,16 +1,17 @@
 ---
-name: setup-matt-pocock-skills
-description: "Configure this repo for the engineering skills: set up its issue tracker, triage label vocabulary, and domain doc layout. Run once before first use of the other engineering skills."
+name: setup-dotskills
+description: "Configure this repo for dotskills' engineering skills: set up its issue tracker, triage label vocabulary, and domain doc layout. Run once before first use of the other engineering skills."
 disable-model-invocation: true
 ---
 
-# Setup Matt Pocock's Skills
+# Setup dotskills
 
 Scaffold the per-repo configuration that the engineering skills assume:
 
 - **Issue tracker**: where issues live (GitHub by default; local markdown is also supported out of the box)
 - **Triage labels**: the strings used for the five canonical triage roles
 - **Domain docs**: where `GLOSSARY.md` and ADRs live, and the consumer rules for reading them
+- **Agent conventions** and the **OpenSpec** flow: optional, asked about after the three above
 
 This is a prompt-driven skill, not a deterministic script. Explore, present what you found, confirm with the user, then write.
 
@@ -61,6 +62,10 @@ The defaults are the five canonical roles, each label string equal to its name: 
 **Section C: Domain docs.** Default to **single-context** (one `GLOSSARY.md` + `docs/adr/` at the repo root). This fits almost every repo; write it without asking.
 
 Offer **multi-context** (a root `GLOSSARY-MAP.md` pointing to per-context `GLOSSARY.md` files) only when exploration found monorepo signals. Then confirm which layout they want.
+
+**Section D: Agent conventions.** Only ask when the repo has neither `AGENTS.md` nor `CLAUDE.md`. Offer to create them from the dotskills project template (`conventions/project-template/`, the same files `install.sh --init-project` copies). Find the template by resolving this skill folder's real path (it may be a symlink) and going up three levels to the dotskills root. Copy only files that don't exist yet; never overwrite. If the user says no, move on; step 4 then asks which file to create for the `## Agent skills` block.
+
+**Section E: OpenSpec.** Ask whether this repo will use the OpenSpec flow (`grill-spec`, `ralph-apply`). If yes, check that `openspec/` exists at the repo root. If it doesn't, tell the user to run `openspec init`. Don't run it for them.
 
 ### 3. Confirm and edit
 

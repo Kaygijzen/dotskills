@@ -45,7 +45,9 @@
     "source_repo": "https://github.com/mattpocock/skills",
     "source_path": "skills/engineering/code-review",
     "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
-    "local_changes": []
+    "local_changes": [
+      "/setup-matt-pocock-skills -> /setup-dotskills"
+    ]
   },
   {
     "skill": "codebase-design",
@@ -112,12 +114,17 @@
     "local_changes": []
   },
   {
-    "skill": "setup-matt-pocock-skills",
+    "skill": "setup-dotskills",
     "domain": "engineering",
     "source_repo": "https://github.com/mattpocock/skills",
     "source_path": "skills/engineering/setup-matt-pocock-skills",
     "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
-    "local_changes": []
+    "local_changes": [
+      "renamed from setup-matt-pocock-skills; name, title, description and openai.yaml display strings say dotskills",
+      "issue-tracker-github.md and triage-labels.md name Kaygijzen/dotskills / dotskills instead of mattpocock/skills",
+      "SKILL.md: added Section D (agent conventions from conventions/project-template) and Section E (OpenSpec check)"
+    ],
+    "renamed_from": "setup-matt-pocock-skills"
   },
   {
     "skill": "tdd",
@@ -133,7 +140,9 @@
     "source_repo": "https://github.com/mattpocock/skills",
     "source_path": "skills/engineering/to-spec",
     "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
-    "local_changes": []
+    "local_changes": [
+      "/setup-matt-pocock-skills -> /setup-dotskills"
+    ]
   },
   {
     "skill": "to-tickets",
@@ -141,7 +150,9 @@
     "source_repo": "https://github.com/mattpocock/skills",
     "source_path": "skills/engineering/to-tickets",
     "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
-    "local_changes": []
+    "local_changes": [
+      "/setup-matt-pocock-skills -> /setup-dotskills (2 places)"
+    ]
   },
   {
     "skill": "wayfinder",
@@ -149,7 +160,9 @@
     "source_repo": "https://github.com/mattpocock/skills",
     "source_path": "skills/engineering/wayfinder",
     "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
-    "local_changes": []
+    "local_changes": [
+      "/setup-matt-pocock-skills -> /setup-dotskills"
+    ]
   },
   {
     "skill": "wizard",
