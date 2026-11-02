@@ -122,12 +122,50 @@ Most skills work out of the box. These two need [OpenSpec](https://github.com/Fi
 
 `ralph.sh` passes `--model` to `claude -p`, so the loop model is always enforced. The `grill-spec` models are instructions to Claude, which sets `model` on each sub-agent call.
 
-## How I work
+## Spec-driven development
 
-Two tools shape this setup:
+When requirements live only in chat history, AI-written code is unpredictable. [OpenSpec](https://github.com/Fission-AI/OpenSpec) adds a lightweight spec layer: you and the agent agree on *what* to build in plain Markdown, in the repo, before any code is written. Then the spec, not the chat, is what the agent implements and what a reviewer checks against.
 
-- **Spec-driven development with [OpenSpec](https://github.com/Fission-AI/OpenSpec).** Before any code, intent is pinned down in a spec (proposal, delta specs, design, tasks) that lives in the repo. `/grill-spec` produces it, `/ralph-apply` implements it task by task, and `/code-review` checks the result against it. The spec, not the chat history, is the source of truth. See [Requirements](#requirements-for-grill-spec-and-ralph-apply) for setup.
-- **[rtk](https://github.com/rtk-ai/rtk) to cut token usage.** rtk is a single Rust binary plus a Claude Code `PreToolUse` hook. The hook rewrites Bash commands such as `git status`, `git diff` and test runs to `rtk` equivalents that filter, group and truncate the output before Claude reads it; the project reports 60-90% less output on common dev commands. It only touches Bash tool calls, not the built-in `Read`, `Grep` and `Glob` tools, and it trims Bash output only, so the saving on your total bill is smaller than that. `./install.sh` offers to install it and run `rtk init -g` (`--with-rtk` or `--no-rtk` skips the prompt), and `rtk gain` shows what it has saved. It is optional; nothing in this repo depends on it. The [install reference](docs/install-reference.md) has the details.
+### The loop
+
+1. **Propose.** The agent drafts a *change*: a folder with a proposal (why), *delta specs* (what changes), a design and a task list. `/grill-spec` interviews you first, so the draft reflects your intent.
+2. **Review.** You read and correct the spec. This is the cheap place to catch a wrong assumption.
+3. **Implement.** The agent works through the tasks. `/ralph-apply` runs one fresh session per task so context never piles up.
+4. **Archive.** `/opsx:archive` moves the finished change into `archive/` and updates the *codebase specs*, which describe what the system does today. The next change starts from an accurate picture.
+
+### What it looks like
+
+```
+openspec/
+├── specs/                 codebase specs: what the system does today
+└── changes/
+    ├── add-dark-mode/     one folder per change in flight
+    │   ├── proposal.md    why we're doing this
+    │   ├── specs/         delta specs: what this change adds or alters
+    │   ├── design.md      technical approach
+    │   └── tasks.md       implementation checklist
+    └── archive/           finished changes
+```
+
+A delta spec lists requirements with concrete scenarios. It uses `ADDED`, `MODIFIED` or `REMOVED` to say how it differs from the codebase spec:
+
+```md
+## ADDED Requirements
+
+### Requirement: Theme selection
+The app SHALL let users switch between light and dark themes,
+defaulting to the system preference.
+
+#### Scenario: User toggles dark mode
+- **WHEN** the user clicks the theme toggle
+- **THEN** the app switches to dark mode and persists the choice
+```
+
+`/grill-spec` reads `openspec/specs/` first, so a new change is checked against current behaviour, and `/code-review` checks the result against the change's spec. Setup is in [Requirements](#requirements-for-grill-spec-and-ralph-apply).
+
+## Saving tokens with rtk
+
+[rtk](https://github.com/rtk-ai/rtk) is a single Rust binary plus a Claude Code `PreToolUse` hook. The hook rewrites Bash commands such as `git status`, `git diff` and test runs to `rtk` equivalents that filter, group and truncate the output before Claude reads it; the project reports 60-90% less output on common dev commands. It only touches Bash tool calls, not the built-in `Read`, `Grep` and `Glob` tools, and it trims Bash output only, so the saving on your total bill is smaller than that. `./install.sh` offers to install it and run `rtk init -g` (`--with-rtk` or `--no-rtk` skips the prompt), and `rtk gain` shows what it has saved. It is optional; nothing in this repo depends on it. The [install reference](docs/install-reference.md) has the details.
 
 ## Example flow
 
@@ -141,7 +179,8 @@ flowchart LR
     review -- "yes" --> ralph["/ralph-apply"]
     ralph --> loop["scripts/ralph.sh"]
     loop --> cr["/code-review"]
-    cr --> pr["/pr"]
+    cr --> arch["/opsx:archive<br/>sync codebase specs"]
+    arch --> pr["/pr"]
     pr --> done(["Pull request"])
 ```
 
