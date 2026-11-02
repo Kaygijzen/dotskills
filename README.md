@@ -1,3 +1,7 @@
+<p align="center">
+  <img src=".claude-plugin/icon.png" alt="dotskills logo" width="160">
+</p>
+
 # dotskills
 
 [![validate](https://github.com/Kaygijzen/dotskills/actions/workflows/validate.yml/badge.svg)](https://github.com/Kaygijzen/dotskills/actions/workflows/validate.yml)
