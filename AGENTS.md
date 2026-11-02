@@ -7,13 +7,14 @@ A public repo of Claude Code skills, subagents, hooks and conventions, shared li
 - `agents/<domain>/<name>.md`: subagents.
 - `hooks/<domain>/hooks.json` plus `hooks/<domain>/scripts/`: hooks. Ship through the plugin only.
 - `mcp/<domain>/.mcp.json`: optional MCP configs. Secrets only as `${ENV_VAR}`.
+- `statusline/`: vendored statusline script (MIT, upstream LICENSE kept). `install.sh` symlinks it to `~/.claude/statusline.sh`.
 - `conventions/`: personal conventions and the project template.
 - `scripts/`: `validate.sh`, `update-readme.sh`, `sync-plugin.sh`, `new-skill.sh`, `ci.sh`.
 - `.claude-plugin/`: one marketplace and one plugin, both named `dotskills`.
 
 ## Rules
 - The repo is public. No personal, client or secret data. Ever.
-- `install.sh` only creates, updates or removes symlinks into this repo and its managed block in `~/.claude/CLAUDE.md`. It never edits `settings.json`.
+- `install.sh` only creates, updates or removes symlinks into this repo and its managed block in `~/.claude/CLAUDE.md`. It edits `settings.json` only with `--statusline-settings`, and then only the `statusLine` key.
 - Versioning is `head`: manifests have no `version`.
 
 ## Workflow

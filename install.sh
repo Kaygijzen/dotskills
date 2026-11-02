@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Symlinks skills (skills/<domain>/<name>/) into ~/.claude/skills/<name> and
-# subagents (agents/<domain>/<name>.md) into ~/.claude/agents/<name>.md, so
+# subagents (agents/<domain>/<name>.md) into ~/.claude/agents/<name>.md, and the
+# statusline script (statusline/statusline.sh) to ~/.claude/statusline.sh, so
 # edits in this repo are live in Claude Code immediately.
 #
 # Usage:
@@ -13,6 +14,7 @@
 #   ./install.sh --uninstall [NAME..]  remove only what this script created (links, conventions block)
 #   ./install.sh --check               validate the repo (same as scripts/validate.sh)
 #   ./install.sh --target codex        not implemented yet; prints a note and exits 0
+#   ./install.sh --statusline-settings set `statusLine` in settings.json (the only key this script edits)
 #   ./install.sh --with-openspec       also install the OpenSpec CLI without asking
 #   ./install.sh --no-openspec         never ask about the OpenSpec CLI
 #   ./install.sh --with-rtk            also install rtk and run `rtk init -g` without asking
@@ -21,7 +23,8 @@
 # CLAUDE_SKILLS_DIR / CLAUDE_AGENTS_DIR / CLAUDE_CONFIG_DIR override ~/.claude/skills,
 # ~/.claude/agents and ~/.claude. Existing folders or foreign symlinks with the same
 # name are never touched. Hooks and MCP servers ship through the plugin only; this
-# script never edits settings.json. On Windows, use install.ps1 instead.
+# script edits settings.json only with --statusline-settings, and then only the
+# `statusLine` key (backed up first, never overwriting a different statusLine). On Windows, use install.ps1 instead.
 # If the openspec CLI (needed by grill-spec) is missing, install asks whether to
 # install it with npm; likewise for rtk (token-saving Bash hook), installed with
 # its official script. Without a terminal to ask on, both only print a hint.
@@ -31,15 +34,18 @@ set -euo pipefail
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 SRC_DIR="$REPO_DIR/skills"
 AGENTS_SRC="$REPO_DIR/agents"
+STATUSLINE_SRC="$REPO_DIR/statusline/statusline.sh"
 CONFIG_DIR="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 DEST_DIR="${CLAUDE_SKILLS_DIR:-$CONFIG_DIR/skills}"
 AGENTS_DEST="${CLAUDE_AGENTS_DIR:-$CONFIG_DIR/agents}"
+STATUSLINE_DEST="$CONFIG_DIR/statusline.sh"
+CLAUDE_SETTINGS="$CONFIG_DIR/settings.json"
 MEMORY_FILE="$CONFIG_DIR/CLAUDE.md"
 BLOCK_START="# >>> dotskills conventions >>>"
 BLOCK_END="# <<< dotskills conventions <<<"
 
 usage() {
-  sed -n '2,28s/^# \{0,1\}//p' "$0"
+  sed -n '2,30s/^# \{0,1\}//p' "$0"
 }
 
 # True if $1 is a symlink this script created, i.e. it points into this repo's
@@ -48,7 +54,7 @@ is_ours() {
   [[ -L "$1" ]] || return 1
   local t
   t="$(readlink "$1")"
-  [[ "$t" == "$SRC_DIR/"* || "$t" == "$AGENTS_SRC/"* ]]
+  [[ "$t" == "$SRC_DIR/"* || "$t" == "$AGENTS_SRC/"* || "$t" == "$STATUSLINE_SRC" ]]
 }
 
 # Prints the source path of skill/agent $2 (kind $1: skill|agent), or fails.
@@ -158,6 +164,10 @@ install() {
       fi
     done < <(list_items ${DOMAINS[@]+"${DOMAINS[@]}"})
     prune_stale
+    if [[ -f "$STATUSLINE_SRC" ]]; then
+      mkdir -p "$CONFIG_DIR"
+      link_one statusline statusline "$STATUSLINE_SRC" "$STATUSLINE_DEST" || failed=1
+    fi
   fi
 
   echo
@@ -217,6 +227,58 @@ uninstall_conventions() {
   strip_block
   if [[ ! -s "$MEMORY_FILE" ]]; then rm -f "$MEMORY_FILE"; echo "removed conventions block (and the now-empty $MEMORY_FILE)"
   else echo "removed conventions block from $MEMORY_FILE"; fi
+}
+
+# --- statusline: the one key we set in settings.json -----------------------
+
+statusline_value() {
+  jq -cn --arg c "$STATUSLINE_DEST" '{type: "command", command: $c, timeout: 10}'
+}
+
+# Writes stdin to $CLAUDE_SETTINGS via a temp file, after a one-time backup.
+write_settings() {
+  local tmp
+  tmp="$(mktemp "$CLAUDE_SETTINGS.XXXXXX")" || return 1
+  cat > "$tmp" && mv "$tmp" "$CLAUDE_SETTINGS" || { rm -f "$tmp"; return 1; }
+}
+
+install_statusline_settings() {
+  local current want
+  want="$(statusline_value)"
+  if [[ ! -f "$STATUSLINE_SRC" ]]; then
+    echo "skip    statusLine: $STATUSLINE_SRC not found"; return 1
+  fi
+  link_one statusline statusline "$STATUSLINE_SRC" "$STATUSLINE_DEST" || return 1
+  mkdir -p "$(dirname "$CLAUDE_SETTINGS")"
+  if [[ ! -f "$CLAUDE_SETTINGS" ]]; then
+    jq -n --argjson v "$want" '{statusLine: $v}' | write_settings || return 1
+    echo "added   statusLine to $CLAUDE_SETTINGS (new file)"
+    return 0
+  fi
+  if ! jq -e 'type == "object"' "$CLAUDE_SETTINGS" >/dev/null 2>&1; then
+    echo "WARN    statusLine: $CLAUDE_SETTINGS is not a valid JSON object; leaving it alone"; return 1
+  fi
+  current="$(jq -c '.statusLine // empty' "$CLAUDE_SETTINGS")"
+  if [[ "$current" == "$want" ]]; then
+    echo "ok      statusLine in $CLAUDE_SETTINGS"; return 0
+  fi
+  if [[ -n "$current" ]]; then
+    echo "WARN    statusLine: $CLAUDE_SETTINGS already sets $current; not overwriting (remove it first to use this one)"
+    return 1
+  fi
+  [[ -e "$CLAUDE_SETTINGS.dotskills.bak" ]] || cp -p "$CLAUDE_SETTINGS" "$CLAUDE_SETTINGS.dotskills.bak"
+  jq --argjson v "$want" '.statusLine = $v' "$CLAUDE_SETTINGS" | write_settings || return 1
+  echo "added   statusLine to $CLAUDE_SETTINGS (backup: $CLAUDE_SETTINGS.dotskills.bak)"
+}
+
+# Removes statusLine only if it is still exactly what install_statusline_settings wrote.
+uninstall_statusline_settings() {
+  [[ -f "$CLAUDE_SETTINGS" ]] || return 0
+  jq -e 'type == "object"' "$CLAUDE_SETTINGS" >/dev/null 2>&1 || return 0
+  if [[ "$(jq -c '.statusLine // empty' "$CLAUDE_SETTINGS")" == "$(statusline_value)" ]]; then
+    jq 'del(.statusLine)' "$CLAUDE_SETTINGS" | write_settings || return 1
+    echo "removed statusLine from $CLAUDE_SETTINGS"
+  fi
 }
 
 # --- init-project ---------------------------------------------------------
@@ -321,7 +383,6 @@ install_openspec() {
 
 RTK_INSTALLER="https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh"
 RTK_BIN="${RTK_INSTALL_DIR:-$HOME/.local/bin}/rtk"
-CLAUDE_SETTINGS="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/settings.json"
 
 # $1 is the question. True on yes; false on no or when there's no terminal.
 confirm() {
@@ -390,7 +451,12 @@ uninstall() {
   if [[ $# -gt 0 ]]; then
     for name in "$@"; do
       local any=0
-      for link in "$DEST_DIR/$name" "$AGENTS_DEST/$name.md"; do
+      local -a links=("$DEST_DIR/$name" "$AGENTS_DEST/$name.md")
+      if [[ "$name" == statusline ]]; then
+        links+=("$STATUSLINE_DEST")
+        uninstall_statusline_settings
+      fi
+      for link in "${links[@]}"; do
         if is_ours "$link"; then
           rm "$link"; echo "removed $name"; removed=$((removed + 1)); any=1
         elif [[ -e "$link" || -L "$link" ]]; then
@@ -400,12 +466,13 @@ uninstall() {
       [[ $any -eq 1 ]] || echo "skip    $name: not installed"
     done
   else
-    for link in "$DEST_DIR"/* "$AGENTS_DEST"/*; do
+    for link in "$DEST_DIR"/* "$AGENTS_DEST"/* "$STATUSLINE_DEST"; do
       if is_ours "$link"; then
         rm "$link"; echo "removed $(basename "$link")"; removed=$((removed + 1))
       fi
     done
     uninstall_conventions
+    uninstall_statusline_settings
   fi
 
   echo
@@ -413,7 +480,7 @@ uninstall() {
 }
 
 main() {
-  local mode=install openspec=ask rtk=ask conventions=0 init_path="" target=claude
+  local mode=install openspec=ask rtk=ask conventions=0 sl_settings=0 init_path="" target=claude
   local -a names=()
   DOMAINS=()
 
@@ -425,6 +492,7 @@ main() {
       --domain)    shift; [[ $# -gt 0 ]] || { echo "--domain needs a name" >&2; return 2; }
                    DOMAINS+=("$1") ;;
       --conventions) conventions=1 ;;
+      --statusline-settings) sl_settings=1 ;;
       --init-project) shift; [[ $# -gt 0 ]] || { echo "--init-project needs a path" >&2; return 2; }
                    mode=init; init_path="$1" ;;
       --target)    shift; [[ $# -gt 0 ]] || { echo "--target needs claude or codex" >&2; return 2; }
@@ -458,12 +526,13 @@ main() {
     install)
       local failed=0
       # With only --conventions, skip linking.
-      if [[ $conventions -eq 0 || ${#names[@]} -gt 0 || ${#DOMAINS[@]} -gt 0 ]]; then
+      if [[ ( $conventions -eq 0 && $sl_settings -eq 0 ) || ${#names[@]} -gt 0 || ${#DOMAINS[@]} -gt 0 ]]; then
         install ${names[@]+"${names[@]}"} || failed=1
         install_openspec "$openspec" || failed=1
         install_rtk "$rtk" || failed=1
       fi
       if [[ $conventions -eq 1 ]]; then install_conventions || failed=1; fi
+      if [[ $sl_settings -eq 1 ]]; then install_statusline_settings || failed=1; fi
       return $failed
       ;;
     uninstall) uninstall ${names[@]+"${names[@]}"} ;;
