@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Rebuilds the generated tables in README.md from frontmatter:
-#   skills-table:start/end   skills grouped by domain
+#   skills-table:start/end   skills grouped by domain (incl. invocation: model or user)
 #   agents-table:start/end   subagents grouped by domain
 # Everything else in the README is left alone.
 #
@@ -17,9 +17,9 @@ source "$REPO_DIR/scripts/frontmatter.sh"
 esc() { local s="$1"; echo "${s//|/\\|}"; }
 
 skills_table() {
-  local file domain name desc what rest trigger manual targets status
-  echo "| Skill | Domain | What it does | Trigger | Targets | Status |"
-  echo "| --- | --- | --- | --- | --- | --- |"
+  local file domain name desc what rest trigger manual targets status invocation
+  echo "| Skill | Domain | What it does | Invocation | Trigger | Targets | Status |"
+  echo "| --- | --- | --- | --- | --- | --- | --- |"
   for file in "$REPO_DIR"/skills/*/*/SKILL.md; do
     [[ -f "$file" ]] || continue
     domain="$(basename "$(dirname "$(dirname "$file")")")"
@@ -38,6 +38,9 @@ skills_table() {
     fi
     rest="${rest#Use when }"
 
+    invocation="model"
+    [[ "$manual" == "true" ]] && invocation="user"
+
     if [[ "$manual" == "true" ]]; then
       trigger="\`/$name\` only (never auto-invoked)"
     elif [[ -n "$rest" ]]; then
@@ -46,7 +49,7 @@ skills_table() {
       trigger="\`/$name\`, or automatically when relevant"
     fi
 
-    printf '%s\t| `%s` | %s | %s | %s | %s | %s |\n' "$domain" "$name" "$domain" "$(esc "$what")" "$(esc "$trigger")" "${targets:-[claude, codex]}" "${status:-stable}"
+    printf '%s\t| `%s` | %s | %s | %s | %s | %s | %s |\n' "$domain" "$name" "$domain" "$(esc "$what")" "$invocation" "$(esc "$trigger")" "${targets:-[claude, codex]}" "${status:-stable}"
   done | LC_ALL=C sort -s -t$'\t' -k1,1 | cut -f2-
 }
 

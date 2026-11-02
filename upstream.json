@@ -1,0 +1,177 @@
+[
+  {
+    "skill": "grill-me",
+    "domain": "productivity",
+    "source_repo": "https://github.com/mattpocock/skills",
+    "source_path": "skills/productivity/grill-me",
+    "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+    "local_changes": []
+  },
+  {
+    "skill": "grilling",
+    "domain": "productivity",
+    "source_repo": "https://github.com/mattpocock/skills",
+    "source_path": "skills/productivity/grilling",
+    "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+    "local_changes": []
+  },
+  {
+    "skill": "handoff",
+    "domain": "productivity",
+    "source_repo": "https://github.com/mattpocock/skills",
+    "source_path": "skills/productivity/handoff",
+    "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+    "local_changes": []
+  },
+  {
+    "skill": "teach",
+    "domain": "productivity",
+    "source_repo": "https://github.com/mattpocock/skills",
+    "source_path": "skills/productivity/teach",
+    "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+    "local_changes": []
+  },
+  {
+    "skill": "writing-for-agents",
+    "domain": "productivity",
+    "source_repo": "https://github.com/mattpocock/skills",
+    "source_path": "skills/productivity/writing-for-agents",
+    "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+    "local_changes": []
+  },
+  {
+    "skill": "code-review",
+    "domain": "engineering",
+    "source_repo": "https://github.com/mattpocock/skills",
+    "source_path": "skills/engineering/code-review",
+    "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+    "local_changes": [
+      "/setup-matt-pocock-skills -> /setup-dotskills"
+    ]
+  },
+  {
+    "skill": "codebase-design",
+    "domain": "engineering",
+    "source_repo": "https://github.com/mattpocock/skills",
+    "source_path": "skills/engineering/codebase-design",
+    "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+    "local_changes": []
+  },
+  {
+    "skill": "domain-modeling",
+    "domain": "engineering",
+    "source_repo": "https://github.com/mattpocock/skills",
+    "source_path": "skills/engineering/domain-modeling",
+    "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+    "local_changes": []
+  },
+  {
+    "skill": "implement",
+    "domain": "engineering",
+    "source_repo": "https://github.com/mattpocock/skills",
+    "source_path": "skills/engineering/implement",
+    "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+    "local_changes": []
+  },
+  {
+    "skill": "improve-codebase-architecture",
+    "domain": "engineering",
+    "source_repo": "https://github.com/mattpocock/skills",
+    "source_path": "skills/engineering/improve-codebase-architecture",
+    "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+    "local_changes": []
+  },
+  {
+    "skill": "pr",
+    "domain": "engineering",
+    "source_repo": "https://github.com/mattpocock/skills",
+    "source_path": "skills/engineering/pr",
+    "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+    "local_changes": []
+  },
+  {
+    "skill": "prototype",
+    "domain": "engineering",
+    "source_repo": "https://github.com/mattpocock/skills",
+    "source_path": "skills/engineering/prototype",
+    "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+    "local_changes": []
+  },
+  {
+    "skill": "research",
+    "domain": "engineering",
+    "source_repo": "https://github.com/mattpocock/skills",
+    "source_path": "skills/engineering/research",
+    "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+    "local_changes": []
+  },
+  {
+    "skill": "retro",
+    "domain": "engineering",
+    "source_repo": "https://github.com/mattpocock/skills",
+    "source_path": "skills/engineering/retro",
+    "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+    "local_changes": []
+  },
+  {
+    "skill": "setup-dotskills",
+    "domain": "engineering",
+    "source_repo": "https://github.com/mattpocock/skills",
+    "source_path": "skills/engineering/setup-matt-pocock-skills",
+    "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+    "local_changes": [
+      "renamed from setup-matt-pocock-skills; name, title, description and openai.yaml display strings say dotskills",
+      "issue-tracker-github.md and triage-labels.md name Kaygijzen/dotskills / dotskills instead of mattpocock/skills",
+      "SKILL.md: added Section D (agent conventions from conventions/project-template) and Section E (OpenSpec check)",
+      "domain.md: dropped the pointer to the grill-with-docs skill (not imported)",
+      "issue-tracker-github.md, issue-tracker-gitlab.md: \"/triage reads this flag\" -> \"a triage skill, if installed, reads this flag\""
+    ],
+    "renamed_from": "setup-matt-pocock-skills"
+  },
+  {
+    "skill": "tdd",
+    "domain": "engineering",
+    "source_repo": "https://github.com/mattpocock/skills",
+    "source_path": "skills/engineering/tdd",
+    "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+    "local_changes": []
+  },
+  {
+    "skill": "to-spec",
+    "domain": "engineering",
+    "source_repo": "https://github.com/mattpocock/skills",
+    "source_path": "skills/engineering/to-spec",
+    "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+    "local_changes": [
+      "/setup-matt-pocock-skills -> /setup-dotskills"
+    ]
+  },
+  {
+    "skill": "to-tickets",
+    "domain": "engineering",
+    "source_repo": "https://github.com/mattpocock/skills",
+    "source_path": "skills/engineering/to-tickets",
+    "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+    "local_changes": [
+      "/setup-matt-pocock-skills -> /setup-dotskills (2 places)"
+    ]
+  },
+  {
+    "skill": "wayfinder",
+    "domain": "engineering",
+    "source_repo": "https://github.com/mattpocock/skills",
+    "source_path": "skills/engineering/wayfinder",
+    "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+    "local_changes": [
+      "/setup-matt-pocock-skills -> /setup-dotskills"
+    ]
+  },
+  {
+    "skill": "wizard",
+    "domain": "engineering",
+    "source_repo": "https://github.com/mattpocock/skills",
+    "source_path": "skills/engineering/wizard",
+    "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+    "local_changes": []
+  }
+]

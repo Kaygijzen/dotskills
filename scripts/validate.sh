@@ -67,12 +67,30 @@ portability_lint() {
   text="$(cat "$file")"
   local pat
   for pat in 'disable-model-invocation' 'argument-hint' '$ARGUMENTS' 'claude -p' 'CLAUDE.md' 'sub-agent' 'subagent' 'Agent tool' 'Task tool'; do
+    # agents/openai.yaml is the Codex counterpart of disable-model-invocation.
+    if [[ "$pat" == 'disable-model-invocation' && -f "$(dirname "$file")/agents/openai.yaml" ]]; then continue; fi
     if grep -qF -- "$pat" <<<"$text"; then hits="$hits '$pat'"; fi
   done
   if [[ -n "$hits" ]]; then
     echo "WARN $label: targets include codex but uses Claude-only constructs:$hits (set targets: [claude]?)"
     WARNINGS=$((WARNINGS + 1))
   fi
+}
+
+# Every upstream.json entry must point to an existing skill folder.
+check_upstream() {
+  local file="$REPO_DIR/upstream.json" bad=0 skill domain
+  [[ -f "$file" ]] || return 0
+  if ! jq -e 'type == "array"' "$file" >/dev/null 2>&1; then
+    echo "FAIL upstream.json: must be a JSON array"; return 1
+  fi
+  while IFS=$'\t' read -r domain skill; do
+    if [[ ! -f "$SKILLS_DIR/$domain/$skill/SKILL.md" ]]; then
+      echo "FAIL upstream.json: $domain/$skill has no skill folder"; bad=1
+    fi
+  done < <(jq -r '.[] | [.domain, .skill] | @tsv' "$file")
+  [[ $bad -eq 0 ]] && echo "ok   upstream.json"
+  return $bad
 }
 
 validate_skill() {
@@ -235,6 +253,9 @@ main() {
 
     count=$((count + 1))
     check_plugin_sync || failed=$((failed + 1))
+
+    count=$((count + 1))
+    check_upstream || failed=$((failed + 1))
   fi
 
   echo

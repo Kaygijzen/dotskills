@@ -34,6 +34,19 @@ A subagent can set its own `model:` in its frontmatter. Use Haiku for search and
 - `grill-spec`: your session model runs the interview, so switch to **Opus** for it. Its fact-finder sub-agents use `sonnet` and its spec reviewers use `opus`.
 - `ralph-apply`: **Sonnet**. `ralph.sh` already passes `--model` (default `sonnet`, override with `RALPH_MODEL`), so the loop model is enforced.
 
+### Imported skills (from mattpocock/skills)
+
+Chosen from what each skill does. The session model runs the skill, so switch before you start.
+
+| Skill | Model | Why |
+| --- | --- | --- |
+| `grill-me`, `wayfinder`, `improve-codebase-architecture` | **Opus** | Open-ended interviews and design judgement: a wrong plan costs more than the tokens |
+| `code-review` | Opus for a large or risky change, otherwise Sonnet | It fans out to sub-agents; the session model aggregates their reports |
+| `implement`, `tdd`, `prototype` | **Sonnet** | Execution against an agreed spec, with tests checking the result |
+| `to-spec`, `to-tickets` | Sonnet | Synthesis of a conversation you already had; no interview |
+| `research`, `domain-modeling`, `codebase-design`, `teach` | Sonnet | Reading, writing and explaining |
+| `pr`, `handoff`, `retro`, `wizard`, `setup-dotskills` | Sonnet, or Haiku for a small change | Short, structured writing |
+
 ## Effort and thinking
 
 `/effort` sets how hard the model thinks (`low`, `medium`, `high`, `xhigh`, `max`). The `effortLevel` setting and `claude --effort` do the same. Raise effort first when the model is on the right track but sloppy. Switch to a bigger model when it keeps misunderstanding the problem. Thinking is always on for current Sonnet, Opus and Haiku models.
