@@ -199,7 +199,7 @@ When a skill is skipped this way, the script exits with status 1. Uninstall leav
 
 `plugin.json` lists every domain folder under `skills`, every agent file under `agents` (the schema takes files, not folders), and the hook files, so both install methods use the same files. `scripts/sync-plugin.sh` regenerates those lists and `validate.sh` fails if they drift.
 
-`plugin.json` has no `version`, so plugin installs track the latest commit. To pull changes on another machine, run `/plugin marketplace update dotskills`. `claude plugin validate .` warns about the missing version, about the root `CLAUDE.md` not being plugin context, and (with the directory profile) about a missing license. Those warnings are expected.
+`plugin.json` has no `version`, so plugin installs track the latest commit. To pull changes on another machine, run `/plugin marketplace update dotskills`. `claude plugin validate .` warns about the missing version, about the root `CLAUDE.md` not being plugin context, and (with the directory profile) about a missing icon. Those warnings are expected.
 
 ## Troubleshooting
 

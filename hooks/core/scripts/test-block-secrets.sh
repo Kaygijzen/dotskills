@@ -21,7 +21,8 @@ check 2 Read  /p/.env
 check 2 Read  /p/.env.local
 check 2 Edit  /p/certs/server.pem
 check 2 Read  /home/u/.ssh/id_rsa
-check 2 Read  /home/u/.ssh/id_rsa.pub
+check 2 Read  /home/u/.ssh/id_rsa_work
+check 0 Read  /home/u/.ssh/id_rsa.pub
 check 2 Write /p/key.pfx
 check 2 Read  /p/secrets.yaml
 check 0 Read  /p/.env.example
