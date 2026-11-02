@@ -13,7 +13,9 @@
     "source_repo": "https://github.com/mattpocock/skills",
     "source_path": "skills/productivity/grilling",
     "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
-    "local_changes": []
+    "local_changes": [
+      "frontmatter: added targets: [claude] (uses sub-agents or argument-hint)"
+    ]
   },
   {
     "skill": "handoff",
@@ -21,7 +23,9 @@
     "source_repo": "https://github.com/mattpocock/skills",
     "source_path": "skills/productivity/handoff",
     "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
-    "local_changes": []
+    "local_changes": [
+      "frontmatter: added targets: [claude] (uses sub-agents or argument-hint)"
+    ]
   },
   {
     "skill": "teach",
@@ -29,7 +33,9 @@
     "source_repo": "https://github.com/mattpocock/skills",
     "source_path": "skills/productivity/teach",
     "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
-    "local_changes": []
+    "local_changes": [
+      "frontmatter: added targets: [claude] (uses sub-agents or argument-hint)"
+    ]
   },
   {
     "skill": "writing-for-agents",
@@ -46,7 +52,8 @@
     "source_path": "skills/engineering/code-review",
     "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
     "local_changes": [
-      "/setup-matt-pocock-skills -> /setup-dotskills"
+      "/setup-matt-pocock-skills -> /setup-dotskills",
+      "frontmatter: added targets: [claude] (uses sub-agents or argument-hint)"
     ]
   },
   {
@@ -55,7 +62,9 @@
     "source_repo": "https://github.com/mattpocock/skills",
     "source_path": "skills/engineering/codebase-design",
     "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
-    "local_changes": []
+    "local_changes": [
+      "frontmatter: added targets: [claude] (uses sub-agents or argument-hint)"
+    ]
   },
   {
     "skill": "domain-modeling",
@@ -79,7 +88,9 @@
     "source_repo": "https://github.com/mattpocock/skills",
     "source_path": "skills/engineering/improve-codebase-architecture",
     "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
-    "local_changes": []
+    "local_changes": [
+      "frontmatter: added targets: [claude] (uses sub-agents or argument-hint)"
+    ]
   },
   {
     "skill": "pr",
@@ -163,7 +174,8 @@
     "source_path": "skills/engineering/wayfinder",
     "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
     "local_changes": [
-      "/setup-matt-pocock-skills -> /setup-dotskills"
+      "/setup-matt-pocock-skills -> /setup-dotskills",
+      "frontmatter: added targets: [claude] (uses sub-agents or argument-hint)"
     ]
   },
   {
