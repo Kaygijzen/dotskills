@@ -9,9 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Validate skills
-        run: ./scripts/validate.sh
-      - name: Check manifests are valid JSON
+      - name: Install shellcheck and the Claude Code CLI
         run: |
-          jq empty .claude-plugin/marketplace.json
-          jq empty .claude-plugin/plugin.json
+          sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
+          npm install -g @anthropic-ai/claude-code || echo "claude CLI not installed; plugin validate will be skipped"
+      - name: Run all checks
+        run: ./scripts/ci.sh

@@ -1,0 +1,93 @@
+# Setting up Claude Code
+
+Last checked: 2026-11-02 against the Claude Code docs at code.claude.com/docs.
+
+A draft for you to edit. It takes about five minutes to read.
+
+## 1. Install Claude Code and sign in
+
+Follow the official install steps at <https://code.claude.com/docs/en/quickstart>, then run `claude` and sign in. If you use an API key, keep it in an environment variable or your shell profile. It never goes in a repo, and never in a prompt.
+
+## 2. Make Sonnet your default model
+
+On most plans the account default is Opus. Set Sonnet yourself in `~/.claude/settings.json`:
+
+```json
+{
+  "model": "sonnet"
+}
+```
+
+Check it with `/model`. Sonnet is the default because it is the best balance of quality, speed and cost for day-to-day work. See [model-selection.md](model-selection.md) for when to switch.
+
+## 3. Install dotskills
+
+Pick **one** of these. Using both duplicates every skill.
+
+**Plugin marketplace** (no clone needed, installs every domain):
+
+```
+/plugin marketplace add Kaygijzen/dotskills
+/plugin install dotskills@dotskills
+```
+
+**Symlink installer** (for machines where you edit the skills):
+
+```bash
+git clone https://github.com/Kaygijzen/dotskills.git
+cd dotskills
+./install.sh                 # every domain; or: ./install.sh --domain engineering
+```
+
+Then add the personal conventions, which plugins cannot ship:
+
+```bash
+./install.sh --conventions
+```
+
+This adds a clearly marked block to `~/.claude/CLAUDE.md` that imports `conventions/AGENTS.md`. `./install.sh --uninstall` removes only that block.
+
+## 4. Recommended personal settings
+
+The installer never edits `settings.json`. Paste these in yourself.
+
+**Statusline** showing model and context use. Run `/statusline` and describe what you want, or point `statusLine` at your own script:
+
+```json
+{
+  "statusLine": { "type": "command", "command": "~/.claude/statusline.sh" }
+}
+```
+
+**Permission allowlists** instead of `--dangerously-skip-permissions`. Allow the safe commands you run all the time:
+
+```json
+{
+  "permissions": {
+    "allow": ["Bash(git status)", "Bash(git diff:*)", "Bash(npm test:*)"]
+  }
+}
+```
+
+**IDE integration:** if you use VS Code or JetBrains, install the Claude Code extension from your IDE's marketplace.
+
+## 5. Smoke test
+
+1. Run `/dotskills:hello-skill` (plugin) or `/hello-skill` (symlinks). It prints where it loaded from.
+2. Run `/memory` and check that `~/.claude/CLAUDE.md` is listed. Then ask Claude "what are my commit message conventions?" to confirm the import resolves.
+3. Ask Claude to read a `.env` file. The secret hook (plugin installs) should block it and explain why.
+
+## 6. Before using it on a client project
+
+- Check that the client allows AI coding tools, and which data may be shared.
+- Run `./install.sh --init-project <path>` to add a starter `AGENTS.md`, `CLAUDE.md` and project settings. It never overwrites existing files.
+- Put client-specific rules in that project's `AGENTS.md`. Never put them in this public repo.
+
+## 7. Updating
+
+- Plugin: `/plugin marketplace update dotskills`
+- Symlinks: `git pull && ./install.sh`
+
+## Codex (later)
+
+`AGENTS.md` already works in OpenAI Codex. Installing skills for Codex is planned but not implemented: `./install.sh --target codex` is a placeholder.
