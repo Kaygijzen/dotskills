@@ -34,7 +34,7 @@ Ground rules for the whole run:
    - Do not let explore capture artifacts or create a change; that happens in Phase 2.
    - Do not end with explore's "What we figured out" block; the Gate's intent summary replaces it.
 2. Confirm OpenSpec is initialised (`openspec/` exists). If it is not, stop and tell the user to run `openspec init`.
-3. In **one message**, dispatch 2–4 parallel `Explore` sub-agents (Agent tool, `subagent_type: "Explore"`) using the fact-finder prompt (Appendix A). Typical recon questions:
+3. In **one message**, dispatch 2–4 parallel `Explore` sub-agents (Agent tool, `subagent_type: "Explore"`, `model: "sonnet"`) using the fact-finder prompt (Appendix A). Typical recon questions:
    - Which modules, files and entry points does this change touch? What calls them?
    - Which existing specs in `openspec/specs/` cover this area, and which requirements are relevant?
    - Are there active changes in `openspec/changes/` (not `archive/`) that overlap?
@@ -117,7 +117,7 @@ Invoke the `openspec-propose` skill with the Skill tool. Pass the change name an
 The context that wrote the artifacts is the worst one to review them, so the review runs in fresh sub-agents.
 
 1. Run `openspec validate <change-name> --strict` and fix any errors yourself first.
-2. In **one message**, dispatch two parallel `general-purpose` sub-agents using the reviewer prompts (Appendix B). (Not `Explore`: it locates code but doesn't review it.)
+2. In **one message**, dispatch two parallel `general-purpose` sub-agents with `model: "opus"` using the reviewer prompts (Appendix B). (Not `Explore`: it locates code but doesn't review it.)
    - **Reviewer A, intent and consistency.** Give it the intent summary and the change path.
    - **Reviewer B, codebase impact.** Give it the change path only, so it judges the artifacts against reality rather than against the conversation.
 3. Merge the findings, drop duplicates, and sort by severity. Then route each one:
@@ -143,7 +143,7 @@ Do not start implementing. The handoff ends this skill.
 
 Use this for every codebase lookup in Phase 0 (recon) and Phase 1 (grilling).
 
-- Tool: the Agent tool, with `subagent_type: "Explore"`. Explore takes its search breadth from the prompt: keep "medium" below, and change it to "very thorough" only for cross-cutting questions.
+- Tool: the Agent tool, with `subagent_type: "Explore"` and `model: "sonnet"`. Lookups are many and narrow, so they run on the faster model. Explore takes its search breadth from the prompt: keep "medium" below, and change it to "very thorough" only for cross-cutting questions.
 - Send one question per agent. Dispatch all of a round's lookups in a single message so they run in parallel.
 
 Fill in `<QUESTION>` and `<CONTEXT>` and send the rest as written.
@@ -173,7 +173,7 @@ Do not speculate beyond the evidence. If the answer depends on a choice nobody h
 
 Phase 3 dispatches both reviewers in a single message.
 
-- Tool: the Agent tool, with `subagent_type: "general-purpose"`.
+- Tool: the Agent tool, with `subagent_type: "general-purpose"` and `model: "opus"`. There are only two reviewers and they are the last check before a coding agent builds the change, so they get the strongest model.
 - Both reviewers are read-only and report findings; they never edit.
 - Both use the same finding format, so the results merge cleanly.
 

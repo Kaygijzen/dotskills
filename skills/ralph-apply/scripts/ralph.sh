@@ -7,7 +7,7 @@
 #
 # Env:
 #   RALPH_ALLOWED_TOOLS  extra allowed tools for the project's verify commands (comma-separated)
-#   RALPH_MODEL          optional model for the iterations
+#   RALPH_MODEL          model for the iterations (default sonnet)
 #   RALPH_MAX_TURNS      max agent turns per iteration (default 60)
 #
 # Stops when: all tasks are ticked (exit 0), an iteration writes .ralph-stop,
@@ -57,8 +57,7 @@ if command -v rtk >/dev/null; then
 fi
 [[ -n "${RALPH_ALLOWED_TOOLS:-}" ]] && allowed="$allowed,$RALPH_ALLOWED_TOOLS"
 
-claude_args=(-p --permission-mode acceptEdits --allowedTools "$allowed" --max-turns "${RALPH_MAX_TURNS:-60}")
-[[ -n "${RALPH_MODEL:-}" ]] && claude_args+=(--model "$RALPH_MODEL")
+claude_args=(-p --permission-mode acceptEdits --allowedTools "$allowed" --max-turns "${RALPH_MAX_TURNS:-60}" --model "${RALPH_MODEL:-sonnet}")
 
 prompt="$(sed "s/{{CHANGE}}/$change/g" "$prompt_file")"
 mkdir -p "$log_dir"

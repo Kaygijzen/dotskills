@@ -54,6 +54,19 @@ Plugin skills get a namespace, so `/grill-spec` becomes `/dotskills:grill-spec`.
 - An approved change on its own branch or worktree. The script refuses to run on `main` or `master`.
 - The loop itself runs in a terminal: `/ralph-apply <change>` checks the change and prints the exact `scripts/ralph.sh` command to run.
 
+### Models
+
+Both skills pick a model per task instead of using one for everything:
+
+| Task | Model |
+| --- | --- |
+| `grill-spec` fact-finder sub-agents | `sonnet` |
+| `grill-spec` spec reviewers | `opus` |
+| `ralph-apply` loop iterations | `sonnet`; set `RALPH_MODEL` to override |
+| The grilling conversation itself | your session model |
+
+`ralph.sh` passes `--model` to `claude -p`, so the loop model is always enforced. The `grill-spec` models are instructions to Claude, which sets `model` on each sub-agent call.
+
 ## Repo layout
 
 ```
