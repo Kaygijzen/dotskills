@@ -17,17 +17,15 @@ source "$REPO_DIR/scripts/frontmatter.sh"
 esc() { local s="$1"; echo "${s//|/\\|}"; }
 
 skills_table() {
-  local file domain name desc what rest trigger manual targets status invocation
-  echo "| Skill | Domain | What it does | Invocation | Trigger | Targets | Status |"
-  echo "| --- | --- | --- | --- | --- | --- | --- |"
+  local file domain name desc what rest trigger manual
+  echo "| Skill | Domain | What it does | Trigger |"
+  echo "| --- | --- | --- | --- |"
   for file in "$REPO_DIR"/skills/*/*/SKILL.md; do
     [[ -f "$file" ]] || continue
     domain="$(basename "$(dirname "$(dirname "$file")")")"
     name="$(frontmatter_value "$file" name)"
     desc="$(frontmatter_value "$file" description)"
     manual="$(frontmatter_value "$file" disable-model-invocation)"
-    targets="$(frontmatter_value "$file" targets)"
-    status="$(frontmatter_value "$file" status)"
 
     # First sentence is what it does; the rest usually says when to use it.
     what="${desc%%. *}"
@@ -38,9 +36,6 @@ skills_table() {
     fi
     rest="${rest#Use when }"
 
-    invocation="model"
-    [[ "$manual" == "true" ]] && invocation="user"
-
     if [[ "$manual" == "true" ]]; then
       trigger="\`/$name\` only (never auto-invoked)"
     elif [[ -n "$rest" ]]; then
@@ -49,7 +44,7 @@ skills_table() {
       trigger="\`/$name\`, or automatically when relevant"
     fi
 
-    printf '%s\t| `%s` | %s | %s | %s | %s | %s | %s |\n' "$domain" "$name" "$domain" "$(esc "$what")" "$invocation" "$(esc "$trigger")" "${targets:-[claude, codex]}" "${status:-stable}"
+    printf '%s\t| `%s` | %s | %s | %s |\n' "$domain" "$name" "$domain" "$(esc "$what")" "$(esc "$trigger")"
   done | LC_ALL=C sort -s -t$'\t' -k1,1 | cut -f2-
 }
 
