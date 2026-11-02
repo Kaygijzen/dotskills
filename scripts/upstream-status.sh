@@ -41,7 +41,7 @@ clone_for() {
 
 both=() upstream_only=() local_only=() clean=() unknown=()
 
-while IFS=$'\t' read -r skill domain repo path commit renamed; do
+while IFS=$'\t' read -r skill domain repo path commit _renamed; do
   clone_for "$repo" || { unknown+=("$skill"); continue; }
   dir="$CLONE_DIR"
   mine="$REPO_DIR/skills/$domain/$skill"
