@@ -7,5 +7,11 @@
   "skills": [
     "./skills/core",
     "./skills/engineering"
+  ],
+  "agents": [
+    "./agents/core/code-reviewer.md"
+  ],
+  "hooks": [
+    "./hooks/core/hooks.json"
   ]
 }

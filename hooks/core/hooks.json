@@ -1,0 +1,16 @@
+{
+  "description": "Blocks reads and edits of obvious secret files",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read|Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/core/scripts/block-secrets.sh\""
+          }
+        ]
+      }
+    ]
+  }
+}
