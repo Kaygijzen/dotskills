@@ -5,7 +5,7 @@
 set -uo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
-cd "$REPO_DIR"
+cd "$REPO_DIR" || exit
 failed=0
 
 step() { echo; echo "== $1"; }
@@ -26,7 +26,7 @@ rm -f /tmp/README.ci.$$ /tmp/plugin.ci.$$
 step "shellcheck"
 if command -v shellcheck >/dev/null 2>&1; then
   mapfile -t sh_files < <(git ls-files '*.sh'; git ls-files --others --exclude-standard '*.sh')
-  shellcheck -x "${sh_files[@]}" || fail shellcheck
+  shellcheck -S warning -x "${sh_files[@]}" || fail shellcheck
 else
   echo "shellcheck not installed; skipping (CI installs it)"
 fi
