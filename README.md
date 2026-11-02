@@ -43,8 +43,28 @@ Pick one install path per machine. Plugins can't ship `CLAUDE.md` content, so co
 | Skill | Domain | What it does | Trigger | Targets | Status |
 | --- | --- | --- | --- | --- | --- |
 | `hello-skill` | core | Greets the user and confirms the dotskills setup is working. | `/hello-skill`, or automatically when the user says "hello skill", asks to test their dotskills install, or invokes /hello-skill. | [claude, codex] | stable |
+| `code-review` | engineering | Review the changes since a fixed point (commit, branch, tag, or merge-base) along two axes: Standards (does the code follow this repo's documented coding standards?) and Spec (does the code match what the originating issue/spec asked for?). | `/code-review`, or automatically when Runs both reviews in parallel sub-agents and reports them side by side. Use when the user wants to review a branch, a PR, work-in-progress changes, or asks to \"review since X\". | [claude, codex] | stable |
+| `codebase-design` | engineering | Shared vocabulary for designing deep modules. | `/codebase-design`, or automatically when the user wants to design or improve a module's interface, find deepening opportunities, decide where a seam goes, make code more testable or AI-navigable, or when another skill needs the deep-module vocabulary. | [claude, codex] | stable |
+| `domain-modeling` | engineering | Build and sharpen a project's domain model. | `/domain-modeling`, or automatically when discussing codebase terminology, writing or editing a GLOSSARY.md, or recording or editing an ADR. | [claude, codex] | stable |
 | `grill-spec` | engineering | Grill the user until intent is shared, then generate a complete OpenSpec change (proposal, delta specs, design, tasks) and review it with fresh-context sub-agents before handing it to a coding agent. | `/grill-spec` only (never auto-invoked) | [claude] | stable |
+| `implement` | engineering | Implement a piece of work based on a spec or set of tickets. | `/implement` only (never auto-invoked) | [claude, codex] | stable |
+| `improve-codebase-architecture` | engineering | Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill through whichever one you pick. | `/improve-codebase-architecture` only (never auto-invoked) | [claude, codex] | stable |
+| `pr` | engineering | Use when writing a PR body. | `/pr`, or automatically when relevant | [claude, codex] | stable |
+| `prototype` | engineering | Build a throwaway prototype to answer a design question. | `/prototype`, or automatically when the user wants to sanity-check whether a state model or logic feels right, or explore what a UI should look like. | [claude, codex] | stable |
 | `ralph-apply` | engineering | Apply an approved OpenSpec change with a Ralph loop - a bash loop that runs a fresh headless Claude session per task, so context never piles up. | `/ralph-apply` only (never auto-invoked) | [claude] | stable |
+| `research` | engineering | Investigate a question against high-trust primary sources and capture the findings as a Markdown file in the repo. | `/research`, or automatically when the user wants a topic researched, docs or API facts gathered, or reading legwork delegated to a background agent. | [claude, codex] | stable |
+| `retro` | engineering | Conduct a retrospective on a coding session. | `/retro` only (never auto-invoked) | [claude, codex] | stable |
+| `setup-matt-pocock-skills` | engineering | Configure this repo for the engineering skills: set up its issue tracker, triage label vocabulary, and domain doc layout. | `/setup-matt-pocock-skills` only (never auto-invoked) | [claude, codex] | stable |
+| `tdd` | engineering | Test-driven development. | `/tdd`, or automatically when the user wants to build features or fix bugs test-first, mentions "red-green-refactor", or wants integration tests. | [claude, codex] | stable |
+| `to-spec` | engineering | Turn the current conversation into a spec and publish it to the project issue tracker: no interview, just synthesis of what you've already discussed. | `/to-spec` only (never auto-invoked) | [claude, codex] | stable |
+| `to-tickets` | engineering | Break a plan, spec, or the current conversation into a set of tracer-bullet tickets, each declaring its blocking edges, published to the configured tracker (edges as text in one file per ticket locally, or native blocking links on a real tracker). | `/to-tickets` only (never auto-invoked) | [claude, codex] | stable |
+| `wayfinder` | engineering | Plan a huge chunk of work (more than one agent session can hold) as a shared map of decision tickets on your issue tracker, and resolve them one at a time until the way to the destination is clear. | `/wayfinder` only (never auto-invoked) | [claude, codex] | stable |
+| `wizard` | engineering | Generate an interactive bash wizard that walks a human through steps only they can perform. | `/wizard`, or automatically when provisioning infrastructure, setting up credentials or CI secrets, walking an unfamiliar third-party dashboard, or running a one-off migration or cutover. Don't invoke this for steps the agent can perform itself. | [claude, codex] | stable |
+| `grill-me` | productivity | A relentless interview to sharpen a plan or design. | `/grill-me` only (never auto-invoked) | [claude, codex] | stable |
+| `grilling` | productivity | Grill the user relentlessly about a plan, decision, or idea. | `/grilling`, or automatically when the user wants to stress-test their thinking, or uses any 'grill' trigger phrases. | [claude, codex] | stable |
+| `handoff` | productivity | Compact the current conversation into a handoff document for another agent to pick up. | `/handoff` only (never auto-invoked) | [claude, codex] | stable |
+| `teach` | productivity | Teach the user a new skill or concept, within this workspace. | `/teach` only (never auto-invoked) | [claude, codex] | stable |
+| `writing-for-agents` | productivity | Writing documents for agents. | `/writing-for-agents`, or automatically when creating or editing skills, or modifying AGENTS.md or CLAUDE.md. | [claude, codex] | stable |
 <!-- skills-table:end -->
 
 ### Subagents
@@ -200,6 +220,11 @@ When a skill is skipped this way, the script exits with status 1. Uninstall leav
 `plugin.json` lists every domain folder under `skills`, every agent file under `agents` (the schema takes files, not folders), and the hook files, so both install methods use the same files. `scripts/sync-plugin.sh` regenerates those lists and `validate.sh` fails if they drift.
 
 `plugin.json` has no `version`, so plugin installs track the latest commit. To pull changes on another machine, run `/plugin marketplace update dotskills`. `claude plugin validate .` warns about the missing version, about the root `CLAUDE.md` not being plugin context, and (with the directory profile) about a missing icon. Those warnings are expected.
+
+## Credits
+
+- Skills imported from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT). See `upstream.json` and `THIRD_PARTY_NOTICES.md`. `pr` credits Dex Horthy's [`show-me`](https://github.com/humanlayer/skills/blob/main/plugins/show-me/skills/show-me/SKILL.md) in its own `CREDITS.md`.
+- Coding principles in the conventions are condensed from [andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) (MIT).
 
 ## Troubleshooting
 
