@@ -122,7 +122,9 @@
     "local_changes": [
       "renamed from setup-matt-pocock-skills; name, title, description and openai.yaml display strings say dotskills",
       "issue-tracker-github.md and triage-labels.md name Kaygijzen/dotskills / dotskills instead of mattpocock/skills",
-      "SKILL.md: added Section D (agent conventions from conventions/project-template) and Section E (OpenSpec check)"
+      "SKILL.md: added Section D (agent conventions from conventions/project-template) and Section E (OpenSpec check)",
+      "domain.md: dropped the pointer to the grill-with-docs skill (not imported)",
+      "issue-tracker-github.md, issue-tracker-gitlab.md: \"/triage reads this flag\" -> \"a triage skill, if installed, reads this flag\""
     ],
     "renamed_from": "setup-matt-pocock-skills"
   },
