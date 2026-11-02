@@ -1,0 +1,2 @@
+# Vendored upstream script: palette/glyph variables are defined but not all used.
+disable=SC2034
