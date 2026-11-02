@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Rebuilds the generated tables in README.md from frontmatter:
-#   skills-table:start/end   skills grouped by domain (incl. invocation: model or user)
+#   skills-table:start/end   skills as one collapsible <details> block per domain
 #   agents-table:start/end   subagents grouped by domain
 # Everything else in the README is left alone.
 #
@@ -18,8 +18,6 @@ esc() { local s="$1"; echo "${s//|/\\|}"; }
 
 skills_table() {
   local file domain name desc what rest trigger manual
-  echo "| Skill | Domain | What it does | Trigger |"
-  echo "| --- | --- | --- | --- |"
   for file in "$REPO_DIR"/skills/*/*/SKILL.md; do
     [[ -f "$file" ]] || continue
     domain="$(basename "$(dirname "$(dirname "$file")")")"
@@ -44,8 +42,21 @@ skills_table() {
       trigger="\`/$name\`, or automatically when relevant"
     fi
 
-    printf '%s\t| `%s` | %s | %s | %s |\n' "$domain" "$name" "$domain" "$(esc "$what")" "$(esc "$trigger")"
-  done | LC_ALL=C sort -s -t$'\t' -k1,1 | cut -f2-
+    printf '%s\t| `%s` | %s | %s |\n' "$domain" "$name" "$(esc "$what")" "$(esc "$trigger")"
+  done | LC_ALL=C sort -s -t$'\t' -k1,1 | awk -F'\t' '
+    function flush(   i) {
+      if (!n) return
+      printf "<details>\n<summary><strong>%s</strong> (%d)</summary>\n\n", cur, n
+      print "| Skill | What it does | Trigger |"
+      print "| --- | --- | --- |"
+      for (i = 1; i <= n; i++) print rows[i]
+      print "\n</details>\n"
+      n = 0
+    }
+    $1 != cur { flush(); cur = $1 }
+    { rows[++n] = $2 }
+    END { flush() }
+  '
 }
 
 agents_table() {

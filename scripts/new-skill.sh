@@ -21,7 +21,7 @@ main() {
   if [[ ! -d "$REPO_DIR/skills/$domain" ]]; then
     echo "Domain '$domain' does not exist. Existing domains:" >&2
     ls "$REPO_DIR/skills" >&2
-    echo "Create a new domain with: mkdir skills/$domain (see README: Adding a domain)" >&2
+    echo "Create a new domain with: mkdir skills/$domain (see docs/contributing.md: Adding a domain)" >&2
     return 1
   fi
   existing="$(compgen -G "$REPO_DIR/skills/*/$name" || true)"
