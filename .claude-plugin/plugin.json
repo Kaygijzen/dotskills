@@ -4,5 +4,8 @@
   "author": {
     "name": "Kaygijzen"
   },
-  "skills": ["./skills/core", "./skills/engineering"]
+  "skills": [
+    "./skills/core",
+    "./skills/engineering"
+  ]
 }
