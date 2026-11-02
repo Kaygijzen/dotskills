@@ -49,15 +49,17 @@ This adds a clearly marked block to `~/.claude/CLAUDE.md` that imports `conventi
 
 ## 4. Recommended personal settings
 
-The installer never edits `settings.json`. Paste these in yourself.
+The installer edits `settings.json` only when you pass `--statusline-settings` (see the statusline below). Paste everything else in yourself.
 
-**Statusline** showing model and context use. Run `/statusline` and describe what you want, or point `statusLine` at your own script:
+**Statusline** with model, a context-use bar, cost, session time, git branch and rate limits. `./install.sh` links `statusline/statusline.sh` (vendored from [kcchien/claude-code-statusline](https://github.com/kcchien/claude-code-statusline), MIT) to `~/.claude/statusline.sh`. Run `./install.sh --statusline-settings` to set `statusLine` for you (backs up `settings.json` first, and never overwrites a `statusLine` you already have), or add it yourself:
 
 ```json
 {
-  "statusLine": { "type": "command", "command": "~/.claude/statusline.sh" }
+  "statusLine": { "type": "command", "command": "~/.claude/statusline.sh", "timeout": 10 }
 }
 ```
+
+Optional env vars: `CLAUDE_STATUSLINE_NERDFONT=1`, `CLAUDE_STATUSLINE_POWERLINE=1`, `CLAUDE_STATUSLINE_ASCII=1`. Needs `jq`. Prefer your own? Run `/statusline` instead and skip the link with `./install.sh --uninstall statusline`.
 
 **Permission allowlists** instead of `--dangerously-skip-permissions`. Allow the safe commands you run all the time:
 
