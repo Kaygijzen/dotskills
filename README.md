@@ -221,6 +221,20 @@ When a skill is skipped this way, the script exits with status 1. Uninstall leav
 
 `plugin.json` has no `version`, so plugin installs track the latest commit. To pull changes on another machine, run `/plugin marketplace update dotskills`. `claude plugin validate .` warns about the missing version, about the root `CLAUDE.md` not being plugin context, and (with the directory profile) about a missing icon. Those warnings are expected.
 
+## Updating imported skills
+
+Skills copied from other repos are listed in `upstream.json` (source, path, pinned commit, and `local_changes`). To see what moved upstream:
+
+```bash
+scripts/upstream-status.sh
+```
+
+It is report-only and needs network access, so CI does not run it. It lists, per skill, whether upstream changed since the pinned commit and whether our copy differs from upstream. Skills that are both need a manual merge:
+
+1. Read the upstream diff: `git diff <commit>..main -- <source_path>` in a clone of the source repo.
+2. Re-apply it by hand, keeping the edits listed in `local_changes`.
+3. Bump `commit` in `upstream.json`.
+
 ## Credits
 
 - Skills imported from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT). See `upstream.json` and `THIRD_PARTY_NOTICES.md`. `pr` credits Dex Horthy's [`show-me`](https://github.com/humanlayer/skills/blob/main/plugins/show-me/skills/show-me/SKILL.md) in its own `CREDITS.md`.
