@@ -1,6 +1,7 @@
 ---
 name: hello-skill
 description: Greets the user and confirms the dotskills setup is working. Use when the user says "hello skill", asks to test their dotskills install, or invokes /hello-skill.
+model: haiku
 ---
 
 # Hello skill
