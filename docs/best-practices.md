@@ -56,6 +56,8 @@ Do:
 Don't:
 - Keep one conversation running for days.
 
+The always-on coding principles (think before coding, simplicity first, surgical changes, goal-driven execution) live in `conventions/AGENTS.md`. The full original text is in [karpathy-guidelines.md](karpathy-guidelines.md).
+
 ## 3. Model selection
 
 Sonnet by default, Opus for planning and hard problems, Haiku for narrow, easy work. See [model-selection.md](model-selection.md).

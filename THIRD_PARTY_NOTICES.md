@@ -35,3 +35,5 @@ SOFTWARE.
 ## multica-ai/andrej-karpathy-skills
 
 The four coding principles in `conventions/AGENTS.md` (Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution) are condensed from <https://github.com/multica-ai/andrej-karpathy-skills> (MIT, checked at `2c60614`, (c) the original authors), which derives them from Andrej Karpathy's observations on LLM coding pitfalls. No files are vendored.
+
+The full upstream `CLAUDE.md` text is reproduced in `docs/karpathy-guidelines.md`, unmodified except for its title line. The upstream repo declares MIT in its skill frontmatter but has no `LICENSE` file in its root (checked on `main`), so no licence text or copyright line is available to copy. The attribution above is the credit.
