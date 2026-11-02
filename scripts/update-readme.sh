@@ -17,7 +17,7 @@ build_table() {
   local file name desc what rest trigger manual
   echo "| Skill | What it does | Trigger |"
   echo "| --- | --- | --- |"
-  for file in "$REPO_DIR"/skills/*/SKILL.md; do
+  for file in "$REPO_DIR"/skills/*/*/SKILL.md; do
     [[ -f "$file" ]] || continue
     name="$(frontmatter_value "$file" name)"
     desc="$(frontmatter_value "$file" description)"

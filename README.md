@@ -71,7 +71,7 @@ Both skills pick a model per task instead of using one for everything:
 
 ```
 dotskills/
-├── skills/<name>/SKILL.md        one folder per skill, plus any supporting files
+├── skills/<domain>/<name>/SKILL.md  one folder per skill, grouped by domain
 ├── install.sh                    symlinks skills into ~/.claude/skills
 ├── install.ps1                   the same for Windows, using junctions
 ├── scripts/validate.sh           checks every SKILL.md's frontmatter
@@ -88,10 +88,10 @@ dotskills/
 1. Create the folder. The name must use lowercase letters, digits and hyphens.
 
    ```bash
-   mkdir skills/my-skill
+   mkdir -p skills/engineering/my-skill
    ```
 
-2. Write `skills/my-skill/SKILL.md`. `name` must match the folder name. Put the main trigger early in `description`, which may be at most 1536 characters.
+2. Write `skills/engineering/my-skill/SKILL.md`. `name` must match the folder name. Put the main trigger early in `description`, which may be at most 1536 characters.
 
    ```markdown
    ---
@@ -157,7 +157,7 @@ When a skill is skipped this way, the script exits with status 1. Uninstall leav
 
 ## How it works
 
-`install.sh` symlinks each `skills/<name>` folder into `~/.claude/skills/`. Claude Code reads the files straight from this repo, so an edit takes effect without a copy step. Both `plugin.json` and `marketplace.json` point at the repo root, which is also the plugin root. Claude Code loads a plugin's `skills/` folder by default, so both install methods use the same files.
+`install.sh` symlinks each `skills/<domain>/<name>` folder into `~/.claude/skills/`. Claude Code reads the files straight from this repo, so an edit takes effect without a copy step. Both `plugin.json` and `marketplace.json` point at the repo root, which is also the plugin root. `plugin.json` lists each domain folder under `skills`, so both install methods use the same files.
 
 `plugin.json` has no `version`, so plugin installs track the latest commit. To pull changes on another machine, run `/plugin marketplace update dotskills`. `claude plugin validate .` warns about the missing version. That warning is expected.
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Validates every skills/<name>/SKILL.md:
+# Validates every skills/<domain>/<name>/SKILL.md:
 #   - starts with a YAML frontmatter block (--- ... ---)
 #   - has a non-empty `name` that matches the folder name
 #     (lowercase letters, digits and hyphens, at most 64 characters)
@@ -61,9 +61,9 @@ main() {
   local -a dirs=()
 
   if [[ $# -gt 0 ]]; then
-    for name in "$@"; do dirs+=("$SKILLS_DIR/$name"); done
+    for name in "$@"; do dirs+=("$(compgen -G "$SKILLS_DIR/*/$name" | head -n 1 || true)"); [[ -n "${dirs[-1]}" ]] || dirs[-1]="$SKILLS_DIR/$name"; done
   else
-    for dir in "$SKILLS_DIR"/*/; do
+    for dir in "$SKILLS_DIR"/*/*/; do
       [[ -d "$dir" ]] && dirs+=("${dir%/}")
     done
   fi

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Symlinks each skills/<name>/ folder into ~/.claude/skills/<name> so edits in
+# Symlinks each skills/<domain>/<name>/ folder into ~/.claude/skills/<name> so edits in
 # this repo are live in Claude Code immediately.
 #
 # Usage:
@@ -35,10 +35,20 @@ is_ours() {
   [[ -L "$1" ]] && [[ "$(readlink "$1")" == "$SRC_DIR/"* ]]
 }
 
-link_skill() {
-  local name="$1" src="$SRC_DIR/$1" dest="$DEST_DIR/$1"
+# Prints the folder of skill $1, searching skills/<domain>/<name>/.
+find_skill() {
+  local d
+  for d in "$SRC_DIR"/*/"$1"; do
+    [[ -f "$d/SKILL.md" ]] && { echo "$d"; return 0; }
+  done
+  return 1
+}
 
-  if [[ ! -f "$src/SKILL.md" ]]; then
+link_skill() {
+  local name="$1" src dest="$DEST_DIR/$1"
+
+  if ! src="$(find_skill "$name")"; then
+    src="$SRC_DIR/<domain>/$name"
     echo "skip    $name: $src/SKILL.md not found"
     return 1
   fi
@@ -84,8 +94,8 @@ install() {
   if [[ $# -gt 0 ]]; then
     for name in "$@"; do link_skill "$name" || failed=1; done
   else
-    for dir in "$SRC_DIR"/*/; do
-      [[ -d "$dir" ]] || continue
+    for dir in "$SRC_DIR"/*/*/; do
+      [[ -f "$dir/SKILL.md" ]] || continue
       name="$(basename "$dir")"
       link_skill "$name" || failed=1
     done

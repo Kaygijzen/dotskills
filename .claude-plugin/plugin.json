@@ -3,5 +3,6 @@
   "description": "Personal Claude Code skills",
   "author": {
     "name": "Kaygijzen"
-  }
+  },
+  "skills": ["./skills/core", "./skills/engineering"]
 }
