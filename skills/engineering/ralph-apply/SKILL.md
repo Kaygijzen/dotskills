@@ -3,7 +3,6 @@ name: ralph-apply
 description: Apply an approved OpenSpec change with a Ralph loop - a bash loop that runs a fresh headless Claude session per task, so context never piles up. Checks the change is ready, sets the allowed tools from the project's verification commands, and hands over the command to run. Use when the user invokes /ralph-apply or asks to apply an OpenSpec change with a Ralph loop.
 argument-hint: "<change-name> [max-iterations]"
 disable-model-invocation: true
-targets: [claude]
 ---
 
 # Ralph apply

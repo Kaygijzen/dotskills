@@ -3,7 +3,6 @@ name: grill-spec
 description: Grill the user until intent is shared, then generate a complete OpenSpec change (proposal, delta specs, design, tasks) and review it with fresh-context sub-agents before handing it to a coding agent. Use when the user invokes /grill-spec or asks to grill-and-spec a change.
 argument-hint: "[rough description of the change]"
 disable-model-invocation: true
-targets: [claude]
 ---
 
 # Grill → Spec → Review
