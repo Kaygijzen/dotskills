@@ -14,6 +14,23 @@ For anything bigger than an afternoon: write the spec first, review it, implemen
 | A feature | [OpenSpec](https://github.com/Fission-AI/OpenSpec) with the `grill-spec` skill |
 | A long approved change | `ralph-apply`, which runs one fresh session per task |
 
+Two spec flows. Pick one per project:
+
+| Project type | Flow |
+| --- | --- |
+| OpenSpec | `grill-spec` (user) → `ralph-apply` (user) |
+| Issue tracker | `grill-me` (user) → `to-spec` (user) → `to-tickets` (user) → `implement` (user), with `wayfinder` (user) for work bigger than one session |
+
+Run `/dotskills:setup-dotskills` once per project before the issue-tracker flow.
+
+These skills work alongside either flow. (model) means Claude may invoke it on its own, (user) means it runs only when you type it:
+
+- `grilling` (model), `codebase-design` (model), `improve-codebase-architecture` (user)
+- `code-review` (model), `pr` (model), `prototype` (model), `research` (model)
+- `tdd` (model), `domain-modeling` (model)
+- `handoff` (user), `retro` (user), `teach` (user)
+- `writing-for-agents` (model), `wizard` (model)
+
 Do:
 - Keep specs in the repo.
 - Review the spec before any code is written.
@@ -34,6 +51,7 @@ Do:
 - Keep `AGENTS.md` short. Move procedures into skills, which load only when needed.
 - Enable only the MCP servers and plugin domains you use.
 - Write state to files (specs, `tasks.md`, notes). `ralph-apply` is built on this idea.
+- Use `handoff` to pass work to a fresh session: it writes a short document the next session reads, instead of you carrying a long conversation forward.
 
 Don't:
 - Keep one conversation running for days.

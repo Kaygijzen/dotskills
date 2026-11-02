@@ -77,6 +77,8 @@ The installer never edits `settings.json`. Paste these in yourself.
 2. Run `/memory` and check that `~/.claude/CLAUDE.md` is listed. Then ask Claude "what are my commit message conventions?" to confirm the import resolves.
 3. Ask Claude to read a `.env` file. The secret hook (plugin installs) should block it and explain why.
 
+Per project: run `/dotskills:setup-dotskills` once (or `/setup-dotskills` with symlinks) to set the issue tracker and domain docs for the engineering skills.
+
 ## 6. Before using it on a client project
 
 - Check that the client allows AI coding tools, and which data may be shared.
