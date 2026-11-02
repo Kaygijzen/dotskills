@@ -3,5 +3,16 @@
   "description": "Personal Claude Code skills",
   "author": {
     "name": "Kaygijzen"
-  }
+  },
+  "license": "MIT",
+  "skills": [
+    "./skills/core",
+    "./skills/engineering"
+  ],
+  "agents": [
+    "./agents/core/code-reviewer.md"
+  ],
+  "hooks": [
+    "./hooks/core/hooks.json"
+  ]
 }

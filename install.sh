@@ -1,21 +1,27 @@
 #!/usr/bin/env bash
-# Symlinks each skills/<name>/ folder into ~/.claude/skills/<name> so edits in
-# this repo are live in Claude Code immediately.
+# Symlinks skills (skills/<domain>/<name>/) into ~/.claude/skills/<name> and
+# subagents (agents/<domain>/<name>.md) into ~/.claude/agents/<name>.md, so
+# edits in this repo are live in Claude Code immediately.
 #
 # Usage:
-#   ./install.sh                  link every skill (safe to rerun)
-#   ./install.sh NAME [NAME ...]  link only the named skills
-#   ./install.sh --uninstall      remove every symlink that points into this repo
-#   ./install.sh --uninstall NAME remove only the named skills' symlinks
-#   ./install.sh --check          validate every SKILL.md (same as scripts/validate.sh)
-#   ./install.sh --with-openspec  also install the OpenSpec CLI without asking
-#   ./install.sh --no-openspec    never ask about the OpenSpec CLI
-#   ./install.sh --with-rtk       also install rtk and run `rtk init -g` without asking
-#   ./install.sh --no-rtk         never ask about rtk
+#   ./install.sh                       link every domain's skills and agents (safe to rerun)
+#   ./install.sh --domain NAME         only core plus the named domain(s); repeatable
+#   ./install.sh --all                 every domain (the default; explicit form)
+#   ./install.sh NAME [NAME ...]       link only the named skills or agents
+#   ./install.sh --conventions         add the managed import block to ~/.claude/CLAUDE.md
+#   ./install.sh --init-project PATH   copy conventions/project-template/ into PATH (never overwrites)
+#   ./install.sh --uninstall [NAME..]  remove only what this script created (links, conventions block)
+#   ./install.sh --check               validate the repo (same as scripts/validate.sh)
+#   ./install.sh --target codex        not implemented yet; prints a note and exits 0
+#   ./install.sh --with-openspec       also install the OpenSpec CLI without asking
+#   ./install.sh --no-openspec         never ask about the OpenSpec CLI
+#   ./install.sh --with-rtk            also install rtk and run `rtk init -g` without asking
+#   ./install.sh --no-rtk              never ask about rtk
 #
-# Set CLAUDE_SKILLS_DIR to link somewhere other than ~/.claude/skills.
-# Existing folders or foreign symlinks with the same name are never touched.
-# On Windows, use install.ps1 instead.
+# CLAUDE_SKILLS_DIR / CLAUDE_AGENTS_DIR / CLAUDE_CONFIG_DIR override ~/.claude/skills,
+# ~/.claude/agents and ~/.claude. Existing folders or foreign symlinks with the same
+# name are never touched. Hooks and MCP servers ship through the plugin only; this
+# script never edits settings.json. On Windows, use install.ps1 instead.
 # If the openspec CLI (needed by grill-spec) is missing, install asks whether to
 # install it with npm; likewise for rtk (token-saving Bash hook), installed with
 # its official script. Without a terminal to ask on, both only print a hint.
@@ -24,24 +30,45 @@ set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 SRC_DIR="$REPO_DIR/skills"
-DEST_DIR="${CLAUDE_SKILLS_DIR:-$HOME/.claude/skills}"
+AGENTS_SRC="$REPO_DIR/agents"
+CONFIG_DIR="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
+DEST_DIR="${CLAUDE_SKILLS_DIR:-$CONFIG_DIR/skills}"
+AGENTS_DEST="${CLAUDE_AGENTS_DIR:-$CONFIG_DIR/agents}"
+MEMORY_FILE="$CONFIG_DIR/CLAUDE.md"
+BLOCK_START="# >>> dotskills conventions >>>"
+BLOCK_END="# <<< dotskills conventions <<<"
 
 usage() {
-  sed -n '2,21s/^# \{0,1\}//p' "$0"
+  sed -n '2,28s/^# \{0,1\}//p' "$0"
 }
 
-# True if $1 is a symlink this script created, i.e. it points into $SRC_DIR.
+# True if $1 is a symlink this script created, i.e. it points into this repo's
+# skills/ or agents/ folder.
 is_ours() {
-  [[ -L "$1" ]] && [[ "$(readlink "$1")" == "$SRC_DIR/"* ]]
+  [[ -L "$1" ]] || return 1
+  local t
+  t="$(readlink "$1")"
+  [[ "$t" == "$SRC_DIR/"* || "$t" == "$AGENTS_SRC/"* ]]
 }
 
-link_skill() {
-  local name="$1" src="$SRC_DIR/$1" dest="$DEST_DIR/$1"
-
-  if [[ ! -f "$src/SKILL.md" ]]; then
-    echo "skip    $name: $src/SKILL.md not found"
-    return 1
+# Prints the source path of skill/agent $2 (kind $1: skill|agent), or fails.
+find_item() {
+  local kind="$1" name="$2" d
+  if [[ "$kind" == skill ]]; then
+    for d in "$SRC_DIR"/*/"$name"; do
+      [[ -f "$d/SKILL.md" ]] && { echo "$d"; return 0; }
+    done
+  else
+    for d in "$AGENTS_SRC"/*/"$name.md"; do
+      [[ -f "$d" ]] && { echo "$d"; return 0; }
+    done
   fi
+  return 1
+}
+
+# $1 kind, $2 name, $3 src, $4 dest. Prints one status line; returns 1 if skipped.
+link_one() {
+  local kind="$1" name="$2" src="$3" dest="$4"
 
   if [[ -L "$dest" ]]; then
     if [[ "$(readlink "$dest")" == "$src" ]]; then
@@ -63,38 +90,167 @@ link_skill() {
   fi
 
   ln -s "$src" "$dest"
-  echo "linked  $name"
+  echo "linked  $name${kind:+ ($kind)}"
 }
 
-# Removes symlinks into this repo whose skill folder no longer exists.
+# Lists "kind name src" for every skill and agent in the given domains
+# (all domains when none are given).
+list_items() {
+  local dir file domain
+  local -a domains=("$@")
+  in_domains() {
+    local x
+    [[ ${#domains[@]} -eq 0 ]] && return 0
+    for x in "${domains[@]}"; do [[ "$x" == "$1" ]] && return 0; done
+    return 1
+  }
+  for dir in "$SRC_DIR"/*/*/; do
+    [[ -f "$dir/SKILL.md" ]] || continue
+    dir="${dir%/}"
+    domain="$(basename "$(dirname "$dir")")"
+    in_domains "$domain" && echo "skill $(basename "$dir") $dir"
+  done
+  for file in "$AGENTS_SRC"/*/*.md; do
+    [[ -f "$file" ]] || continue
+    domain="$(basename "$(dirname "$file")")"
+    in_domains "$domain" && echo "agent $(basename "$file" .md) $file"
+  done
+  return 0
+}
+
+# Removes symlinks into this repo whose target no longer exists.
 prune_stale() {
   local link
-  for link in "$DEST_DIR"/*; do
+  for link in "$DEST_DIR"/* "$AGENTS_DEST"/*; do
     if is_ours "$link" && [[ ! -e "$link" ]]; then
       rm "$link"
-      echo "pruned  $(basename "$link") (skill no longer in repo)"
+      echo "pruned  $(basename "$link") (no longer in repo)"
     fi
   done
 }
 
+# Args: names to link (skills or agents). With none, links every item in the
+# domains listed in the DOMAINS array.
 install() {
-  local failed=0 name dir
+  local failed=0 name kind src found
   mkdir -p "$DEST_DIR"
+  [[ -d "$AGENTS_SRC" ]] && mkdir -p "$AGENTS_DEST"
 
   if [[ $# -gt 0 ]]; then
-    for name in "$@"; do link_skill "$name" || failed=1; done
-  else
-    for dir in "$SRC_DIR"/*/; do
-      [[ -d "$dir" ]] || continue
-      name="$(basename "$dir")"
-      link_skill "$name" || failed=1
+    for name in "$@"; do
+      found=0
+      if src="$(find_item skill "$name")"; then
+        found=1; link_one skill "$name" "$src" "$DEST_DIR/$name" || failed=1
+      fi
+      if src="$(find_item agent "$name")"; then
+        found=1; link_one agent "$name" "$src" "$AGENTS_DEST/$name.md" || failed=1
+      fi
+      if [[ $found -eq 0 ]]; then
+        echo "skip    $name: no skill or agent with this name"; failed=1
+      fi
     done
+  else
+    while read -r kind name src; do
+      if [[ "$kind" == skill ]]; then
+        link_one "" "$name" "$src" "$DEST_DIR/$name" || failed=1
+      else
+        link_one agent "$name" "$src" "$AGENTS_DEST/$name.md" || failed=1
+      fi
+    done < <(list_items ${DOMAINS[@]+"${DOMAINS[@]}"})
     prune_stale
   fi
 
   echo
   echo "Skills directory: $DEST_DIR"
+  echo "Agents directory: $AGENTS_DEST"
   return $failed
+}
+
+# --- conventions: a managed block in ~/.claude/CLAUDE.md ------------------
+
+conventions_block() {
+  printf '%s\n' "$BLOCK_START" "# Managed by dotskills ./install.sh; edit conventions/AGENTS.md in the repo instead." "@$REPO_DIR/conventions/AGENTS.md" "$BLOCK_END"
+}
+
+has_block() {
+  [[ -f "$MEMORY_FILE" ]] && grep -qxF "$BLOCK_START" "$MEMORY_FILE"
+}
+
+# Removes the managed block and the one blank separator line install_conventions
+# put before it. Everything else in $MEMORY_FILE is left byte-for-byte alone.
+strip_block() {
+  local tmp
+  tmp="$(mktemp)"
+  awk -v s="$BLOCK_START" -v e="$BLOCK_END" '
+    $0 == s { skip = 1; held_blank = 0; next }
+    skip    { if ($0 == e) skip = 0; next }
+    { if (held_blank) print ""; held_blank = 0
+      if ($0 == "") { held_blank = 1 } else { print } }
+    END { if (held_blank) print "" }
+  ' "$MEMORY_FILE" > "$tmp"
+  cat "$tmp" > "$MEMORY_FILE"
+  rm -f "$tmp"
+}
+
+install_conventions() {
+  if [[ ! -f "$REPO_DIR/conventions/AGENTS.md" ]]; then
+    echo "skip    conventions: $REPO_DIR/conventions/AGENTS.md not found"
+    return 1
+  fi
+  mkdir -p "$CONFIG_DIR"
+  if has_block; then
+    if [[ "$(awk -v s="$BLOCK_START" -v e="$BLOCK_END" '$0==s{f=1} f{print} $0==e{exit}' "$MEMORY_FILE")" == "$(conventions_block)" ]]; then
+      echo "ok      conventions block in $MEMORY_FILE"
+      return 0
+    fi
+    strip_block
+    echo "update  conventions block in $MEMORY_FILE"
+  else
+    echo "added   conventions block to $MEMORY_FILE"
+  fi
+  if [[ -s "$MEMORY_FILE" ]]; then printf '\n' >> "$MEMORY_FILE"; fi
+  conventions_block >> "$MEMORY_FILE"
+}
+
+uninstall_conventions() {
+  has_block || { echo "skip    conventions: no managed block in $MEMORY_FILE"; return 0; }
+  strip_block
+  if [[ ! -s "$MEMORY_FILE" ]]; then rm -f "$MEMORY_FILE"; echo "removed conventions block (and the now-empty $MEMORY_FILE)"
+  else echo "removed conventions block from $MEMORY_FILE"; fi
+}
+
+# --- init-project ---------------------------------------------------------
+
+init_project() {
+  local target="$1" tpl="$REPO_DIR/conventions/project-template" rel copied=0 skipped=0
+  if [[ ! -d "$target" ]]; then
+    echo "WARN    --init-project: $target is not a directory"
+    return 1
+  fi
+  while IFS= read -r rel; do
+    rel="${rel#./}"
+    if [[ -e "$target/$rel" || -L "$target/$rel" ]]; then
+      echo "skip    $rel (already exists)"; skipped=$((skipped + 1))
+    else
+      mkdir -p "$target/$(dirname "$rel")"
+      cp "$tpl/$rel" "$target/$rel"
+      echo "copied  $rel"; copied=$((copied + 1))
+    fi
+  done < <(cd "$tpl" && find . -type f | LC_ALL=C sort)
+  echo
+  echo "Project template: $copied copied, $skipped skipped in $target"
+}
+
+# --- codex (not implemented) ----------------------------------------------
+
+# Where Codex support will go. Not wired up yet.
+#   - Skills: link each skill whose frontmatter `targets` includes codex (the
+#     default) into Codex's skills directory; skip targets: [claude] skills.
+#   - Conventions: add the same import to ~/.codex/AGENTS.md (Codex reads
+#     AGENTS.md natively, so conventions/AGENTS.md can be referenced directly).
+#   - Subagents, hooks and MCP configs stay Claude-only for now.
+install_codex() {
+  echo "note    --target codex is not implemented yet; nothing was changed"
 }
 
 OPENSPEC_PKG="@fission-ai/openspec@latest"
@@ -231,39 +387,48 @@ install_rtk() {
 
 uninstall() {
   local name link removed=0
-  [[ -d "$DEST_DIR" ]] || { echo "Nothing to remove: $DEST_DIR does not exist"; return 0; }
-
   if [[ $# -gt 0 ]]; then
     for name in "$@"; do
-      link="$DEST_DIR/$name"
-      if is_ours "$link"; then
-        rm "$link"; echo "removed $name"; removed=$((removed + 1))
-      elif [[ -e "$link" || -L "$link" ]]; then
-        echo "WARN    $name: $link was not created by this script; leaving it"
-      else
-        echo "skip    $name: not installed"
-      fi
+      local any=0
+      for link in "$DEST_DIR/$name" "$AGENTS_DEST/$name.md"; do
+        if is_ours "$link"; then
+          rm "$link"; echo "removed $name"; removed=$((removed + 1)); any=1
+        elif [[ -e "$link" || -L "$link" ]]; then
+          echo "WARN    $name: $link was not created by this script; leaving it"; any=1
+        fi
+      done
+      [[ $any -eq 1 ]] || echo "skip    $name: not installed"
     done
   else
-    for link in "$DEST_DIR"/*; do
+    for link in "$DEST_DIR"/* "$AGENTS_DEST"/*; do
       if is_ours "$link"; then
         rm "$link"; echo "removed $(basename "$link")"; removed=$((removed + 1))
       fi
     done
+    uninstall_conventions
   fi
 
   echo
-  echo "Removed $removed symlink(s) from $DEST_DIR"
+  echo "Removed $removed symlink(s)"
 }
 
 main() {
-  local mode=install openspec=ask rtk=ask
+  local mode=install openspec=ask rtk=ask conventions=0 init_path="" target=claude
   local -a names=()
+  DOMAINS=()
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --uninstall) mode=uninstall ;;
       --check)     mode=check ;;
+      --all)       DOMAINS=() ;;
+      --domain)    shift; [[ $# -gt 0 ]] || { echo "--domain needs a name" >&2; return 2; }
+                   DOMAINS+=("$1") ;;
+      --conventions) conventions=1 ;;
+      --init-project) shift; [[ $# -gt 0 ]] || { echo "--init-project needs a path" >&2; return 2; }
+                   mode=init; init_path="$1" ;;
+      --target)    shift; [[ $# -gt 0 ]] || { echo "--target needs claude or codex" >&2; return 2; }
+                   target="$1" ;;
       --with-openspec) openspec=yes ;;
       --no-openspec)   openspec=no ;;
       --with-rtk)      rtk=yes ;;
@@ -275,16 +440,35 @@ main() {
     shift
   done
 
+  if [[ "$target" == codex ]]; then install_codex; return 0; fi
+  [[ "$target" == claude ]] || { echo "Unknown target: $target (use claude or codex)" >&2; return 2; }
+
+  if [[ ${#DOMAINS[@]} -gt 0 ]]; then
+    local d
+    for d in "${DOMAINS[@]}"; do
+      if [[ ! -d "$SRC_DIR/$d" && ! -d "$AGENTS_SRC/$d" ]]; then
+        echo "Unknown domain: $d (have: $(cd "$SRC_DIR" && ls | tr '\n' ' '))" >&2
+        return 2
+      fi
+    done
+    DOMAINS=(core "${DOMAINS[@]}")
+  fi
+
   case "$mode" in
     install)
       local failed=0
-      install ${names[@]+"${names[@]}"} || failed=1
-      install_openspec "$openspec" || failed=1
-      install_rtk "$rtk" || failed=1
+      # With only --conventions, skip linking.
+      if [[ $conventions -eq 0 || ${#names[@]} -gt 0 || ${#DOMAINS[@]} -gt 0 ]]; then
+        install ${names[@]+"${names[@]}"} || failed=1
+        install_openspec "$openspec" || failed=1
+        install_rtk "$rtk" || failed=1
+      fi
+      if [[ $conventions -eq 1 ]]; then install_conventions || failed=1; fi
       return $failed
       ;;
     uninstall) uninstall ${names[@]+"${names[@]}"} ;;
     check)     "$REPO_DIR/scripts/validate.sh" ${names[@]+"${names[@]}"} ;;
+    init)      init_project "$init_path" ;;
   esac
 }
 

@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # Shared frontmatter helper; source this file, don't run it.
 
 # Prints the value of a top-level frontmatter key. Handles plain, quoted and

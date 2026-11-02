@@ -81,7 +81,9 @@ function New-SkillLink([string]$Path, [string]$Target) {
 }
 
 function Add-Skill([string]$Name) {
-  $src = Join-Path $SrcDir $Name
+  $src = Get-ChildItem -LiteralPath $SrcDir -Directory | ForEach-Object { Join-Path $_.FullName $Name } |
+    Where-Object { Test-Path -LiteralPath (Join-Path $_ 'SKILL.md') } | Select-Object -First 1
+  if (-not $src) { $src = Join-Path $SrcDir "<domain>\$Name" }
   $dest = Join-Path $DestDir $Name
 
   if (-not (Test-Path -LiteralPath (Join-Path $src 'SKILL.md'))) {
@@ -137,7 +139,7 @@ function Install-Skills([string[]]$Names) {
   if ($Names.Count -gt 0) {
     foreach ($name in $Names) { if (-not (Add-Skill $name)) { $ok = $false } }
   } else {
-    foreach ($dir in Get-ChildItem -LiteralPath $SrcDir -Directory) {
+    foreach ($dir in Get-ChildItem -LiteralPath $SrcDir -Directory | Get-ChildItem -Directory) {
       if (-not (Add-Skill $dir.Name)) { $ok = $false }
     }
     Remove-Stale
