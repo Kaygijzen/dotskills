@@ -6,7 +6,7 @@
 
 [![validate](https://github.com/Kaygijzen/dotskills/actions/workflows/validate.yml/badge.svg)](https://github.com/Kaygijzen/dotskills/actions/workflows/validate.yml)
 
-My personal Claude Code setup, versioned like dotfiles: [skills](https://code.claude.com/docs/en/skills) grouped by domain, subagents, hooks, optional MCP configs, and shared conventions in `AGENTS.md`.
+My personal Claude Code setup, versioned like dotfiles. Fork it or take what you want. It holds: [skills](https://code.claude.com/docs/en/skills) grouped by domain, subagents, hooks, optional MCP configs, and shared conventions in `AGENTS.md`.
 
 New here? Start with the [setup guide](docs/setup.md), then read [model selection](docs/model-selection.md) and [best practices](docs/best-practices.md).
 
@@ -51,13 +51,13 @@ Windows, the optional OpenSpec and rtk installs, and every other flag are in the
 
 | Skill | What it does | Trigger |
 | --- | --- | --- |
-| `code-review` | Review the changes since a fixed point (commit, branch, tag, or merge-base) along two axes: Standards (does the code follow this repo's documented coding standards?) and Spec (does the code match what the originating issue/spec asked for?). | `/code-review`, or automatically when Runs both reviews in parallel sub-agents and reports them side by side. Use when the user wants to review a branch, a PR, work-in-progress changes, or asks to \"review since X\". |
+| `code-review` | Review the changes since a fixed point (commit, branch, tag, or merge-base) along two axes: Standards (does the code follow this repo's documented coding standards?) and Spec (does the code match what the originating issue/spec asked for?). | `/code-review`, or automatically when the user wants to review a branch, a PR, work-in-progress changes, or asks to \"review since X\". |
 | `codebase-design` | Shared vocabulary for designing deep modules. | `/codebase-design`, or automatically when the user wants to design or improve a module's interface, find deepening opportunities, decide where a seam goes, make code more testable or AI-navigable, or when another skill needs the deep-module vocabulary. |
 | `domain-modeling` | Build and sharpen a project's domain model. | `/domain-modeling`, or automatically when discussing codebase terminology, writing or editing a GLOSSARY.md, or recording or editing an ADR. |
 | `grill-spec` | Grill the user until intent is shared, then generate a complete OpenSpec change (proposal, delta specs, design, tasks) and review it with fresh-context sub-agents before handing it to a coding agent. | `/grill-spec` only (never auto-invoked) |
 | `implement` | Implement a piece of work based on a spec or set of tickets. | `/implement` only (never auto-invoked) |
 | `improve-codebase-architecture` | Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill through whichever one you pick. | `/improve-codebase-architecture` only (never auto-invoked) |
-| `pr` | Use when writing a PR body. | `/pr`, or automatically when relevant |
+| `pr` | Write a pull request body. | `/pr`, or automatically when writing a PR body. |
 | `prototype` | Build a throwaway prototype to answer a design question. | `/prototype`, or automatically when the user wants to sanity-check whether a state model or logic feels right, or explore what a UI should look like. |
 | `ralph-apply` | Apply an approved OpenSpec change with a Ralph loop - a bash loop that runs a fresh headless Claude session per task, so context never piles up. | `/ralph-apply` only (never auto-invoked) |
 | `research` | Investigate a question against high-trust primary sources and capture the findings as a Markdown file in the repo. | `/research`, or automatically when the user wants a topic researched, docs or API facts gathered, or reading legwork delegated to a background agent. |
@@ -189,14 +189,17 @@ flowchart LR
 ```
 dotskills/
 ├── AGENTS.md  CLAUDE.md          how to work on this repo (CLAUDE.md is @AGENTS.md)
-├── docs/                         setup, model selection, best practices
+├── docs/                         setup, install reference, model selection, best practices,
+│                                 contributing, troubleshooting
 ├── conventions/                  my working conventions + project-template/
 ├── skills/<domain>/<name>/       SKILL.md plus scripts/ and references/
 ├── agents/<domain>/<name>.md     subagents
 ├── hooks/<domain>/               hooks.json + scripts/ (plugin installs only)
-├── mcp/<domain>/.mcp.json        optional MCP configs (env vars only)
+├── mcp/<domain>/.mcp.json        optional MCP configs (env vars only; none yet)
+├── statusline/                   vendored statusline script (MIT, licence kept)
+├── upstream.json                 provenance of imported skills
 ├── install.sh  install.ps1       symlink installers
-├── scripts/                      validate, update-readme, sync-plugin, new-skill, ci
+├── scripts/                      validate, update-readme, sync-plugin, new-skill, ci, frontmatter, upstream-status
 ├── templates/SKILL.md
 ├── .claude-plugin/               one marketplace and one plugin, both "dotskills"
 └── .github/workflows/validate.yml  runs scripts/ci.sh
@@ -232,3 +235,4 @@ Short version for a new skill: `scripts/new-skill.sh <domain> <name>`, then `scr
 
 - Skills imported from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT). See `upstream.json` and `THIRD_PARTY_NOTICES.md`. `pr` credits Dex Horthy's [`show-me`](https://github.com/humanlayer/skills/blob/main/plugins/show-me/skills/show-me/SKILL.md) in its own `CREDITS.md`.
 - Coding principles in the conventions are condensed from [andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) (MIT per its skill frontmatter); the full text is in `docs/karpathy-guidelines.md`.
+- `statusline/statusline.sh` is vendored from [kcchien/claude-code-statusline](https://github.com/kcchien/claude-code-statusline) (MIT). Licence kept in `statusline/LICENSE`; see `THIRD_PARTY_NOTICES.md`.
