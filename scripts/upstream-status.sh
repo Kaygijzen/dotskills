@@ -24,19 +24,21 @@ trap 'rm -rf "$tmp"' EXIT
 
 # One clone per distinct source_repo. Sets CLONE_DIR; runs in the parent shell
 # (not a subshell) so the cache survives between calls.
-declare -A clones=()
+clone_repos=() clone_dirs=()
 CLONE_DIR=""
 clone_for() {
-  local repo="$1" dir
-  if [[ -z "${clones[$repo]:-}" ]]; then
-    dir="$tmp/clone-${#clones[@]}"
-    if ! git clone -q "$repo" "$dir" 2>/dev/null; then
-      echo "Could not clone $repo (offline?)" >&2
-      return 1
-    fi
-    clones[$repo]="$dir"
+  local repo="$1" dir i
+  for ((i = 0; i < ${#clone_repos[@]}; i++)); do
+    if [[ "${clone_repos[$i]}" == "$repo" ]]; then CLONE_DIR="${clone_dirs[$i]}"; return 0; fi
+  done
+  dir="$tmp/clone-${#clone_repos[@]}"
+  if ! git clone -q "$repo" "$dir" 2>/dev/null; then
+    echo "Could not clone $repo (offline?)" >&2
+    return 1
   fi
-  CLONE_DIR="${clones[$repo]}"
+  clone_repos+=("$repo")
+  clone_dirs+=("$dir")
+  CLONE_DIR="$dir"
 }
 
 both=() upstream_only=() local_only=() clean=() unknown=()

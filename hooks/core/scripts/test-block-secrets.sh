@@ -26,9 +26,21 @@ check 0 Read  /home/u/.ssh/id_rsa.pub
 check 2 Write /p/key.pfx
 check 2 Read  /p/secrets.yaml
 check 0 Read  /p/.env.example
+check 2 Read  /p/.ENV
+check 2 Read  /p/KEY.PEM
+check 2 Read  /home/u/.ssh/id_ed25519
+check 0 Read  /home/u/.ssh/id_ed25519.pub
+check 2 Read  /p/server.key
+check 2 Read  /p/.npmrc
+check 0 Read  /p/secrets.ts
+check 0 Read  /p/secrets.md
+check 0 Read  /p/.env.local.example
+check 0 Read  /p/.env.production.sample
 check 0 Read  /p/README.md
 check 0 Edit  /p/src/environment.ts
 
+# NotebookEdit passes notebook_path.
+echo '{"tool_name":"NotebookEdit","tool_input":{"notebook_path":"/p/.env"}}' | "$HOOK" >/dev/null 2>&1; [[ $? -eq 2 ]] || { echo "FAIL notebook_path"; fail=1; }
 # No file_path (e.g. a Bash call) is allowed.
 echo '{"tool_name":"Bash","tool_input":{"command":"ls"}}' | "$HOOK" >/dev/null 2>&1 || { echo "FAIL no file_path"; fail=1; }
 # Garbage input fails open.

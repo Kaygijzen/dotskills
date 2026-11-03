@@ -32,7 +32,8 @@ else
   sc=()
 fi
 if (( ${#sc[@]} )); then
-  mapfile -t sh_files < <(git ls-files '*.sh'; git ls-files --others --exclude-standard '*.sh')
+  sh_files=()
+  while IFS= read -r f; do sh_files+=("$f"); done < <(git ls-files '*.sh'; git ls-files --others --exclude-standard '*.sh')
   "${sc[@]}" -S warning -x "${sh_files[@]}" || fail shellcheck
 else
   fail "shellcheck not found; install it (apt install shellcheck) or uv (uvx runs it)"

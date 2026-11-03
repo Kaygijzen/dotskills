@@ -179,7 +179,7 @@ install() {
 # --- conventions: a managed block in ~/.claude/CLAUDE.md ------------------
 
 conventions_block() {
-  printf '%s\n' "$BLOCK_START" "# Managed by dotskills ./install.sh; edit conventions/AGENTS.md in the repo instead." "@$REPO_DIR/conventions/AGENTS.md" "$BLOCK_END"
+  printf '%s\n' "$BLOCK_START" "# Managed by dotskills ./install.sh; edit conventions/AGENTS.md in the repo instead." "@${REPO_DIR// /\\ }/conventions/AGENTS.md" "$BLOCK_END"
 }
 
 has_block() {
@@ -235,7 +235,8 @@ statusline_value() {
   jq -cn --arg c "$STATUSLINE_DEST" '{type: "command", command: $c, timeout: 10}'
 }
 
-# Writes stdin to $CLAUDE_SETTINGS via a temp file, after a one-time backup.
+# Writes stdin to $CLAUDE_SETTINGS via a temp file. The caller makes the
+# one-time backup (see install_statusline).
 write_settings() {
   local tmp
   tmp="$(mktemp "$CLAUDE_SETTINGS.XXXXXX")" || return 1
