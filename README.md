@@ -109,29 +109,28 @@ Most skills work out of the box. These two need [OpenSpec](https://github.com/Fi
 - An approved change on its own branch or worktree. The script refuses to run on `main` or `master`.
 - A terminal for the loop itself. `/ralph-apply <change>` checks the change and prints the exact `scripts/ralph.sh` command to run.
 
-### Models used by these skills
-
-`grill-spec` and `ralph-apply` pick a model per task instead of using one for everything:
-
-| Task | Model |
-| --- | --- |
-| `grill-spec` fact-finder sub-agents | `sonnet` |
-| `grill-spec` spec reviewers | `opus` |
-| `ralph-apply` loop iterations | `sonnet`; set `RALPH_MODEL` to override |
-| The grilling conversation itself | your session model |
-
-`ralph.sh` passes `--model` to `claude -p`, so the loop model is always enforced. The `grill-spec` models are instructions to Claude, which sets `model` on each sub-agent call.
-
 ## Spec-driven development
 
 When requirements live only in chat history, AI-written code is unpredictable. [OpenSpec](https://github.com/Fission-AI/OpenSpec) adds a lightweight spec layer: you and the agent agree on *what* to build in plain Markdown, in the repo, before any code is written. Then the spec, not the chat, is what the agent implements and what a reviewer checks against.
 
 ### The loop
 
-1. **Propose.** The agent drafts a *change*: a folder with a proposal (why), *delta specs* (what changes), a design and a task list. `/grill-spec` interviews you first, so the draft reflects your intent.
-2. **Review.** You read and correct the spec. This is the cheap place to catch a wrong assumption.
-3. **Implement.** The agent works through the tasks. `/ralph-apply` runs one fresh session per task so context never piles up.
-4. **Archive.** `/opsx:archive` moves the finished change into `archive/` and updates the *codebase specs*, which describe what the system does today. The next change starts from an accurate picture.
+`openspec init` installs these slash commands. On their own they cover the whole loop:
+
+1. **Explore** (optional). `/opsx:explore` is a thinking mode: investigate the code and clarify requirements before anything is written down.
+2. **Propose.** `/opsx:propose <idea>` drafts a *change*: a folder with a proposal (why), *delta specs* (what changes), a design and a task list.
+3. **Review.** You read and correct the spec. This is the cheap place to catch a wrong assumption. `/opsx:update` revises the artifacts and keeps them consistent with each other.
+4. **Implement.** `/opsx:apply` works through the tasks in the current session.
+5. **Archive.** `/opsx:archive` moves the finished change into `archive/` and merges its delta specs into the *codebase specs*, which describe what the system does today. The next change starts from an accurate picture. (`/opsx:sync` does the merge without archiving.)
+
+### Where dotskills fits in
+
+Two skills replace steps of that loop when the change is large or the intent is fuzzy:
+
+- **`/grill-spec` instead of explore + propose.** It interviews you until intent is shared, then runs `openspec-explore` and `openspec-propose` itself and has fresh-context sub-agents review the result before you see it.
+- **`/ralph-apply` instead of `/opsx:apply`.** It runs one fresh headless session per task, so context never piles up over a long task list.
+
+Review and archive stay the same. `/code-review` slots in between implement and archive to check the code against the change's spec.
 
 ### What it looks like
 
@@ -161,7 +160,7 @@ defaulting to the system preference.
 - **THEN** the app switches to dark mode and persists the choice
 ```
 
-`/grill-spec` reads `openspec/specs/` first, so a new change is checked against current behaviour, and `/code-review` checks the result against the change's spec. Setup is in [Requirements](#requirements-for-grill-spec-and-ralph-apply).
+`/grill-spec` reads `openspec/specs/` first, so a new change is checked against current behaviour. Setup is in [Requirements](#requirements-for-grill-spec-and-ralph-apply).
 
 ## Saving tokens with rtk
 
