@@ -20,6 +20,8 @@ Check it with `/model`. Sonnet is the default because it is the best balance of 
 
 ## 3. Install dotskills
 
+Prerequisites: `git` and `jq` (used by the installer, the secret hook and the statusline). Node 20.19+ with npm is needed only for the optional OpenSpec install.
+
 Pick **one** of these. Using both duplicates every skill.
 
 **Plugin marketplace** (no clone needed, installs every domain):
@@ -37,7 +39,7 @@ cd dotskills
 ./install.sh                 # every domain; or: ./install.sh --domain engineering
 ```
 
-Then add the personal conventions, which plugins cannot ship:
+Then add the personal conventions, which plugins cannot ship. This applies to plugin installs too, so run it from a clone either way:
 
 ```bash
 ./install.sh --conventions
@@ -53,10 +55,10 @@ The installer edits `settings.json` only when you pass `--statusline-settings` (
 
 ```json
 {
-  "statusLine": { 
-    "type": "command", 
-    "command": "~/.claude/statusline.sh", 
-    "timeout": 10 
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh",
+    "timeout": 10
   }
 }
 ```
@@ -79,7 +81,7 @@ Optional env vars: `CLAUDE_STATUSLINE_NERDFONT=1`, `CLAUDE_STATUSLINE_POWERLINE=
 
 1. Run `/dotskills:hello-skill` (plugin) or `/hello-skill` (symlinks). It prints where it loaded from.
 2. Run `/memory` and check that `~/.claude/CLAUDE.md` is listed. Then ask Claude "what are my commit message conventions?" to confirm the import resolves.
-3. Ask Claude to read a `.env` file. The secret hook (plugin installs) should block it and explain why.
+3. Ask Claude to read a `.env` file. The secret hook (plugin installs only; the symlink installer does not ship hooks) should block it and explain why.
 
 Per project: run `/dotskills:setup-dotskills` once (or `/setup-dotskills` with symlinks) to set the issue tracker and domain docs for the engineering skills.
 

@@ -25,14 +25,13 @@ skills_table() {
     desc="$(frontmatter_value "$file" description)"
     manual="$(frontmatter_value "$file" disable-model-invocation)"
 
-    # First sentence is what it does; the rest usually says when to use it.
+    # First sentence is what it does; the "Use when ..." clause says when to use it.
     what="${desc%%. *}"
+    [[ "$what" == "$desc" ]] || what="$what."
     rest=""
-    if [[ "$what" != "$desc" ]]; then
-      what="$what."
-      rest="${desc#*. }"
+    if [[ "$desc" == *"Use when "* ]]; then
+      rest="${desc#*Use when }"
     fi
-    rest="${rest#Use when }"
 
     if [[ "$manual" == "true" ]]; then
       trigger="\`/$name\` only (never auto-invoked)"

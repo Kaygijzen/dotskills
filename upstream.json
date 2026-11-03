@@ -87,7 +87,9 @@
     "source_repo": "https://github.com/mattpocock/skills",
     "source_path": "skills/engineering/pr",
     "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
-    "local_changes": []
+    "local_changes": [
+      "frontmatter: added model: sonnet; description now starts with 'Write a pull request body.' so the README table reads well"
+    ]
   },
   {
     "skill": "prototype",

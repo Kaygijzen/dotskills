@@ -1,6 +1,6 @@
 ---
 name: pr
-description: "Use when writing a PR body."
+description: "Write a pull request body. Use when writing a PR body."
 model: sonnet
 metadata:
   credits:
