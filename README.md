@@ -109,56 +109,7 @@ Most skills work out of the box. These two need [OpenSpec](https://github.com/Fi
 
 ## Spec-driven development
 
-When requirements live only in chat history, AI-written code is unpredictable. [OpenSpec](https://github.com/Fission-AI/OpenSpec) adds a lightweight spec layer: you and the agent agree on *what* to build in plain Markdown, in the repo, before any code is written. Then the spec, not the chat, is what the agent implements and what a reviewer checks against.
-
-### The loop
-
-`openspec init` installs these slash commands. On their own they cover the whole loop:
-
-1. **Explore** (optional). `/opsx:explore` is a thinking mode: investigate the code and clarify requirements before anything is written down.
-2. **Propose.** `/opsx:propose <idea>` drafts a *change*: a folder with a proposal (why), *delta specs* (what changes), a design and a task list.
-3. **Review.** You read and correct the spec. This is the cheap place to catch a wrong assumption. `/opsx:update` revises the artifacts and keeps them consistent with each other.
-4. **Implement.** `/opsx:apply` works through the tasks in the current session.
-5. **Archive.** `/opsx:archive` moves the finished change into `archive/` and merges its delta specs into the *codebase specs*, which describe what the system does today. The next change starts from an accurate picture. (`/opsx:sync` does the merge without archiving.)
-
-### Where dotskills fits in
-
-Two skills replace steps of that loop when the change is large or the intent is fuzzy:
-
-- **`/grill-spec` instead of explore + propose.** It interviews you until intent is shared, then runs `openspec-explore` and `openspec-propose` itself and has fresh-context sub-agents review the result before you see it.
-- **`/ralph-apply` instead of `/opsx:apply`.** It runs one fresh headless session per task, so context never piles up over a long task list.
-
-Review and archive stay the same. `/code-review` slots in between implement and archive to check the code against the change's spec.
-
-### What it looks like
-
-```
-openspec/
-├── specs/                 codebase specs: what the system does today
-└── changes/
-    ├── add-dark-mode/     one folder per change in flight
-    │   ├── proposal.md    why we're doing this
-    │   ├── specs/         delta specs: what this change adds or alters
-    │   ├── design.md      technical approach
-    │   └── tasks.md       implementation checklist
-    └── archive/           finished changes
-```
-
-A delta spec lists requirements with concrete scenarios. It uses `ADDED`, `MODIFIED` or `REMOVED` to say how it differs from the codebase spec:
-
-```md
-## ADDED Requirements
-
-### Requirement: Theme selection
-The app SHALL let users switch between light and dark themes,
-defaulting to the system preference.
-
-#### Scenario: User toggles dark mode
-- **WHEN** the user clicks the theme toggle
-- **THEN** the app switches to dark mode and persists the choice
-```
-
-`/grill-spec` reads `openspec/specs/` first, so a new change is checked against current behaviour. Setup is in [Requirements](#requirements-for-grill-spec-and-ralph-apply).
+When requirements live only in chat history, AI-written code is unpredictable. [OpenSpec](https://github.com/Fission-AI/OpenSpec) keeps the agreed *what* in plain Markdown in the repo, so the spec, not the chat, is what the agent implements and a reviewer checks against. `/grill-spec` and `/ralph-apply` replace the propose and apply steps for large or fuzzy changes. The full loop, folder layout and the issue-tracker alternative are in [docs/best-practices.md](docs/best-practices.md#1-spec-driven-development). Setup is in [Requirements](#requirements-for-grill-spec-and-ralph-apply).
 
 ## Saving tokens with rtk
 

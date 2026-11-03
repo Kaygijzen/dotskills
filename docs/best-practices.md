@@ -6,26 +6,78 @@ Last checked: 2026-11-02 against the Claude Code docs.
 
 For anything bigger than an afternoon: write the spec first, review it, implement it in fresh contexts, then verify against the spec.
 
+When requirements live only in chat history, AI-written code is unpredictable. [OpenSpec](https://github.com/Fission-AI/OpenSpec) adds a lightweight spec layer: you and the agent agree on *what* to build in plain Markdown, in the repo, before any code is written. Then the spec, not the chat, is what the agent implements and what a reviewer checks against.
+
+### The loop
+
+`openspec init` installs these slash commands. On their own they cover the whole loop:
+
+1. **Explore** (optional). `/opsx:explore` is a thinking mode: investigate the code and clarify requirements before anything is written down.
+2. **Propose.** `/opsx:propose <idea>` drafts a *change*: a folder with a proposal (why), *delta specs* (what changes), a design and a task list.
+3. **Review.** You read and correct the spec. This is the cheap place to catch a wrong assumption. `/opsx:update` revises the artifacts and keeps them consistent with each other.
+4. **Implement.** `/opsx:apply` works through the tasks in the current session.
+5. **Archive.** `/opsx:archive` moves the finished change into `archive/` and merges its delta specs into the *codebase specs*, which describe what the system does today. The next change starts from an accurate picture. (`/opsx:sync` does the merge without archiving.)
+
+### Where dotskills fits in
+
+Two skills replace steps of that loop when the change is large or the intent is fuzzy:
+
+- **`/grill-spec` instead of explore + propose.** It interviews you until intent is shared, then runs `openspec-explore` and `openspec-propose` itself and has fresh-context sub-agents review the result before you see it.
+- **`/ralph-apply` instead of `/opsx:apply`.** It runs one fresh headless session per task, so context never piles up over a long task list.
+
+Review and archive stay the same. `/code-review` slots in between implement and archive to check the code against the change's spec.
+
+### What it looks like
+
+```
+openspec/
+├── specs/                 codebase specs: what the system does today
+└── changes/
+    ├── add-dark-mode/     one folder per change in flight
+    │   ├── proposal.md    why we're doing this
+    │   ├── specs/         delta specs: what this change adds or alters
+    │   ├── design.md      technical approach
+    │   └── tasks.md       implementation checklist
+    └── archive/           finished changes
+```
+
+A delta spec lists requirements with concrete scenarios. It uses `ADDED`, `MODIFIED` or `REMOVED` to say how it differs from the codebase spec:
+
+```md
+## ADDED Requirements
+
+### Requirement: Theme selection
+The app SHALL let users switch between light and dark themes,
+defaulting to the system preference.
+
+#### Scenario: User toggles dark mode
+- **WHEN** the user clicks the theme toggle
+- **THEN** the app switches to dark mode and persists the choice
+```
+
+`/grill-spec` reads `openspec/specs/` first, so a new change is checked against current behaviour. Setup is in the [README](../README.md#requirements-for-grill-spec-and-ralph-apply).
+
+### Choosing a flow
+
 | Size of change | Tool |
 | --- | --- |
 | Small | Plan mode (`/plan`) |
 | A feature | [OpenSpec](https://github.com/Fission-AI/OpenSpec) with the `grill-spec` skill |
 | A long approved change | `ralph-apply`, which runs one fresh session per task |
 
-Two spec flows. Pick one per project:
+Two spec flows. Pick one per project. (user) means the skill runs only when you type it, (model) means Claude may also invoke it on its own.
 
 | Project type | Flow |
 | --- | --- |
 | OpenSpec | `grill-spec` (user) → `ralph-apply` (user) |
 | Issue tracker | `grill-me` (user) → `to-spec` (user) → `to-tickets` (user), with `wayfinder` (user) for work bigger than one session |
 
-Run `/dotskills:setup-dotskills` once per project before the issue-tracker flow.
+Run `/dotskills:setup-dotskills` (user) once per project before the issue-tracker flow. The issue-tracker flow currently ends at the tickets: skills for implementing them are still in progress.
 
-These skills work alongside either flow. (model) means Claude may invoke it on its own, (user) means it runs only when you type it:
+These skills work alongside either flow:
 
 - `grilling` (model), `codebase-design` (model), `improve-codebase-architecture` (user)
-- `code-review` (model), `pr` (model), `prototype` (model), `research` (model)
-- `domain-modeling` (model)
+- `code-review` (model), `pr` (model), `prototype` (model), `research` (model), `domain-modeling` (model)
 - `handoff` (user), `retro` (user), `teach` (user)
 - `writing-for-agents` (model), `wizard` (model)
 
