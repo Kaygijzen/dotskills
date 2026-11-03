@@ -83,7 +83,7 @@ Optional env vars: `CLAUDE_STATUSLINE_NERDFONT=1`, `CLAUDE_STATUSLINE_POWERLINE=
 2. Run `/memory` and check that `~/.claude/CLAUDE.md` is listed. Then ask Claude "what are my commit message conventions?" to confirm the import resolves.
 3. Ask Claude to read a `.env` file. The secret hook (plugin installs only; the symlink installer does not ship hooks) should block it and explain why.
 
-Per project: run `/dotskills:setup-dotskills` once (or `/setup-dotskills` with symlinks) to set the issue tracker and domain docs for the engineering skills.
+Per project: run `/dotskills:setup-dotskills` once (or `/setup-dotskills` with symlinks) to set the issue tracker and domain docs for the engineering skills. The tracker can be local markdown files in the repo, which needs nothing else. For GitHub or GitLab, setup also connects the tracker's MCP server: GitHub needs a personal access token, and GitLab needs version 19.5 or newer. The `gh`/`glab` CLIs are optional; the skills fall back to them only for a few steps, and `wayfinder` still uses them.
 
 ## 6. Before using it on a client project
 
