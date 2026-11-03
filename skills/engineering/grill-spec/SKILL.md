@@ -1,7 +1,7 @@
 ---
 name: grill-spec
 description: Grill the user until intent is shared, then generate a complete OpenSpec change (proposal, delta specs, design, tasks) and review it with fresh-context sub-agents before handing it to a coding agent. Use when the user invokes /grill-spec or asks to grill-and-spec a change.
-argument-hint: "[rough description of the change]"
+argument-hint: "[rough description of the change, or an issue number or URL]"
 disable-model-invocation: true
 ---
 
@@ -33,13 +33,14 @@ Ground rules for the whole run:
    - The questioning cadence is the numbered rounds from Phase 1, not explore's free-flowing open threads.
    - Do not let explore capture artifacts or create a change; that happens in Phase 2.
    - Do not end with explore's "What we figured out" block; the Gate's intent summary replaces it.
-2. Confirm OpenSpec is initialised (`openspec/` exists). If it is not, stop and tell the user to run `openspec init`.
-3. In **one message**, dispatch 2–4 parallel `Explore` sub-agents (Agent tool, `subagent_type: "Explore"`, `model: "sonnet"`) using the fact-finder prompt (Appendix A). Typical recon questions:
+2. **Source issue.** If the input is an issue (a number, a URL, or `#<n>`), read its body and all its comments with the operations in `docs/agents/issue-tracker.md`. If that file is missing, say so and ask for the tracker. Treat what you read as the user's first answer: seed the design tree with it and ask only about what it leaves open. **Never edit, label or close the issue**, and don't comment on it from this skill. Keep its reference (`#<n>` or the full URL) for Phase 2.
+3. Confirm OpenSpec is initialised (`openspec/` exists). If it is not, stop and tell the user to run `openspec init`.
+4. In **one message**, dispatch 2–4 parallel `Explore` sub-agents (Agent tool, `subagent_type: "Explore"`, `model: "sonnet"`) using the fact-finder prompt (Appendix A). Typical recon questions:
    - Which modules, files and entry points does this change touch? What calls them?
    - Which existing specs in `openspec/specs/` cover this area, and which requirements are relevant?
    - Are there active changes in `openspec/changes/` (not `archive/`) that overlap?
    - What conventions apply here (patterns, test setup, error handling, config)?
-4. Summarise the recon in five lines or fewer and seed the design tree with what it found.
+5. Summarise the recon in five lines or fewer and seed the design tree with what it found.
 
 **Scope check.** If recon or the first round shows the tree spans several independent capabilities, or more than one reviewable change's worth of work, propose splitting it into multiple OpenSpec changes before grilling further. Then grill and spec them one at a time. A session heading past ~40 questions is a sign the scope is too big.
 
@@ -108,6 +109,7 @@ Invoke the `openspec-propose` skill with the Skill tool. Pass the change name an
 
 - **No new questions.** Skip propose's opening "what do you want to build?" question; the intent summary answers it. Where propose would ask the user for missing context, stop generating instead. Grill that single branch in one short round, update the intent summary, get it confirmed again, and resume. A gap found here means the grilling missed something; do not fill it with a guess.
 - **Trace everything to intent.** Every decision, requirement and non-goal in the summary must land in an artifact: proposal (why/what, non-goals), delta specs (requirements with scenarios), design (decisions, rationale, alternatives considered, open risks), tasks. Do not add scope the summary does not contain.
+- **Link the source issue.** If there is one, put a line `Source: <reference>` at the top of `proposal.md`, using the reference as the user gave it. `to-tracker` reads this line to reuse the issue as the parent of its mirror.
 - **Follow the schema.** The `instruction`, `template`, `context` and `rules` from `openspec instructions` are authoritative for each artifact's structure; the overrides here only govern content and cadence.
 - **Write tasks for a coding agent.** Each task should be small enough for one focused session, name the files or modules it touches (from the codebase facts), and state how to verify it (a test, a command, or an observable behaviour). Put spike tasks for open risks first.
 - **Do not end the way propose normally ends.** Where it would tell the user to run `/opsx:apply`, continue to Phase 3 instead.

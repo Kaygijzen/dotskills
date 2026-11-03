@@ -9,7 +9,8 @@ The OpenSpec change is the source of truth: it is what `ralph-apply` implements 
 
 ## Map
 
-- **Parent**: a short summary of `proposal.md` (its Why and What Changes, in a few lines), then a link to the change folder. Leave the delta specs out, so the mirror can't drift from them. Marker: `<!-- to-tracker:spec -->`.
+- **Parent, with a source issue**: if `proposal.md` starts with a `Source: <reference>` line (written by `grill-spec`), that issue is the parent. It is a foreign issue: never edit its body, title or labels, and never close it. It carries no marker, so `.tracker.json` is the only record of it. If the reference can't be read, stop and say so; don't create a second parent.
+- **Parent, without one**: a short summary of `proposal.md` (its Why and What Changes, in a few lines), then a link to the change folder. Leave the delta specs out, so the mirror can't drift from them. Marker: `<!-- to-tracker:spec -->`.
 - **Children**: one per task group, the numbered `## N. <heading>` sections of `tasks.md`. Body: the group's checkboxes, copied with their tick state, which shows progress. Marker: `<!-- to-tracker:<key> -->`, where the key is a kebab slug of the heading without its number.
 - **Blocking**: each group is blocked by the group before it, because `ralph-apply` works top to bottom. The first group is `Blocked by: none`.
 - **Labels**: as in `SKILL.md` step 1.
@@ -21,6 +22,7 @@ Follow `SKILL.md` step 5 (review) and step 6 (push, dedupe, writing state after 
 
 - A group whose checkboxes are all ticked: edit its body, then close it with the comment "All tasks done".
 - A group removed from `tasks.md`: close it with "Removed from the change by to-tracker".
-- An archived change: update every child as above, then close the parent with a comment linking to the archived folder.
+- An archived change: update every child as above, then close the parent with a comment linking to the archived folder. A source-issue parent is never closed: comment instead.
+- A source-issue parent gets status as comments only: one comment on the first push linking to the change folder and listing the children, and one comment per later run in which a child closed or the change was archived. No comment when nothing changed.
 
 Then report as in `SKILL.md` step 8.
