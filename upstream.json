@@ -47,7 +47,8 @@
     "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
     "local_changes": [
       "/setup-matt-pocock-skills -> /setup-dotskills",
-      "SKILL.md: without a tracker doc, falls back to the local-markdown tracker instead of stopping"
+      "SKILL.md: without a tracker doc, falls back to the local-markdown tracker instead of stopping",
+      "SKILL.md: tracker-not-configured sentence also names Azure DevOps"
     ]
   },
   {
@@ -117,7 +118,8 @@
     "local_changes": [
       "/setup-matt-pocock-skills -> /setup-dotskills",
       "SKILL.md: tracker-not-configured sentence unified with to-tracker and code-review (local-markdown fallback, said once)",
-      "SKILL.md: blocking is a soft Blocked by: line on every tracker, not the tracker's native dependency link"
+      "SKILL.md: blocking is a soft Blocked by: line on every tracker, not the tracker's native dependency link",
+      "SKILL.md: tracker-not-configured sentence also names Azure DevOps"
     ]
   },
   {

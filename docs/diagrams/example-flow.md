@@ -25,4 +25,4 @@ flowchart LR
 
 Archiving runs after review and before the PR, so the updated `openspec/specs/` and the archived change land in the same pull request as the code. `/opsx:archive` moves the change to `openspec/changes/archive/` and updates the codebase specs in `openspec/specs/`, which is what the next `/grill-spec` reads as current behaviour.
 
-For smaller work, swap steps 1-2 for `/to-tracker`. To show an OpenSpec change on GitHub or GitLab, run `/to-tracker <change>` after steps 1, 2 and 4.
+For smaller work, swap steps 1-2 for `/to-tracker`. To show an OpenSpec change on GitHub, GitLab or Azure DevOps, run `/to-tracker <change>` after steps 1, 2 and 4.

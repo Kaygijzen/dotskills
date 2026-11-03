@@ -9,7 +9,7 @@ targets: [claude]
 
 Scaffold the per-repo configuration that the engineering skills assume:
 
-- **Issue tracker**: where issues live (GitHub, GitLab, local markdown, or another tracker the user describes), and the **MCP server** the skills reach it through
+- **Issue tracker**: where issues live (GitHub, GitLab, Azure DevOps, local markdown, or another tracker the user describes), and the **MCP server** the skills reach it through
 - **Labels**: the strings used for the canonical label roles
 - **Domain docs**: where `GLOSSARY.md` and ADRs live, and the consumer rules for reading them
 - **Issue templates**: the spec and ticket bodies `to-tracker` writes, copied into the repo to edit
@@ -23,7 +23,7 @@ This is a prompt-driven skill, not a deterministic script. Explore, present what
 
 Look at the current repo to understand its starting state. Read whatever exists; don't assume:
 
-- `git remote -v` and `.git/config`: is this a GitHub or GitLab repo? Which one?
+- `git remote -v` and `.git/config`: is this a GitHub, GitLab or Azure DevOps repo? Which one? Azure DevOps remotes contain `dev.azure.com` or `.visualstudio.com`.
 - MCP servers already configured: `claude mcp list`, and the project `.mcp.json`. A server for this repo's tracker that is already there gets reused; never add a second one.
 - GitLab self-managed: the instance version (`https://<host>/api/v4/version`, or ask). The MCP server needs **GitLab 19.5** or newer, with MCP enabled for the instance. If it isn't, stop and say so.
 - `AGENTS.md` and `CLAUDE.md` at the repo root: does either exist? Is there already an `## Agent skills` section in either?
@@ -42,18 +42,21 @@ Lead each section with the recommended answer so the user can accept it in a wor
 
 **Section A: Issue tracker.**
 
-> Explainer: The "issue tracker" is where issues live for this repo. Skills like `to-tracker`, `wayfinder`, and `code-review` read from and write to it. An external tracker (GitHub, GitLab) is optional: local markdown files in the repo work with every skill and need no server or account. Pick the place you actually track work for this repo.
+> Explainer: The "issue tracker" is where issues live for this repo. Skills like `to-tracker`, `wayfinder`, and `code-review` read from and write to it. An external tracker (GitHub, GitLab, Azure DevOps) is optional: local markdown files in the repo work with every skill and need no server or account. Pick the place you actually track work for this repo.
 
-If a `git remote` points at GitHub, propose GitHub. If one points at GitLab (`gitlab.com` or a self-hosted host), propose GitLab. Otherwise propose local markdown. Always offer all four:
+If a `git remote` points at GitHub, propose GitHub. If one points at GitLab (`gitlab.com` or a self-hosted host), propose GitLab. If one points at Azure DevOps, propose Azure DevOps. Otherwise propose local markdown. Always offer all five:
 
 - **GitHub**: the repo's GitHub Issues, through GitHub's remote MCP server
 - **GitLab**: the repo's GitLab Issues, through GitLab's built-in MCP server (GitLab 19.5+)
+- **Azure DevOps**: the project's work items, through the Azure DevOps MCP server
 - **Local markdown**: files under `.scratch/<feature>/` in this repo; no server needed (good for solo projects or repos without a remote)
 - **Other** (Jira, Linear, etc.): the user describes the workflow and brings their own MCP server or CLI. Write it down as operations: `to-tracker` checks that the doc defines create, edit body and title, link a child to a parent, list a parent's children, ensure a label exists, and close with a comment.
 
-Record the choice in `docs/agents/issue-tracker.md`. The GitHub and GitLab templates carry a "PRs as a request surface" flag, defaulted **off**. Leave it off and don't raise it: a user who wants external PRs in the triage queue can flip the flag in the file later.
+Record the choice in `docs/agents/issue-tracker.md`. The GitHub, GitLab and Azure DevOps templates carry a "PRs as a request surface" flag, defaulted **off**. Leave it off and don't raise it: a user who wants external PRs in the triage queue can flip the flag in the file later.
 
-A GitHub or GitLab tracker needs a reachable repo. When the user picks one and no `git remote` points at that host, get the repo URL from them and wire it up (`git init` if needed, `git remote add origin <url>`) before going further. Done when `gh repo view` / `glab repo view` prints the project from inside this directory. Without that CLI, the read-only check in the new session (step 5) confirms it instead.
+An Azure DevOps tracker also needs three answers, which go into the Scope block of `docs/agents/issue-tracker.md`: the **organization** and **project** (from the remote URL when there is one), and the **work item types**, because they depend on the project's process template. Propose the defaults from the doc (Agile: Feature / User Story / Closed; Scrum: Feature / Product Backlog Item / Done; Basic: Epic / Issue / Done; CMMI: Feature / Requirement / Closed) and ask which process the project uses. This is the one question setup must ask for Azure DevOps. Area path and iteration stay empty unless the user names them.
+
+A GitHub, GitLab or Azure DevOps tracker needs a reachable repo. When the user picks one and no `git remote` points at that host, get the repo URL from them and wire it up (`git init` if needed, `git remote add origin <url>`) before going further. Done when `gh repo view` / `glab repo view` prints the project from inside this directory. Without that CLI, the read-only check in the new session (step 5) confirms it instead.
 
 **Section A2: MCP server.** Skipped for local markdown, and for a server exploration already found.
 
@@ -74,6 +77,23 @@ A GitHub or GitLab tracker needs a reachable repo. When the user picks one and n
      ```
 
      Then the user signs in with `claude mcp login GitLab`, or `/mcp` in a session. A personal access token must be fine-grained; legacy tokens get 403.
+
+   - Azure DevOps, remote server (Microsoft's recommended option). It needs an organization backed by a Microsoft Entra tenant (a standalone Microsoft-account organization is not supported) and a custom **Entra app registration** with admin consent; it has no dynamic client registration, so Claude Code needs the app's client id. Microsoft's remote-server page walks through the registration. The user runs, with the id from the registration:
+
+     ```
+     claude mcp add -s user --transport http ado https://mcp.dev.azure.com/<organization> \
+       --client-id <client-id> --callback-port 3118 -H 'X-MCP-Toolsets: wit'
+     ```
+
+     Then they sign in with `/mcp` in a session (Microsoft Entra, in the browser). The client id is not a secret.
+   - Azure DevOps, local server, when the user can't register an app: it needs Node 20+ and `az login`. The user runs:
+
+     ```
+     claude mcp add -s user ado -- npx -y @azure-devops/mcp <organization> --authentication azcli -d core work-items
+     ```
+
+     The local server's tool names match the remote's for work items.
+   - Ask which of the two the user can use. Recommend remote when they can register an app, local otherwise. Offer to run the `wizard` skill to walk them through the registration.
 3. **Check.** `claude mcp get <name>` shows the server as configured. A project-scope server shows "pending approval" until the user approves it; say so. Tools load only in a new session, so the connection is checked there (step 5).
 
 The server name is part of every tool id (`mcp__github__issue_write`): write it at the top of `docs/agents/issue-tracker.md` when it differs from the seed's.
@@ -141,6 +161,7 @@ Then write the docs files using the seed templates in this skill folder as a sta
 
 - [issue-tracker-github.md](./issue-tracker-github.md): GitHub issue tracker
 - [issue-tracker-gitlab.md](./issue-tracker-gitlab.md): GitLab issue tracker
+- [issue-tracker-ado.md](./issue-tracker-ado.md): Azure DevOps issue tracker (fill in its Scope block from the answers above)
 - [issue-tracker-local.md](./issue-tracker-local.md): local-markdown issue tracker
 - [triage-labels.md](./triage-labels.md): label mapping
 - [domain.md](./domain.md): domain doc consumer rules + layout
@@ -155,6 +176,7 @@ List what is left for the user, only the items that apply:
 
 - export `GITHUB_PAT` in the shell profile (GitHub)
 - `claude mcp login GitLab`, or `/mcp` (GitLab)
+- register the Entra app, run the `claude mcp add` command, and sign in with `/mcp` (Azure DevOps remote); `az login` (Azure DevOps local)
 - approve the project server (project scope)
 - start a new session, then run `/to-tracker`: its first call is a read-only check of the connection
 

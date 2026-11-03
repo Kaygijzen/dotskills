@@ -13,7 +13,7 @@ Synthesize a **spec** and its **tickets** (tracer-bullet vertical slices with bl
 ## 1. Preconditions
 
 - Read `docs/agents/issue-tracker.md`. Every tracker action below is an operation named in that doc; carry it out exactly as the doc says.
-- If `docs/agents/issue-tracker.md` is missing, use the local-markdown tracker (files in `.scratch/`) and tell the user so once; `/setup-dotskills` connects GitHub or GitLab. The local tracker's doc is `issue-tracker-local.md` in the `setup-dotskills` skill folder (the sibling of this skill folder's real path).
+- If `docs/agents/issue-tracker.md` is missing, use the local-markdown tracker (files in `.scratch/`) and tell the user so once; `/setup-dotskills` connects GitHub, GitLab or Azure DevOps. The local tracker's doc is `issue-tracker-local.md` in the `setup-dotskills` skill folder (the sibling of this skill folder's real path).
 - External tracker: make the doc's read-only connection check the session's first tracker call. If the MCP server isn't connected, stop and point to `/setup-dotskills`. Use the CLI only where the doc marks a step **CLI**.
 - A tracker the doc describes freely ("other"): check that it defines create, edit body and title, link a child to a parent, list a parent's children, ensure a label exists, and close with a comment. If any is missing, stop and name them.
 - Labels: the `ready-for-agent` mapping in `docs/agents/triage-labels.md`, plus the file's extra labels, or the literal `ready-for-agent` when that file is absent.
