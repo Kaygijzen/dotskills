@@ -6,9 +6,29 @@ Issues and specs for this repo live as markdown files in `.scratch/`.
 
 - One feature per directory: `.scratch/<feature-slug>/`
 - The spec is `.scratch/<feature-slug>/spec.md`
-- Implementation issues are one file per ticket at `.scratch/<feature-slug>/issues/<NN>-<slug>.md`, numbered from `01`, never a single combined tickets file
-- Triage state is recorded as a `Status:` line near the top of each issue file (see `triage-labels.md` for the role strings)
+- Implementation issues are one file per ticket at `.scratch/<feature-slug>/issues/<NN>-<slug>.md`, numbered from `01`, never a single combined tickets file. Numbers are never reused or renumbered; a new ticket takes the next free number.
+- Each ticket file opens with a title line, then plain metadata lines:
+
+  ```
+  # 03: <Ticket title>
+
+  Parent: ../spec.md
+  Status: ready-for-agent
+  Blocked by: 01, 02
+  ```
+
+  `Status:` holds a role string from `triage-labels.md`, or `closed`. `Blocked by:` lists ticket numbers, or `none`.
 - Comments and conversation history append to the bottom of the file under a `## Comments` heading
+
+## Operations
+
+- **Create an issue**: write a new file (create the directory if needed).
+- **Edit body and title**: rewrite the file, keeping its `Status:` line and its `## Comments` section as they are.
+- **Link a child to a parent**: the `Parent: ../spec.md` line.
+- **List a parent's children**: the files in `.scratch/<feature-slug>/issues/`.
+- **Add / remove a blocker, list blockers**: read or edit the `Blocked by:` line. A ticket is unblocked when every ticket it lists is `closed`.
+- **Ensure a label exists**: nothing to do; the label is the `Status:` value.
+- **Close with a comment**: append the comment under `## Comments`, then set `Status: closed`.
 
 ## When a skill says "publish to the issue tracker"
 
