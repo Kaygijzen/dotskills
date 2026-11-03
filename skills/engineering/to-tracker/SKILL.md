@@ -1,6 +1,6 @@
 ---
 name: to-tracker
-description: Turn the current conversation, or a spec or issue you pass, into a spec plus tracer-bullet tickets and push both to the configured issue tracker. Re-running updates what it pushed before.
+description: Turn the current conversation, or a spec or issue you pass, into a spec plus tracer-bullet tickets and push both to the configured issue tracker; or mirror an OpenSpec change there. Re-running updates what it pushed before.
 model: opus
 disable-model-invocation: true
 targets: [claude]
@@ -23,6 +23,7 @@ Synthesize a **spec** and its **tickets** (tracer-bullet vertical slices with bl
 
 Done when exactly one mode is chosen:
 
+- **OpenSpec change**: the argument names a change under `openspec/changes/` (archived or not). Follow [openspec-mirror.md](openspec-mirror.md) from here on, in place of the steps below.
 - **Re-run**: the argument is a spec or ticket this skill pushed. It carries a `<!-- to-tracker:… -->` marker, or matches an entry in some `.scratch/*/.tracker.json`. Load that feature's `spec.md` and `.tracker.json`.
 - **Foreign issue**: the argument is an issue this skill did not push. It is the *source*: read its body and all its comments. It stays untouched, apart from one comment in step 6.
 - **New**: a spec path (read it in full) or the conversation.

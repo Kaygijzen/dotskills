@@ -96,6 +96,8 @@ Offer **multi-context** (a root `GLOSSARY-MAP.md` pointing to per-context `GLOSS
 
 **Section E: OpenSpec.** Ask whether this repo will use the OpenSpec flow (`grill-spec`, `ralph-apply`). If yes, check that `openspec/` exists at the repo root. If it doesn't, tell the user to run `openspec init`. Don't run it for them.
 
+When Section A chose an external tracker, ask one more question: "Mirror OpenSpec changes to the tracker?" (recommended: **no**). On yes, add a line to the `### Issue tracker` sub-block: "OpenSpec changes are mirrored to the tracker: run `/to-tracker <change>` after `/grill-spec`, after each `ralph-apply` run, and after `/opsx:archive`."
+
 ### 3. Confirm and edit
 
 Show the user a draft of:
