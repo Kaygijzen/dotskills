@@ -46,7 +46,8 @@
     "source_path": "skills/engineering/code-review",
     "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
     "local_changes": [
-      "/setup-matt-pocock-skills -> /setup-dotskills"
+      "/setup-matt-pocock-skills -> /setup-dotskills",
+      "SKILL.md: without a tracker doc, falls back to the local-markdown tracker instead of stopping"
     ]
   },
   {
@@ -114,7 +115,8 @@
     "source_path": "skills/engineering/wayfinder",
     "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
     "local_changes": [
-      "/setup-matt-pocock-skills -> /setup-dotskills"
+      "/setup-matt-pocock-skills -> /setup-dotskills",
+      "SKILL.md: tracker-not-configured sentence unified with to-tracker and code-review (local-markdown fallback, said once)"
     ]
   },
   {
