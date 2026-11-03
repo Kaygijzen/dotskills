@@ -62,6 +62,15 @@ claude_args=(-p --permission-mode acceptEdits --allowedTools "$allowed" --max-tu
 prompt="$(sed "s/{{CHANGE}}/$change/g" "$prompt_file")"
 mkdir -p "$log_dir"
 
+# Keep logs and the stop file out of the iterations' `git add -A` commits.
+# Uses the local exclude file, so the repo's tracked .gitignore is untouched.
+exclude_file="$(git rev-parse --git-path info/exclude)"
+mkdir -p "$(dirname "$exclude_file")"
+touch "$exclude_file"
+for pattern in ".ralph/" ".ralph-stop"; do
+  grep -qxF "$pattern" "$exclude_file" || echo "$pattern" >> "$exclude_file"
+done
+
 echo "Ralph: change '$change' on branch '$branch', $remaining open task(s), max $max iteration(s)"
 echo "Logs: $log_dir/"
 
