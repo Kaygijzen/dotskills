@@ -54,9 +54,9 @@ open_tickets() { jq '[.tickets[] | select(.state != "closed")] | length' "$state
 
 remaining="$(open_tickets)"
 max="${2:-$((remaining + 3))}"
-allowed="Bash(git add:*),Bash(git commit:*),Bash(git status:*),Bash(git diff:*),Bash(git log:*),Read,Edit,Write,Glob,Grep"
+allowed="Bash(git add:*),Bash(git commit:*),Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git restore:*),Bash(git clean:*),Read,Edit,Write,Glob,Grep"
 if command -v rtk >/dev/null; then
-  allowed="$allowed,Bash(rtk git add:*),Bash(rtk git commit:*),Bash(rtk git status:*),Bash(rtk git diff:*),Bash(rtk git log:*)"
+  allowed="$allowed,Bash(rtk git add:*),Bash(rtk git commit:*),Bash(rtk git status:*),Bash(rtk git diff:*),Bash(rtk git log:*),Bash(rtk git restore:*),Bash(rtk git clean:*)"
 fi
 [[ -n "${RALPH_ALLOWED_TOOLS:-}" ]] && allowed="$allowed,$RALPH_ALLOWED_TOOLS"
 

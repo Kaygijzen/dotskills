@@ -62,7 +62,7 @@ Then tell them:
 - **Optional env vars:** `RALPH_MODEL` (default `sonnet`) and `RALPH_MAX_TURNS` (default 60).
 - **One runner at a time.** Tickets are not claimed, so two loops on the same feature would pick the same ticket.
 - **Logs** go to `.ralph/<feature>/iter-N.log`.
-- **When it stops** on a `.ralph-stop`, run `/ralph-tickets <feature>` again to handle the question, then rerun the command.
+- **When it stops** on a `.ralph-stop`, the tree is clean again and any unfinished work is saved as `.ralph/<feature>/wip-<ticket>.patch` (apply it with `git apply` if you want to keep it). Run `/ralph-tickets <feature>` again to handle the question, then rerun the command.
 - **When the frontier is empty,** the loop reports it. If tickets are still open they are blocked or not labelled `ready-for-agent`; look at them yourself. Otherwise do the manual checks the loop skips, run `/code-review` against the spec, and close the parent.
 
 Don't start the loop yourself in this session unless the user explicitly asks. If they do, run it with the Bash tool in the background and report when it exits.

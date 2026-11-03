@@ -30,13 +30,19 @@ You have a fresh context. Everything you know comes from files and the issue tra
      decisions, anything the next iteration must know. Don't repeat what is in the spec.
    Do not edit the ticket's body other than ticking its criteria, and never edit the parent.
 
-6. Stop instead of guessing. Write a short reason to `.ralph-stop` at the repo root, leave the ticket
-   open, commit nothing half-done, and exit, if the ticket needs any of:
+6. Stop instead of guessing. Leave the ticket open and exit if the ticket needs any of:
    - a product or UX decision that isn't in the spec or the ticket;
    - a new dependency, or platform, signing, secrets or CI configuration the project says to ask about;
    - changing the spec, or deleting/weakening tests to get to green (the ticket may be wrong: say why);
    - a command or tracker tool you are not allowed to run;
    - a failure you could not fix after a real attempt (include the error).
+   Leave the tree clean, so the loop can restart. In this order:
+   - If you have uncommitted changes, save them first: `git add -A -N` (so new files count), then
+     `git diff > .ralph/{{FEATURE}}/wip-<ticket id>.patch` (create the folder if needed).
+   - Undo them: `git restore --staged --worktree .`, then delete the files you created
+     (`git clean -fd`, never with `-x`).
+   - Write the reason to `.ralph-stop` at the repo root, with the patch path if you saved one.
+   Commit nothing half-done.
 
 Rules: never skip or disable tests, never touch tickets other than the one you are doing, and keep your
 final message to two lines: the ticket you did (or why you stopped) and the verification result.
