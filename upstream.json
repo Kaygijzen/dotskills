@@ -66,14 +66,6 @@
     "local_changes": []
   },
   {
-    "skill": "implement",
-    "domain": "engineering",
-    "source_repo": "https://github.com/mattpocock/skills",
-    "source_path": "skills/engineering/implement",
-    "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
-    "local_changes": []
-  },
-  {
     "skill": "improve-codebase-architecture",
     "domain": "engineering",
     "source_repo": "https://github.com/mattpocock/skills",
@@ -129,14 +121,6 @@
       "issue-tracker-github.md, issue-tracker-gitlab.md: \"/triage reads this flag\" -> \"a triage skill, if installed, reads this flag\""
     ],
     "renamed_from": "setup-matt-pocock-skills"
-  },
-  {
-    "skill": "tdd",
-    "domain": "engineering",
-    "source_repo": "https://github.com/mattpocock/skills",
-    "source_path": "skills/engineering/tdd",
-    "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
-    "local_changes": []
   },
   {
     "skill": "to-spec",
