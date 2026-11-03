@@ -8,13 +8,14 @@ targets: [claude]
 
 # To Tracker
 
-Synthesize a **spec** and its **tickets** (tracer-bullet vertical slices with blocking edges), then push them to the issue tracker: the spec as the parent, each ticket as a child. The push is one-way: tracker *content* never flows back into the spec. Tracker *state* (ids, children, blockers, open/closed, assignee) is read only to update safely.
+Synthesize a **spec** and its **tickets** (tracer-bullet vertical slices with blocking edges), then push them to the issue tracker: the spec as the parent, each ticket as a child. The push is one-way: tracker *content* never flows back into the spec. Tracker *state* (ids, children, open/closed, assignee) is read only to update safely. Blocking edges are soft on every tracker: a `Blocked by:` line in the ticket body, never a native tracker link.
 
 ## 1. Preconditions
 
-- Read `docs/agents/issue-tracker.md`. If it is missing, stop and tell the user to run `/setup-dotskills`. Every tracker action below is an operation named in that doc; carry it out exactly as the doc says.
+- Read `docs/agents/issue-tracker.md`. Every tracker action below is an operation named in that doc; carry it out exactly as the doc says.
+- No `docs/agents/issue-tracker.md`: use the local-markdown tracker, whose doc is `issue-tracker-local.md` in the `setup-dotskills` skill folder (the sibling of this skill folder's real path). Tell the user once that the push goes to `.scratch/`, and that `/setup-dotskills` connects GitHub or GitLab if they want an external tracker.
 - External tracker: make the doc's read-only connection check the session's first tracker call. If the MCP server isn't connected, stop and point to `/setup-dotskills`. Use the CLI only where the doc marks a step **CLI**.
-- A tracker the doc describes freely ("other"): check that it defines create, edit body and title, link a child to a parent, list a parent's children, add / remove a blocker, list an issue's blockers, ensure a label exists, and close with a comment. If any is missing, stop and name them.
+- A tracker the doc describes freely ("other"): check that it defines create, edit body and title, link a child to a parent, list a parent's children, ensure a label exists, and close with a comment. If any is missing, stop and name them.
 - The label is the `ready-for-agent` mapping in `docs/agents/triage-labels.md`, or the literal `ready-for-agent` when that file is absent.
 - Templates: `docs/agents/templates/spec.md` and `ticket.md` when present, else [templates/spec.md](templates/spec.md) and [templates/ticket.md](templates/ticket.md). Fill every heading of the template, including headings the user added; write "n/a" where nothing applies.
 
@@ -74,7 +75,8 @@ The skill owns these parts of every body, outside the template:
 
 - the marker: `<!-- to-tracker:spec -->` on the parent, `<!-- to-tracker:<key> -->` on each ticket;
 - on a foreign source, a first line `Source: #<n>` in the parent;
-- the parent link and the blocking edges, as the tracker doc represents them.
+- the parent link, as the tracker doc represents it;
+- the `Blocked by:` line, listing the ids of the blocking tickets (`#<n>` externally, `NN` locally), or `none`.
 
 Run "ensure a label exists" once before the first write.
 
@@ -82,12 +84,12 @@ Run "ensure a label exists" once before the first write.
 
 1. Create the parent from the spec. On the local tracker, the parent is `.scratch/<feature-slug>/spec.md`.
 2. With a foreign source, comment once on the source, linking to the new parent.
-3. Create the tickets in dependency order (blockers first), each linked to the parent, with its blocking edges and the label.
+3. Create the tickets in dependency order (blockers first), so each `Blocked by:` line can name real ids. Link each to the parent and apply the label.
 
 **Re-run**:
 
 1. Edit the parent body.
-2. Changed tickets: edit body and title. Diff the planned edges against "list an issue's blockers": add the missing, remove the stale.
+2. Changed tickets, including changed edges: edit body and title. The `Blocked by:` line is part of the body, so the edit updates the edges.
 3. Create new tickets as above.
 4. Close removed tickets with the comment "Removed from the spec by to-tracker".
 
