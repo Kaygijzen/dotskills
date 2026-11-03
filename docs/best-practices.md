@@ -64,6 +64,7 @@ defaulting to the system preference.
 | Small | Plan mode (`/plan`) |
 | A feature | [OpenSpec](https://github.com/Fission-AI/OpenSpec) with the `grill-spec` skill |
 | A long approved change | `ralph-apply`, which runs one fresh session per task |
+| A spec with tickets | `ralph-tickets`, which runs one fresh session per ready ticket |
 
 Each project makes two separate choices. (user) means the skill runs only when you type it, (model) means Claude may also invoke it on its own.
 
@@ -72,7 +73,7 @@ Each project makes two separate choices. (user) means the skill runs only when y
 | Spec flow | Skills |
 | --- | --- |
 | OpenSpec | `grill-spec` (user) → `ralph-apply` (user) |
-| Spec plus tickets | `grill-me` (user) → `to-tracker` (user), with `wayfinder` (user) for work bigger than one session |
+| Spec plus tickets | `grill-me` (user) → `to-tracker` (user) → `ralph-tickets` (user), with `wayfinder` (user) for work bigger than one session |
 
 **Where the work is visible:**
 
@@ -82,7 +83,7 @@ Each project makes two separate choices. (user) means the skill runs only when y
 | Local markdown | — (the change is already local) | files in `.scratch/`, the default without setup |
 | GitHub, GitLab | optional mirror: `/to-tracker <change>` pushes the change as a parent issue with one child per task group, and later runs update their status | issues, pushed by `to-tracker` |
 
-Run `/dotskills:setup-dotskills` (user) once per project to pick the tracker. The spec-plus-tickets flow currently ends at the tickets: skills for implementing them are still in progress.
+Run `/dotskills:setup-dotskills` (user) once per project to pick the tracker. `/ralph-tickets` then implements the pushed tickets one by one, each in a fresh session.
 
 These skills work alongside either flow:
 

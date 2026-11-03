@@ -47,7 +47,7 @@ Windows, the optional OpenSpec and rtk installs, and every other flag are in the
 </details>
 
 <details>
-<summary><strong>engineering</strong> (14)</summary>
+<summary><strong>engineering</strong> (15)</summary>
 
 | Skill | What it does | Trigger |
 | --- | --- | --- |
@@ -59,6 +59,7 @@ Windows, the optional OpenSpec and rtk installs, and every other flag are in the
 | `pr` | Write a pull request body. | `/pr`, or automatically when writing a PR body. |
 | `prototype` | Build a throwaway prototype to answer a design question. | `/prototype`, or automatically when the user wants to sanity-check whether a state model or logic feels right, or explore what a UI should look like. |
 | `ralph-apply` | Apply an approved OpenSpec change with a Ralph loop - a bash loop that runs a fresh headless Claude session per task, so context never piles up. | `/ralph-apply` only (never auto-invoked) |
+| `ralph-tickets` | Implement the tickets that to-tracker pushed, one at a time, with a Ralph loop - a bash loop that runs a fresh headless Claude session per ticket, always taking the next unblocked ready-for-agent ticket. | `/ralph-tickets` only (never auto-invoked) |
 | `research` | Investigate a question against high-trust primary sources and capture the findings as a Markdown file in the repo. | `/research`, or automatically when the user wants a topic researched, docs or API facts gathered, or reading legwork delegated to a background agent. |
 | `retro` | Conduct a retrospective on a coding session. | `/retro` only (never auto-invoked) |
 | `setup-dotskills` | Configure this repo for dotskills' engineering skills: set up its issue tracker and its MCP server, the label vocabulary, and the domain doc layout. | `/setup-dotskills` only (never auto-invoked) |
