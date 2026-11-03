@@ -118,7 +118,10 @@
       "issue-tracker-github.md and triage-labels.md name Kaygijzen/dotskills / dotskills instead of mattpocock/skills",
       "SKILL.md: added Section D (agent conventions from conventions/project-template) and Section E (OpenSpec check)",
       "domain.md: dropped the pointer to the grill-with-docs skill (not imported)",
-      "issue-tracker-github.md, issue-tracker-gitlab.md: \"/triage reads this flag\" -> \"a triage skill, if installed, reads this flag\""
+      "issue-tracker-github.md, issue-tracker-gitlab.md: \"/triage reads this flag\" -> \"a triage skill, if installed, reads this flag\"",
+      "issue-tracker-github.md: Conventions rewritten as github MCP tool map, blocking as a text line; PR and Wayfinding sections marked CLI-only",
+      "issue-tracker-gitlab.md: Conventions rewritten as GitLab MCP tool map with glab fallbacks, blocking as a text line; MR and Wayfinding sections marked CLI-only",
+      "issue-tracker-local.md: fixed ticket file format (Parent/Status/Blocked by lines) and added an Operations list"
     ],
     "renamed_from": "setup-matt-pocock-skills"
   },

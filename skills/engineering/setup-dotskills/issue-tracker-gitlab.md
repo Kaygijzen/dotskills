@@ -1,20 +1,25 @@
 # Issue tracker: GitLab
 
-Issues and specs for this repo live as GitLab issues. Use the [`glab`](https://gitlab.com/gitlab-org/cli) CLI for all operations.
+Issues and specs for this repo live as GitLab issues (work items), reached through GitLab's built-in MCP server (GitLab 19.5+). Tools are named by short name: `save_work_item` means `mcp__GitLab__save_work_item`. Pass `project_id` (the project path from `git remote -v`) on every call. The [`glab`](https://gitlab.com/gitlab-org/cli) CLI is used only for the steps marked **CLI**, and for the MR and Wayfinding sections.
 
 ## Conventions
 
-- **Create an issue**: `glab issue create --title "..." --description "..."`. Use a heredoc for multi-line descriptions. Pass `--description -` to open an editor.
-- **Read an issue**: `glab issue view <number> --comments`. Use `-F json` for machine-readable output.
-- **List issues**: `glab issue list -O json` with appropriate `--label` filters.
-- **Comment on an issue**: `glab issue note <number> --message "..."`. GitLab calls comments "notes".
-- **Apply / remove labels**: `glab issue update <number> --label "..."` / `--unlabel "..."`. Multiple labels can be comma-separated or by repeating the flag.
-- **Close**: `glab issue close <number>`. `glab issue close` does not accept a closing comment, so post the explanation first with `glab issue note <number> --message "..."`, then close.
-- **Merge requests**: GitLab calls PRs "merge requests". Use `glab mr create`, `glab mr view`, `glab mr note`, etc., the same shape as `gh pr ...` with `mr` in place of `pr` and `note`/`--message` in place of `comment`/`--body`.
-
-Infer the repo from `git remote -v`; `glab` does this automatically when run inside a clone.
+- **Check the connection**: `list_work_items` with `types: ["ISSUE"]`, `first: 1`. Read-only; run it before the first write of a session.
+- **Create an issue**: `save_work_item` without `work_item_iid`, with `type_name: Issue`, `title`, `description`, `labels`. Add `parent_id` to create it as a child.
+- **Read an issue**: `get_work_item` with `work_item_iid`, then again with `include: ["notes"]` for the comments.
+- **List issues**: `list_work_items` with `state` (`opened`/`closed`/`all`) and `label_name`.
+- **Edit body and title**: `save_work_item` with `work_item_iid`, `title`, `description`.
+- **Link a child to a parent**: `save_work_item` with `parent_id`, at creation or on update. `parent_id` is the parent's numeric `id` (or global ID) from `get_work_item`, not its iid. An Issue's child type depends on the tier's hierarchy rules; if the server rejects an Issue as a child, use `type_name: Task`.
+- **List a parent's children**: `list_work_items` with `parent_iid` (GitLab 19.6+). On 19.5, use `list_work_items` with `search: <text>`, which searches titles and descriptions, with the marker text the children carry.
+- **Blocking**: a `Blocked by: #<n>, #<n>` line at the top of the description, or `Blocked by: none`. Add, remove and list blockers by reading and editing that line with **Edit body and title**. A ticket is unblocked when every listed issue is closed. Native blocking links are not used, so this works on every tier.
+- **Ensure a label exists**: `search_labels` with `full_path: <project path>`, `is_project: true`, `search: <name>`. MCP has no create-label tool: if it is missing, **CLI** `glab label create --name <name>`.
+- **Comment on an issue**: `save_note` with `work_item_iid`, `body`. GitLab calls comments "notes". A line starting with `/` runs as a quick action, so keep the body clear of those.
+- **Apply / remove labels**: `save_work_item` with `work_item_iid` and `add_labels` / `remove_labels`. `labels` works only at creation. Unknown label names are an error, not created.
+- **Close with a comment**: `save_note`, then `save_work_item` with `work_item_iid`, `state: closed`.
 
 ## Merge requests as a triage surface
+
+This section uses the `glab` CLI, not the MCP server.
 
 **MRs as a request surface: no.** _(Set to `yes` if this repo treats external merge requests as feature requests; a `triage` skill, if installed, reads this flag.)_
 
@@ -32,11 +37,11 @@ Create a GitLab issue.
 
 ## When a skill says "fetch the relevant ticket"
 
-Run `glab issue view <number> --comments`.
+Read it as in **Read an issue** above.
 
 ## Wayfinding operations
 
-Used by `/wayfinder`. The **map** is a single issue with **child** issues as tickets.
+Used by `/wayfinder`. This section uses the `glab` CLI, not the MCP server. The **map** is a single issue with **child** issues as tickets.
 
 - **Map**: a single issue labelled `wayfinder:map`, holding the Notes / Decisions-so-far / Fog body. `glab issue create --label wayfinder:map`. (On GitLab tiers with native epics, an epic may hold the map instead; a labelled issue works everywhere.)
 - **Child ticket**: an issue carrying `Part of #<map>` at the top of its description, linked to the map (`glab issue create --linked-issues <map> --link-type relates_to`), and labels `wayfinder:<type>` (`research`/`prototype`/`grilling`/`task`). Once claimed, the ticket is assigned to the driving dev.
