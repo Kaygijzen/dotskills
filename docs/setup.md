@@ -2,8 +2,6 @@
 
 Last checked: 2026-11-02 against the Claude Code docs at code.claude.com/docs.
 
-A draft for you to edit. It takes about five minutes to read.
-
 ## 1. Install Claude Code and sign in
 
 Follow the official install steps at <https://code.claude.com/docs/en/quickstart>, then run `claude` and sign in. If you use an API key, keep it in an environment variable or your shell profile. It never goes in a repo, and never in a prompt.
@@ -55,7 +53,11 @@ The installer edits `settings.json` only when you pass `--statusline-settings` (
 
 ```json
 {
-  "statusLine": { "type": "command", "command": "~/.claude/statusline.sh", "timeout": 10 }
+  "statusLine": { 
+    "type": "command", 
+    "command": "~/.claude/statusline.sh", 
+    "timeout": 10 
+  }
 }
 ```
 

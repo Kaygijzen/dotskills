@@ -2,8 +2,6 @@
 
 Last checked: 2026-11-02 against the Claude Code docs.
 
-A draft for you to edit. It takes about five minutes to read.
-
 ## 1. Spec-driven development
 
 For anything bigger than an afternoon: write the spec first, review it, implement it in fresh contexts, then verify against the spec.

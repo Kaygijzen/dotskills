@@ -94,7 +94,7 @@ check_upstream() {
 }
 
 validate_skill() {
-  local dir="$1" domain folder file ok=0 targets status
+  local dir="$1" domain folder file ok=0 targets status model
   folder="$(basename "$dir")"
   domain="$(basename "$(dirname "$dir")")"
   file="$dir/SKILL.md"
@@ -121,6 +121,11 @@ validate_skill() {
   status="$(frontmatter_value "$file" status)"
   if [[ -n "$status" && "$status" != "stable" && "$status" != "experimental" ]]; then
     echo "FAIL $label: status '$status' must be stable or experimental"; ok=1
+  fi
+
+  model="$(frontmatter_value "$file" model)"
+  if [[ -n "$model" && ! "$model" =~ ^(opus|sonnet|haiku|inherit)$ ]]; then
+    echo "FAIL $label: model '$model' must be opus, sonnet, haiku or inherit"; ok=1
   fi
 
   portability_lint "$file" "$label" "${targets:-[claude, codex]}"
