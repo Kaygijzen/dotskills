@@ -70,7 +70,7 @@ Two spec flows. Pick one per project. (user) means the skill runs only when you 
 | Project type | Flow |
 | --- | --- |
 | OpenSpec | `grill-spec` (user) → `ralph-apply` (user) |
-| Issue tracker | `grill-me` (user) → `to-spec` (user) → `to-tickets` (user), with `wayfinder` (user) for work bigger than one session |
+| Issue tracker | `grill-me` (user) → `to-tracker` (user), with `wayfinder` (user) for work bigger than one session |
 
 Run `/dotskills:setup-dotskills` (user) once per project before the issue-tracker flow. The issue-tracker flow currently ends at the tickets: skills for implementing them are still in progress.
 

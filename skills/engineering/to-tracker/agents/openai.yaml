@@ -1,0 +1,5 @@
+interface:
+  display_name: "To Tracker"
+  short_description: "Push a spec and tickets to the tracker"
+policy:
+  allow_implicit_invocation: false

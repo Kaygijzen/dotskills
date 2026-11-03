@@ -43,8 +43,7 @@ Chosen from what each skill does. The session model runs the skill, so switch be
 | `grill-me`, `wayfinder`, `improve-codebase-architecture` | **Opus** | Open-ended interviews and design judgement: a wrong plan costs more than the tokens |
 | `code-review` | **Opus** (pinned in frontmatter) | It fans out to sub-agents and aggregates their reports; judgement matters more than speed |
 | `prototype` | **Sonnet** | Execution against an agreed spec, with tests checking the result |
-| `to-spec` | **Opus** (pinned in frontmatter) | Synthesis of a conversation into a spec; a weak spec misleads every later step |
-| `to-tickets` | Sonnet (pinned) | Breaking an existing plan into tickets; no interview |
+| `to-tracker` | **Opus** (pinned in frontmatter) | Synthesis of a conversation into a spec and tickets; a weak spec misleads every later step |
 | `research` (pinned), `domain-modeling`, `codebase-design`, `teach` | Sonnet | Reading, writing and explaining |
 | `pr` and `wizard` (pinned), `handoff`, `retro`, `setup-dotskills` | Sonnet, or Haiku for a small change | Short, structured writing |
 | `hello-skill` | Haiku (pinned) | A one-line greeting and install check |

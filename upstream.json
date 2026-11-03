@@ -121,29 +121,10 @@
       "issue-tracker-github.md, issue-tracker-gitlab.md: \"/triage reads this flag\" -> \"a triage skill, if installed, reads this flag\"",
       "issue-tracker-github.md: Conventions rewritten as github MCP tool map, gh only as fallback; PR and Wayfinding sections marked CLI-only",
       "issue-tracker-gitlab.md: Conventions rewritten as GitLab MCP tool map with glab fallbacks and a Tier flag; MR and Wayfinding sections marked CLI-only",
-      "issue-tracker-local.md: fixed ticket file format (Parent/Status/Blocked by lines) and added an Operations list"
+      "issue-tracker-local.md: fixed ticket file format (Parent/Status/Blocked by lines) and added an Operations list",
+      "SKILL.md: Section A explainer names to-tracker, wayfinder and code-review instead of to-tickets, triage and to-spec"
     ],
     "renamed_from": "setup-matt-pocock-skills"
-  },
-  {
-    "skill": "to-spec",
-    "domain": "engineering",
-    "source_repo": "https://github.com/mattpocock/skills",
-    "source_path": "skills/engineering/to-spec",
-    "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
-    "local_changes": [
-      "/setup-matt-pocock-skills -> /setup-dotskills"
-    ]
-  },
-  {
-    "skill": "to-tickets",
-    "domain": "engineering",
-    "source_repo": "https://github.com/mattpocock/skills",
-    "source_path": "skills/engineering/to-tickets",
-    "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
-    "local_changes": [
-      "/setup-matt-pocock-skills -> /setup-dotskills (2 places)"
-    ]
   },
   {
     "skill": "wayfinder",
