@@ -4,9 +4,9 @@
 
 The skills listed below were copied from <https://github.com/mattpocock/skills> at commit `4ae2317`. Per-skill provenance and local edits are recorded in `upstream.json`.
 
-Imported skills: grill-me, grilling, handoff, teach, writing-for-agents, code-review, codebase-design, domain-modeling, improve-codebase-architecture, pr, prototype, research, retro, setup-dotskills (from setup-matt-pocock-skills), wayfinder, wizard.
+Imported skills: grill-me, grilling, handoff, teach, writing-for-agents, code-review, codebase-design, domain-modeling, improve-codebase-architecture, pr, prototype, research, retro, wayfinder, wizard.
 
-`to-tracker` is derived from the upstream `to-spec` and `to-tickets` skills.
+`to-tracker` is derived from the upstream `to-spec` and `to-tickets` skills. `setup-dotskills` is derived from upstream `setup-matt-pocock-skills`.
 
 `skills/engineering/pr` also keeps its own `CREDITS.md`, which credits Dex Horthy's `show-me`.
 

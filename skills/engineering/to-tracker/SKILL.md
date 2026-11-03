@@ -15,7 +15,7 @@ Synthesize a **spec** and its **tickets** (tracer-bullet vertical slices with bl
 - Read `docs/agents/issue-tracker.md`. If it is missing, stop and tell the user to run `/setup-dotskills`. Every tracker action below is an operation named in that doc; carry it out exactly as the doc says.
 - External tracker: make the doc's read-only connection check the session's first tracker call. If the MCP server isn't connected, stop and point to `/setup-dotskills`. Use the CLI only where the doc marks a step **CLI**.
 - A tracker the doc describes freely ("other"): check that it defines create, edit body and title, link a child to a parent, list a parent's children, ensure a label exists, and close with a comment. If any is missing, stop and name them.
-- The label is the `ready-for-agent` mapping in `docs/agents/triage-labels.md`, or the literal `ready-for-agent` when that file is absent.
+- Labels: the `ready-for-agent` mapping in `docs/agents/triage-labels.md`, plus the file's extra labels, or the literal `ready-for-agent` when that file is absent.
 - Templates: `docs/agents/templates/spec.md` and `ticket.md` when present, else [templates/spec.md](templates/spec.md) and [templates/ticket.md](templates/ticket.md). Fill every heading of the template, including headings the user added; write "n/a" where nothing applies.
 
 ## 2. Mode
@@ -77,7 +77,7 @@ The skill owns these parts of every body, outside the template:
 - the parent link, as the tracker doc represents it;
 - the `Blocked by:` line, listing the ids of the blocking tickets (`#<n>` externally, `NN` locally), or `none`.
 
-Run "ensure a label exists" once before the first write.
+Run "ensure a label exists" for each label once before the first write.
 
 **New**:
 
