@@ -47,7 +47,7 @@ Windows, the optional OpenSpec and rtk installs, and every other flag are in the
 </details>
 
 <details>
-<summary><strong>engineering</strong> (17)</summary>
+<summary><strong>engineering</strong> (15)</summary>
 
 | Skill | What it does | Trigger |
 | --- | --- | --- |
@@ -55,7 +55,6 @@ Windows, the optional OpenSpec and rtk installs, and every other flag are in the
 | `codebase-design` | Shared vocabulary for designing deep modules. | `/codebase-design`, or automatically when the user wants to design or improve a module's interface, find deepening opportunities, decide where a seam goes, make code more testable or AI-navigable, or when another skill needs the deep-module vocabulary. |
 | `domain-modeling` | Build and sharpen a project's domain model. | `/domain-modeling`, or automatically when discussing codebase terminology, writing or editing a GLOSSARY.md, or recording or editing an ADR. |
 | `grill-spec` | Grill the user until intent is shared, then generate a complete OpenSpec change (proposal, delta specs, design, tasks) and review it with fresh-context sub-agents before handing it to a coding agent. | `/grill-spec` only (never auto-invoked) |
-| `implement` | Implement a piece of work based on a spec or set of tickets. | `/implement` only (never auto-invoked) |
 | `improve-codebase-architecture` | Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill through whichever one you pick. | `/improve-codebase-architecture` only (never auto-invoked) |
 | `pr` | Write a pull request body. | `/pr`, or automatically when writing a PR body. |
 | `prototype` | Build a throwaway prototype to answer a design question. | `/prototype`, or automatically when the user wants to sanity-check whether a state model or logic feels right, or explore what a UI should look like. |
@@ -63,7 +62,6 @@ Windows, the optional OpenSpec and rtk installs, and every other flag are in the
 | `research` | Investigate a question against high-trust primary sources and capture the findings as a Markdown file in the repo. | `/research`, or automatically when the user wants a topic researched, docs or API facts gathered, or reading legwork delegated to a background agent. |
 | `retro` | Conduct a retrospective on a coding session. | `/retro` only (never auto-invoked) |
 | `setup-dotskills` | Configure this repo for dotskills' engineering skills: set up its issue tracker, triage label vocabulary, and domain doc layout. | `/setup-dotskills` only (never auto-invoked) |
-| `tdd` | Test-driven development. | `/tdd`, or automatically when the user wants to build features or fix bugs test-first, mentions "red-green-refactor", or wants integration tests. |
 | `to-spec` | Turn the current conversation into a spec and publish it to the project issue tracker: no interview, just synthesis of what you've already discussed. | `/to-spec` only (never auto-invoked) |
 | `to-tickets` | Break a plan, spec, or the current conversation into a set of tracer-bullet tickets, each declaring its blocking edges, published to the configured tracker (edges as text in one file per ticket locally, or native blocking links on a real tracker). | `/to-tickets` only (never auto-invoked) |
 | `wayfinder` | Plan a huge chunk of work (more than one agent session can hold) as a shared map of decision tickets on your issue tracker, and resolve them one at a time until the way to the destination is clear. | `/wayfinder` only (never auto-invoked) |

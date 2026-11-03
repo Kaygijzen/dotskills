@@ -17,7 +17,7 @@ Two spec flows. Pick one per project:
 | Project type | Flow |
 | --- | --- |
 | OpenSpec | `grill-spec` (user) → `ralph-apply` (user) |
-| Issue tracker | `grill-me` (user) → `to-spec` (user) → `to-tickets` (user) → `implement` (user), with `wayfinder` (user) for work bigger than one session |
+| Issue tracker | `grill-me` (user) → `to-spec` (user) → `to-tickets` (user), with `wayfinder` (user) for work bigger than one session |
 
 Run `/dotskills:setup-dotskills` once per project before the issue-tracker flow.
 
@@ -25,7 +25,7 @@ These skills work alongside either flow. (model) means Claude may invoke it on i
 
 - `grilling` (model), `codebase-design` (model), `improve-codebase-architecture` (user)
 - `code-review` (model), `pr` (model), `prototype` (model), `research` (model)
-- `tdd` (model), `domain-modeling` (model)
+- `domain-modeling` (model)
 - `handoff` (user), `retro` (user), `teach` (user)
 - `writing-for-agents` (model), `wizard` (model)
 
