@@ -92,9 +92,18 @@ A secret blocker stops Claude from reading or editing `.env*`, keys and similar 
 
 ## Getting started
 
-Want to edit the skills? Clone and symlink. Just want to use them? Install the plugin. Pick one per machine.
+Just want to use the skills? Install the plugin. Want to edit them? Clone and symlink. Pick one per machine.
 
-**Clone and symlink** (macOS, Linux, WSL):
+**Install as a plugin**, no clone needed. Run in a Claude Code session:
+
+```
+/plugin marketplace add Kaygijzen/dotskills
+/plugin install dotskills@dotskills
+```
+
+Then run `/dotskills:setup-dotskills` once, also inside a Claude Code session. Plugins can't change settings or install tools, so this skill installs the statusline, sets the default model to sonnet if none is set, and offers to install OpenSpec (for `/grill-spec` and `/ralph-apply`) and rtk. Run it again after each plugin update.
+
+**Or clone and symlink** (macOS, Linux, WSL):
 
 ```bash
 git clone https://github.com/Kaygijzen/dotskills.git
@@ -102,15 +111,6 @@ cd dotskills
 ./install.sh                # every domain, or: --domain engineering
 ./install.sh --conventions  # optional: add my conventions to ~/.claude/CLAUDE.md
 ```
-
-**Or install as a plugin**, no clone needed. Run in a Claude Code session:
-
-```
-/plugin marketplace add Kaygijzen/dotskills
-/plugin install dotskills@dotskills
-```
-
-Then run `/dotskills:setup-dotskills` once. Plugins can't change settings or install tools, so this skill installs the statusline, sets the default model to sonnet if none is set, and offers to install OpenSpec (for `/grill-spec` and `/ralph-apply`) and rtk. Run it again after each plugin update.
 
 Run `/hello-skill` (or `/dotskills:hello-skill`) to check it works.
 
