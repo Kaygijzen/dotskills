@@ -18,7 +18,7 @@ powershell -ExecutionPolicy Bypass -File .\install.ps1
 | `./install.sh --init-project <path>` | Copies the project template into `<path>`, skipping existing files and reporting them. |
 | `./install.sh --uninstall [NAME...]` | Removes only what this script created, including the conventions block. |
 | `./install.sh --check` | Runs `scripts/validate.sh`. |
-| `./install.sh --statusline-settings` | Sets `statusLine` in `settings.json`, the only key the script edits. Backs up the file first and never overwrites an existing `statusLine`. Needs `jq`. |
+| `./install.sh --statusline-settings` | Sets `statusLine` in `settings.json`, the only key the script edits. Backs up the file first and never overwrites an existing `statusLine`. Writes through a symlinked `settings.json` and quotes the command path, so spaces work (an unquoted path from an older version is updated). Needs `jq`. |
 | `./install.sh --target codex` | Placeholder: prints "not implemented yet" and exits 0. |
 | `./install.sh --with-openspec` | Installs the OpenSpec CLI with npm if it's missing, without asking. Needs Node.js 20.19.0 or newer. |
 | `./install.sh --no-openspec` | Skips the OpenSpec question. |

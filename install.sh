@@ -262,8 +262,14 @@ uninstall_conventions() {
 
 # --- statusline: the one key we set in settings.json -----------------------
 
+# The command is run through a shell, so the path is double-quoted (one form for
+# every path; spaces are common in Windows and macOS user names).
+statusline_cmd() {
+  printf '"%s"' "$STATUSLINE_DEST"
+}
+
 statusline_value() {
-  jq -cn --arg c "$STATUSLINE_DEST" '{type: "command", command: $c, timeout: 10}'
+  jq -cn --arg c "$(statusline_cmd)" '{type: "command", command: $c, timeout: 10}'
 }
 
 # Prints the statusLine command in settings.json. Ours is recognised by its command
@@ -273,12 +279,29 @@ statusline_command() {
   jq -r '.statusLine.command? // empty' "$CLAUDE_SETTINGS" 2>/dev/null
 }
 
-# Writes stdin to $CLAUDE_SETTINGS via a temp file. The caller makes the
-# one-time backup (see install_statusline).
+# True if settings.json runs our script: the quoted path, or the bare path that
+# older versions wrote.
+statusline_is_ours() {
+  local c
+  c="$(statusline_command)"
+  [[ "$c" == "$(statusline_cmd)" || "$c" == "$STATUSLINE_DEST" ]]
+}
+
+# Runs jq "$@" into a temp file, then copies it over $CLAUDE_SETTINGS in place,
+# which follows a symlink and keeps the mode. A new file is moved into place. A
+# failed jq leaves $CLAUDE_SETTINGS untouched. The caller makes the one-time
+# backup (see install_statusline_settings).
 write_settings() {
   local tmp
   tmp="$(mktemp "$CLAUDE_SETTINGS.XXXXXX")" || return 1
-  cat > "$tmp" && mv "$tmp" "$CLAUDE_SETTINGS" || { rm -f "$tmp"; return 1; }
+  if jq "$@" > "$tmp" && [[ -s "$tmp" ]]; then
+    if [[ -e "$CLAUDE_SETTINGS" || -L "$CLAUDE_SETTINGS" ]]; then
+      cat "$tmp" > "$CLAUDE_SETTINGS" && rm -f "$tmp" && return 0
+    else
+      mv "$tmp" "$CLAUDE_SETTINGS" && return 0
+    fi
+  fi
+  rm -f "$tmp"; echo "WARN    statusLine: could not write $CLAUDE_SETTINGS"; return 1
 }
 
 install_statusline_settings() {
@@ -287,10 +310,15 @@ install_statusline_settings() {
   if [[ ! -f "$STATUSLINE_SRC" ]]; then
     echo "skip    statusLine: $STATUSLINE_SRC not found"; return 1
   fi
+  case "$STATUSLINE_DEST" in
+    *[\"\$\`\\]*|*$'\n'*)
+      echo "WARN    statusLine: $STATUSLINE_DEST contains a quote, \$, backtick, backslash or newline; the command can't quote it. Set CLAUDE_CONFIG_DIR to a plainer path"
+      return 1 ;;
+  esac
   link_one statusline statusline "$STATUSLINE_SRC" "$STATUSLINE_DEST" || return 1
   mkdir -p "$(dirname "$CLAUDE_SETTINGS")"
-  if [[ ! -f "$CLAUDE_SETTINGS" ]]; then
-    jq -n --argjson v "$want" '{statusLine: $v}' | write_settings || return 1
+  if [[ ! -e "$CLAUDE_SETTINGS" ]]; then
+    write_settings -n --argjson v "$want" '{statusLine: $v}' || return 1
     echo "added   statusLine to $CLAUDE_SETTINGS (new file)"
     return 0
   fi
@@ -298,24 +326,29 @@ install_statusline_settings() {
     echo "WARN    statusLine: $CLAUDE_SETTINGS is not a valid JSON object; leaving it alone"; return 1
   fi
   current="$(jq -c '.statusLine // empty' "$CLAUDE_SETTINGS")"
-  if [[ "$(statusline_command)" == "$STATUSLINE_DEST" ]]; then
+  if [[ "$(statusline_command)" == "$(statusline_cmd)" ]]; then
     echo "ok      statusLine in $CLAUDE_SETTINGS"; return 0
   fi
-  if [[ -n "$current" ]]; then
+  if ! statusline_is_ours && [[ -n "$current" ]]; then
     echo "WARN    statusLine: $CLAUDE_SETTINGS already sets $current; not overwriting (remove it first to use this one)"
     return 1
   fi
   [[ -e "$CLAUDE_SETTINGS.dotskills.bak" ]] || cp -p "$CLAUDE_SETTINGS" "$CLAUDE_SETTINGS.dotskills.bak"
-  jq --argjson v "$want" '.statusLine = $v' "$CLAUDE_SETTINGS" | write_settings || return 1
+  if statusline_is_ours; then
+    write_settings --arg c "$(statusline_cmd)" '.statusLine.command = $c' "$CLAUDE_SETTINGS" || return 1
+    echo "updated statusLine in $CLAUDE_SETTINGS (quoted the command path; backup: $CLAUDE_SETTINGS.dotskills.bak)"
+    return 0
+  fi
+  write_settings --argjson v "$want" '.statusLine = $v' "$CLAUDE_SETTINGS" || return 1
   echo "added   statusLine to $CLAUDE_SETTINGS (backup: $CLAUDE_SETTINGS.dotskills.bak)"
 }
 
-# Removes statusLine only if it still runs our script (see statusline_command).
+# Removes statusLine only if it still runs our script (see statusline_is_ours).
 uninstall_statusline_settings() {
   [[ -f "$CLAUDE_SETTINGS" ]] || return 0
   jq -e 'type == "object"' "$CLAUDE_SETTINGS" >/dev/null 2>&1 || return 0
-  if [[ "$(statusline_command)" == "$STATUSLINE_DEST" ]]; then
-    jq 'del(.statusLine)' "$CLAUDE_SETTINGS" | write_settings || return 1
+  if statusline_is_ours; then
+    write_settings 'del(.statusLine)' "$CLAUDE_SETTINGS" || return 1
     echo "removed statusLine from $CLAUDE_SETTINGS"
   fi
 }
