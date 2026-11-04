@@ -13,7 +13,9 @@ run() { CLAUDE_CONFIG_DIR="$tmp/c" "$SCRIPT" >"$tmp/out" 2>&1; echo $?; }
 ok()  { echo "ok   $1"; }
 bad() { echo "FAIL $1: $(cat "$tmp/out")"; fail=1; }
 sl()  { jq -c '.statusLine // empty' "$tmp/c/settings.json"; }
-want="$(jq -cn --arg c "$tmp/c/statusline.sh" '{type: "command", command: $c, timeout: 10}')"
+want="$(jq -cn --arg c "\"$tmp/c/statusline.sh\"" '{type: "command", command: $c, timeout: 10}')"
+# File mode, portable across GNU and BSD.
+mode() { ls -lL "$1" | cut -c1-10; }
 
 # Fresh config: copies the script and creates settings.json.
 rm -rf "$tmp/c"
@@ -68,6 +70,40 @@ rm -rf "$tmp/c"
 CLAUDE_CONFIG_DIR="$tmp/c" PATH=/nonexistent /bin/bash "$SCRIPT" >"$tmp/out" 2>&1; rc=$?
 [[ $rc -eq 1 && ! -e "$tmp/c" ]] && grep -q "jq not found" "$tmp/out" && ok "stops without jq" || bad "stops without jq"
 
+# A symlinked settings.json (dotfiles repo) stays a link; its target is updated and keeps its mode.
+rm -rf "$tmp/c" "$tmp/dot"; mkdir -p "$tmp/c" "$tmp/dot"; echo '{"model":"sonnet"}' > "$tmp/dot/settings.json"
+chmod 644 "$tmp/dot/settings.json"; ln -s "$tmp/dot/settings.json" "$tmp/c/settings.json"
+[[ "$(run)" == 0 ]] && [[ -L "$tmp/c/settings.json" && "$(jq -c .statusLine "$tmp/dot/settings.json")" == "$want" \
+  && "$(mode "$tmp/dot/settings.json")" == "-rw-r--r--" && ! -L "$tmp/c/settings.json.dotskills.bak" \
+  && "$(cat "$tmp/c/settings.json.dotskills.bak")" == '{"model":"sonnet"}' ]] && ok "writes through a symlinked settings.json" || bad "writes through a symlinked settings.json"
+
+# A failed jq write leaves settings.json as it was (a jq that reads fine but fails on write).
+rm -rf "$tmp/c" "$tmp/fakebin"; mkdir -p "$tmp/c" "$tmp/fakebin"; echo '{"model":"sonnet"}' > "$tmp/c/settings.json"
+realjq="$(command -v jq)"
+printf '#!/bin/sh\nfor a; do [ "$a" = ".statusLine = \\$v" ] && exit 5; done\nexec "%s" "$@"\n' "$realjq" > "$tmp/fakebin/jq"; chmod +x "$tmp/fakebin/jq"
+CLAUDE_CONFIG_DIR="$tmp/c" PATH="$tmp/fakebin:$PATH" "$SCRIPT" >"$tmp/out" 2>&1; rc=$?
+[[ $rc -eq 1 && "$(cat "$tmp/c/settings.json")" == '{"model":"sonnet"}' ]] && grep -q "could not write" "$tmp/out" \
+  && [[ -z "$(find "$tmp/c" -name 'settings.json.??????')" ]] && ok "failed write keeps settings.json" || bad "failed write keeps settings.json"
+
+# A config dir with a space: the command is quoted and runs through a shell.
+sp="$tmp/with space/c"; rm -rf "$tmp/with space"
+CLAUDE_CONFIG_DIR="$sp" "$SCRIPT" >"$tmp/out" 2>&1 \
+  && [[ "$(jq -r .statusLine.command "$sp/settings.json")" == "\"$sp/statusline.sh\"" ]] \
+  && echo '{}' | sh -c "$(jq -r .statusLine.command "$sp/settings.json")" >/dev/null 2>&1 \
+  && ok "quotes a command path with a space" || bad "quotes a command path with a space"
+
+# A path the quotes can't protect is refused before anything is written.
+rm -rf "$tmp/c\$x"
+CLAUDE_CONFIG_DIR="$tmp/c\$x" "$SCRIPT" >"$tmp/out" 2>&1; rc=$?
+[[ $rc -eq 1 && ! -e "$tmp/c\$x" ]] && grep -q "can't quote it" "$tmp/out" && ok "refuses an unquotable path" || bad "refuses an unquotable path"
+
+# The bare path older versions wrote is ours: a rerun quotes it, keeping other keys.
+old="$(jq -cn --arg c "$tmp/c/statusline.sh" '{type: "command", command: $c}')"
+rm -rf "$tmp/c"; run >/dev/null; jq --argjson v "$old" '.statusLine = $v' "$tmp/c/settings.json" > "$tmp/s" && cp "$tmp/s" "$tmp/c/settings.json"
+[[ "$(run)" == 0 ]] && grep -q "^updated statusLine" "$tmp/out" \
+  && [[ "$(sl)" == "$(jq -cn --arg c "\"$tmp/c/statusline.sh\"" '{type: "command", command: $c}')" ]] \
+  && ok "quotes an old unquoted statusLine" || bad "quotes an old unquoted statusLine"
+
 # install.sh treats the skill's copy as its own: a full install swaps it for a
 # link, and --uninstall removes the link and the statusLine.
 REPO="$(cd "$DIR/../../../.." && pwd -P)"
@@ -82,6 +118,20 @@ installer --uninstall && [[ ! -e "$tmp/c/statusline.sh" && -z "$(sl)" ]] && ok "
 rm -rf "$tmp/c"; run >/dev/null; jq '.statusLine |= del(.timeout)' "$tmp/c/settings.json" > "$tmp/s" && cp "$tmp/s" "$tmp/c/settings.json"
 [[ "$(run)" == 0 ]] && grep -q "^ok      statusLine" "$tmp/out" && ok "recognises statusLine without timeout" || bad "recognises statusLine without timeout"
 installer --uninstall && [[ -z "$(sl)" ]] && ok "install.sh --uninstall removes statusLine without timeout" || bad "install.sh --uninstall removes statusLine without timeout"
+# install.sh recognises the old unquoted command too: --uninstall removes it,
+# --statusline-settings quotes it.
+rm -rf "$tmp/c"; run >/dev/null; jq --argjson v "$old" '.statusLine = $v' "$tmp/c/settings.json" > "$tmp/s" && cp "$tmp/s" "$tmp/c/settings.json"
+installer --uninstall && [[ -z "$(sl)" ]] && ok "install.sh --uninstall removes an old unquoted statusLine" || bad "install.sh --uninstall removes an old unquoted statusLine"
+rm -rf "$tmp/c"; run >/dev/null; jq --argjson v "$old" '.statusLine = $v' "$tmp/c/settings.json" > "$tmp/s" && cp "$tmp/s" "$tmp/c/settings.json"
+installer --statusline-settings && grep -q "^updated statusLine" "$tmp/out" && [[ "$(jq -r .statusLine.command "$tmp/c/settings.json")" == "\"$tmp/c/statusline.sh\"" ]] \
+  && ok "install.sh --statusline-settings quotes an old unquoted statusLine" || bad "install.sh --statusline-settings quotes an old unquoted statusLine"
+# install.sh writes the same value as the skill, through a symlinked settings.json.
+rm -rf "$tmp/c" "$tmp/dot"; mkdir -p "$tmp/c" "$tmp/dot"; echo '{}' > "$tmp/dot/settings.json"; chmod 644 "$tmp/dot/settings.json"
+ln -s "$tmp/dot/settings.json" "$tmp/c/settings.json"
+installer --statusline-settings && [[ -L "$tmp/c/settings.json" && "$(jq -c .statusLine "$tmp/dot/settings.json")" == "$want" && "$(mode "$tmp/dot/settings.json")" == "-rw-r--r--" ]] \
+  && ok "install.sh --statusline-settings writes through a symlinked settings.json" || bad "install.sh --statusline-settings writes through a symlinked settings.json"
+installer --uninstall statusline && [[ -L "$tmp/c/settings.json" && -z "$(jq -c '.statusLine // empty' "$tmp/dot/settings.json")" ]] \
+  && ok "install.sh --uninstall keeps a symlinked settings.json" || bad "install.sh --uninstall keeps a symlinked settings.json"
 # ...but still leaves a foreign regular file alone.
 rm -rf "$tmp/c"; mkdir -p "$tmp/c"; echo 'echo mine' > "$tmp/c/statusline.sh"
 installer --uninstall statusline; [[ -f "$tmp/c/statusline.sh" ]] && ok "install.sh --uninstall keeps a foreign file" || bad "install.sh --uninstall keeps a foreign file"

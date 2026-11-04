@@ -11,6 +11,7 @@
     "./skills/productivity"
   ],
   "agents": [
+    "./agents/core/ask-opus.md",
     "./agents/core/code-reviewer.md"
   ],
   "hooks": [
