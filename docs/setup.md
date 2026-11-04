@@ -6,6 +6,8 @@ Last checked: 2026-11-02 against the Claude Code docs at code.claude.com/docs.
 
 Follow the official install steps at <https://code.claude.com/docs/en/quickstart>, then run `claude` and sign in. If you use an API key, keep it in an environment variable or your shell profile. It never goes in a repo, and never in a prompt.
 
+On a corporate network that inspects TLS, the installer can fail with a certificate error. See [Behind a TLS-inspecting proxy](troubleshooting.md#behind-a-tls-inspecting-proxy).
+
 ## 2. Make Sonnet your default model
 
 On most plans the account default is Opus. Set Sonnet yourself in `~/.claude/settings.json`:
