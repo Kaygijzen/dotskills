@@ -16,7 +16,7 @@ Short working rules for every project, in [`conventions/AGENTS.md`](conventions/
 
 ### Statusline
 
-Shows the model, a context-use bar, cost and spend rate, session time, rate limits, git branch with ahead/behind upstream, and the worktree the session is in.
+The statusline is the bar Claude Code draws below the input box, filled by a script that reruns as the session changes. Ours shows the model, a context-use bar, cost and spend rate, session time, rate limits, git branch with ahead/behind upstream, and the worktree the session is in.
 
 ![dotskills statusline in a terminal](docs/images/statusline-terminal.png)
 
