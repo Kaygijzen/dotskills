@@ -20,7 +20,16 @@ The statusline is the bar Claude Code draws below the input box, filled by a scr
 
 ![dotskills statusline in a terminal](docs/images/statusline-terminal.png)
 
+### Companion tools
+
+Two external tools round out the setup. I use both; the installers offer to install them, but neither is required.
+
+- **[OpenSpec](https://github.com/Fission-AI/OpenSpec)** keeps agreed requirements as Markdown specs in the repo, so the agent implements the spec, not the chat. `/grill-spec` and `/ralph-apply` build on it; see [How I use it](#how-i-use-it).
+- **[rtk](https://github.com/rtk-ai/rtk)** is a hook that filters and truncates Bash output (git, tests, builds) before Claude reads it, so sessions use fewer tokens. See [Saving tokens with rtk](docs/install-reference.md#saving-tokens-with-rtk).
+
 ### Skills
+
+Skills are instruction sets Claude loads when a task calls for them. Some trigger on their own when your request matches their description; others run only when you type their slash command. They are grouped by domain.
 
 - **core:** checks that the install works and sets up the statusline.
 - **engineering:** specifying, building, reviewing and shipping code.
@@ -90,9 +99,18 @@ A secret blocker stops Claude from reading or editing `.env*`, keys and similar 
 
 ## Getting started
 
-Want to edit the skills? Clone and symlink. Just want to use them? Install the plugin. Pick one per machine.
+Just want to use the skills? Install the plugin. Want to edit them? Clone and symlink. Pick one per machine.
 
-**Clone and symlink** (macOS, Linux, WSL):
+**Install as a plugin**, no clone needed. Run in a Claude Code session:
+
+```
+/plugin marketplace add Kaygijzen/dotskills
+/plugin install dotskills@dotskills
+```
+
+Then run `/dotskills:setup-dotskills` once, also inside a Claude Code session. Plugins can't change settings or install tools, so this skill installs the statusline, sets the default model to sonnet if none is set, and offers to install OpenSpec (for `/grill-spec` and `/ralph-apply`) and rtk. Run it again after each plugin update.
+
+**Or clone and symlink** (macOS, Linux, WSL):
 
 ```bash
 git clone https://github.com/Kaygijzen/dotskills.git
@@ -100,15 +118,6 @@ cd dotskills
 ./install.sh                # every domain, or: --domain engineering
 ./install.sh --conventions  # optional: add my conventions to ~/.claude/CLAUDE.md
 ```
-
-**Or install as a plugin**, no clone needed. Run in a Claude Code session:
-
-```
-/plugin marketplace add Kaygijzen/dotskills
-/plugin install dotskills@dotskills
-```
-
-Then run `/dotskills:setup-dotskills` once. Plugins can't change settings or install tools, so this skill installs the statusline, sets the default model to sonnet if none is set, and offers to install OpenSpec (for `/grill-spec` and `/ralph-apply`) and rtk. Run it again after each plugin update.
 
 Run `/hello-skill` (or `/dotskills:hello-skill`) to check it works.
 
