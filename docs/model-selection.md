@@ -33,20 +33,18 @@ A subagent can set its own `model:` in its frontmatter. Use Haiku for search and
 
 ## The skills in this repo
 
-- `grill-spec`: your session model runs the interview, so switch to **Opus** for it. Its fact-finder sub-agents use `sonnet` and its spec reviewers use `opus`.
-- `ralph-apply`: **Sonnet**. `ralph.sh` already passes `--model` (default `sonnet`, override with `RALPH_MODEL`), so the loop model is enforced.
-
-### Imported skills (from mattpocock/skills)
-
-Chosen from what each skill does. The session model runs the skill, so switch before you start.
+Chosen from what each skill does. Unless a skill is pinned, the session model runs it, so switch before you start.
 
 | Skill | Model | Why |
 | --- | --- | --- |
-| `grill-me`, `improve-codebase-architecture` | **Opus** | Open-ended interviews and design judgement: a wrong plan costs more than the tokens |
+| `grill-spec` | **Opus** | The session model runs the interview. Its fact-finder sub-agents use `sonnet` and its spec reviewers use `opus` |
+| `ralph-apply` | **Sonnet** (enforced) | `ralph.sh` passes `--model` to every loop session (default `sonnet`, override with `RALPH_MODEL`) |
+| `grill-me`, `grilling`, `improve-codebase-architecture` | **Opus** | Open-ended interviews and design judgement: a wrong plan costs more than the tokens |
 | `code-review` | **Opus** (pinned in frontmatter) | It fans out to sub-agents and aggregates their reports; judgement matters more than speed |
+| `second-opinion` | Sonnet | It hands the hard question to Opus through the `ask-opus` agent, so the session can stay on Sonnet |
 | `prototype` | **Sonnet** | Execution against an agreed spec, with tests checking the result |
-| `research` (pinned), `domain-modeling`, `codebase-design`, `teach` | Sonnet | Reading, writing and explaining |
-| `pr` and `wizard` (pinned), `handoff`, `retro`, `setup-dotskills` | Sonnet, or Haiku for a small change | Short, structured writing |
+| `research` (pinned), `domain-modeling`, `codebase-design`, `teach`, `writing-for-agents` | Sonnet | Reading, writing and explaining |
+| `pr` and `wizard` (pinned), `handoff`, `retro`, `bro`, `setup-dotskills` | Sonnet, or Haiku for a small change | Short, structured writing or a scripted setup |
 | `hello-skill` | Haiku (pinned) | A one-line greeting and install check |
 
 ## Effort and thinking
