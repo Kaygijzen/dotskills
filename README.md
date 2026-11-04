@@ -20,6 +20,13 @@ The statusline is the bar Claude Code draws below the input box, filled by a scr
 
 ![dotskills statusline in a terminal](docs/images/statusline-terminal.png)
 
+### Companion tools
+
+Two external tools round out the setup. I use both; the installers offer to install them, but neither is required.
+
+- **[OpenSpec](https://github.com/Fission-AI/OpenSpec)** keeps agreed requirements as Markdown specs in the repo, so the agent implements the spec, not the chat. `/grill-spec` and `/ralph-apply` build on it; see [How I use it](#how-i-use-it).
+- **[rtk](https://github.com/rtk-ai/rtk)** is a hook that filters and truncates Bash output (git, tests, builds) before Claude reads it, so sessions use fewer tokens. See [Saving tokens with rtk](docs/install-reference.md#saving-tokens-with-rtk).
+
 ### Skills
 
 Skills are instruction sets Claude loads when a task calls for them. Some trigger on their own when your request matches their description; others run only when you type their slash command. They are grouped by domain.
