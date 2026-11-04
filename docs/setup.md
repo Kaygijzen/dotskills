@@ -65,7 +65,7 @@ For a single project, `./install.sh --init-project <path>` copies `conventions/p
 
 The installer edits `settings.json` on a linking run: it sets `statusLine` and sets `model` to `sonnet`, each only if none is set (`--no-statusline-settings` and `--no-model-setting` skip them). The `setup-dotskills` skill does the same, only when you run it (see the statusline below). Paste everything else in yourself.
 
-**Statusline** with model, a context-use bar, cost, session time, git branch and rate limits. The script is `statusline/statusline.sh` (vendored from [kcchien/claude-code-statusline](https://github.com/kcchien/claude-code-statusline), MIT). Plugins cannot set a statusline, so install it one of these ways:
+**Statusline** with model, a context-use bar, cost and spend rate, session time, rate limits, git branch with ahead/behind upstream, and the worktree the session is in. The script is `statusline/statusline.sh`. Plugins cannot set a statusline, so install it one of these ways:
 
 - **Plugin:** run `/dotskills:setup-dotskills`. It copies the script to `~/.claude/statusline.sh` and sets `statusLine`, sets `model` to `sonnet` if none is set, and offers to install OpenSpec and rtk (then you run `rtk init -g` yourself). It is a copy because the plugin folder changes with every version, so run it again after a [plugin update](#7-updating).
 - **Symlinks:** `./install.sh` links the script to `~/.claude/statusline.sh` and sets `statusLine`. `--no-statusline-settings` skips the setting.

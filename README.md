@@ -16,7 +16,7 @@ Short working rules for every project, in [`conventions/AGENTS.md`](conventions/
 
 ### Statusline
 
-Shows the model, a context-use bar, cost, session time, git branch and rate limits. Vendored from [kcchien/claude-code-statusline](https://github.com/kcchien/claude-code-statusline).
+Shows the model, a context-use bar, cost and spend rate, session time, rate limits, git branch with ahead/behind upstream, and the worktree the session is in.
 
 ![dotskills statusline in a terminal](docs/images/statusline-terminal.png)
 
@@ -149,4 +149,3 @@ The full loop and folder layout are in [best practices](docs/best-practices.md#1
 - Skills imported from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT). See `upstream.json` and `THIRD_PARTY_NOTICES.md`. `pr` credits Dex Horthy's [`show-me`](https://github.com/humanlayer/skills/blob/main/plugins/show-me/skills/show-me/SKILL.md) in its own `CREDITS.md`.
 - `bro` is imported from [luchasarie/bro-skill](https://github.com/luchasarie/bro-skill) (MIT). Licence kept in `skills/productivity/bro/LICENSE`; see `upstream.json` and `THIRD_PARTY_NOTICES.md`.
 - Coding principles in the conventions are condensed from [andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) (MIT per its skill frontmatter); the full text is in `docs/karpathy-guidelines.md`.
-- `statusline/statusline.sh` is vendored from [kcchien/claude-code-statusline](https://github.com/kcchien/claude-code-statusline) (MIT). Licence kept in `statusline/LICENSE`; see `THIRD_PARTY_NOTICES.md`.
