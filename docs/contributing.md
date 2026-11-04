@@ -1,6 +1,43 @@
 # Contributing to dotskills
 
+## Repo layout
+
+```
+dotskills/
+├── AGENTS.md  CLAUDE.md          how to work on this repo (CLAUDE.md is @AGENTS.md)
+├── docs/                         setup, install reference, model selection, best practices,
+│                                 contributing, troubleshooting, karpathy-guidelines
+│   ├── diagrams/                 Mermaid diagrams (example flow)
+│   └── images/                   README screenshot
+├── conventions/                  my working conventions + project-template/
+├── skills/<domain>/<name>/       SKILL.md, plus reference .md files, scripts/,
+│                                 templates/ and agents/openai.yaml where needed
+├── agents/<domain>/<name>.md     subagents
+├── hooks/<domain>/               hooks.json + scripts/ (plugin installs only)
+├── mcp/<domain>/.mcp.json        optional MCP configs, env vars only (planned, none yet)
+├── statusline/                   vendored statusline script (MIT, licence kept)
+├── templates/SKILL.md            skeleton for new skills
+├── upstream.json                 provenance of imported skills
+├── THIRD_PARTY_NOTICES.md        licences of imported and vendored code
+├── install.sh  install.ps1       symlink installers
+├── scripts/                      validate, update-readme, sync-plugin, new-skill, ci, frontmatter, upstream-status
+├── .claude-plugin/               one marketplace and one plugin, both "dotskills"
+└── .github/workflows/validate.yml  runs scripts/ci.sh
+```
+
+Domains organise the repo and decide what `install.sh` links. They are not separate plugins: there is one plugin, `dotskills`, containing every domain. If others ever want only some domains, per-domain plugins can be added next to it without moving files.
+
+## How it works
+
+`install.sh` symlinks each `skills/<domain>/<name>` folder into `~/.claude/skills/` and each agent into `~/.claude/agents/`. Claude Code reads the files straight from this repo, so an edit takes effect without a copy step.
+
+`plugin.json` lists every domain folder under `skills`, every agent file under `agents` (the schema takes files, not folders), and the hook files, so both install methods use the same files. `scripts/sync-plugin.sh` regenerates those lists and `validate.sh` fails if they drift.
+
+`plugin.json` has no `version`, so plugin installs track the latest commit. To pull changes on another machine, update the plugin itself, not just the marketplace (see [Updating](setup.md#7-updating)). `claude plugin validate .` warns about the missing version and about the root `CLAUDE.md` not being plugin context. Those warnings are expected.
+
 ## Adding a skill
+
+Short version: `scripts/new-skill.sh <domain> <name>`, then `scripts/update-readme.sh && scripts/sync-plugin.sh && scripts/ci.sh`. In detail:
 
 1. Scaffold it. The domain must exist and the name must be unused across all domains (the installer flattens names into `~/.claude/skills/<name>`).
 
