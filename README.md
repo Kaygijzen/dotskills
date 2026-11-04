@@ -21,7 +21,7 @@ Pick **one** install path per machine.
 | Conventions | `./install.sh --conventions` | Loaded by a hook at session start |
 | Statusline | `./install.sh` links it; `--statusline-settings` turns it on | `/dotskills:setup-statusline` copies it and turns it on |
 | Skill names | `/grill-spec` | `/dotskills:grill-spec` |
-| How to update | `git pull && ./install.sh` | `/plugin marketplace update dotskills` |
+| How to update | `git pull && ./install.sh` | `claude plugin marketplace update dotskills`, then `claude plugin update dotskills@dotskills`, then restart ([details](docs/setup.md#7-updating)) |
 
 **Clone and symlink** (macOS, Linux, WSL). Skill names have no prefix (`/grill-spec`) and you get a working copy to edit:
 
@@ -171,7 +171,7 @@ Domains organise the repo and decide what `install.sh` links. They are not separ
 
 `plugin.json` lists every domain folder under `skills`, every agent file under `agents` (the schema takes files, not folders), and the hook files, so both install methods use the same files. `scripts/sync-plugin.sh` regenerates those lists and `validate.sh` fails if they drift.
 
-`plugin.json` has no `version`, so plugin installs track the latest commit. To pull changes on another machine, run `/plugin marketplace update dotskills`. `claude plugin validate .` warns about the missing version, about the root `CLAUDE.md` not being plugin context, and (with the directory profile) about a missing icon. Those warnings are expected.
+`plugin.json` has no `version`, so plugin installs track the latest commit. To pull changes on another machine, update the plugin itself, not just the marketplace (see [Updating](docs/setup.md#7-updating)). `claude plugin validate .` warns about the missing version, about the root `CLAUDE.md` not being plugin context, and (with the directory profile) about a missing icon. Those warnings are expected.
 
 ## Conventions
 
