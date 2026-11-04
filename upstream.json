@@ -137,7 +137,8 @@
     "source_path": ".",
     "commit": "6c08e7ee5eb8ef8b9bf0588d400170654abc256b",
     "local_changes": [
-      "Only SKILL.md and LICENSE copied; README.md, install.sh and examples/ omitted (upstream-status.sh will report this as locally changed)"
+      "Only SKILL.md and LICENSE copied; README.md, install.sh and examples/ omitted (upstream-status.sh will report this as locally changed)",
+      "Added disable-model-invocation: true so it runs only on /bro"
     ]
   }
 ]
