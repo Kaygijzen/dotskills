@@ -24,7 +24,7 @@ Synthesize a **spec** and its **tickets** (tracer-bullet vertical slices with bl
 Done when exactly one mode is chosen:
 
 - **OpenSpec change**: the argument names a change under `openspec/changes/` (archived or not). Follow [openspec-mirror.md](openspec-mirror.md) from here on, in place of the steps below.
-- **Re-run**: the argument is a spec or ticket this skill pushed. It carries a `<!-- to-tracker:… -->` marker, or matches an entry in some `.scratch/*/.tracker.json`. Load that feature's `spec.md` and `.tracker.json`.
+- **Re-run**: the argument is a spec or ticket this skill pushed. It carries a `to-tracker:…` marker (see step 6), or matches an entry in some `.scratch/*/.tracker.json`. Load that feature's `spec.md` and `.tracker.json`.
 - **Foreign issue**: the argument is an issue this skill did not push. It is the *source*: read its body and all its comments. It stays untouched, apart from one comment in step 6.
 - **New**: a spec path (read it in full) or the conversation.
 
@@ -74,7 +74,7 @@ Push nothing until the user approves. Iterate until they do.
 
 The skill owns these parts of every body, outside the template:
 
-- the marker: `<!-- to-tracker:spec -->` on the parent, `<!-- to-tracker:<key> -->` on each ticket;
+- the marker: `to-tracker:spec` on the parent, `to-tracker:<key>` on each ticket. By default it is the body comment `<!-- to-tracker:<key> -->`. If the tracker doc says it strips body comments and names a **tag** marker, apply the tag `to-tracker:<key>` instead (merged with the item's other tags) and write no comment;
 - on a foreign source, a first line `Source: #<n>` in the parent;
 - the parent link, as the tracker doc represents it;
 - the `Blocked by:` line, listing the ids of the blocking tickets (`#<n>` externally, `NN` locally), or `none`.
@@ -96,7 +96,7 @@ Run "ensure a label exists" for each label once before the first write.
 
 Touch only the parent and issues listed in `.tracker.json` or carrying this feature's markers. The parent stays open.
 
-**Before every create**, list the parent's children and look for `<!-- to-tracker:<key> -->`. A child that carries it is adopted, not duplicated. After every create, write `.tracker.json`.
+**Before every create**, list the parent's children and look for the marker (comment or tag, as above). A child that carries it is adopted, not duplicated. After every create, write `.tracker.json`.
 
 ## 7. State
 

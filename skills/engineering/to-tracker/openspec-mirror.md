@@ -10,8 +10,8 @@ The OpenSpec change is the source of truth: it is what `ralph-apply` implements 
 ## Map
 
 - **Parent, with a source issue**: if `proposal.md` starts with a `Source: <reference>` line (written by `grill-spec`), that issue is the parent. It is a foreign issue: never edit its body, title or labels, and never close it. It carries no marker, so on a lost `.tracker.json` the `Source:` line in `proposal.md` stands in for it: read the issue from there, then rebuild the children from their markers. If the reference can't be read, stop and say so; don't create a second parent.
-- **Parent, without one**: a short summary of `proposal.md` (its Why and What Changes, in a few lines), then a link to the change folder. Leave the delta specs out, so the mirror can't drift from them. Marker: `<!-- to-tracker:spec -->`.
-- **Children**: one per task group, the numbered `## N. <heading>` sections of `tasks.md`. Body: the group's checkboxes, copied with their tick state, which shows progress. Marker: `<!-- to-tracker:<key> -->`, where the key is a kebab slug of the heading without its number.
+- **Parent, without one**: a short summary of `proposal.md` (its Why and What Changes, in a few lines), then a link to the change folder. Leave the delta specs out, so the mirror can't drift from them. Marker: `to-tracker:spec` (comment or tag, as in `SKILL.md` step 6).
+- **Children**: one per task group, the numbered `## N. <heading>` sections of `tasks.md`. Body: the group's checkboxes, copied with their tick state, which shows progress. Marker: `to-tracker:<key>` (comment or tag, as in `SKILL.md` step 6), where the key is a kebab slug of the heading without its number.
 - **Blocking**: each group is blocked by the group before it, because `ralph-apply` works top to bottom. The first group is `Blocked by: none`.
 - **Labels**: as in `SKILL.md` step 1.
 - **State**: `.tracker.json` inside the change folder, in the format of `SKILL.md` step 7. `/opsx:archive` moves it with the change.

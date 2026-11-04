@@ -22,7 +22,7 @@ The map is a single issue on this repo's issue tracker, labelled `wayfinder:map`
 
 The map is an **index**, not a store. It lists the decisions made and points at the tickets that hold their detail; a decision lives in exactly one place, its ticket, so the map never restates it, only gists it and links.
 
-**Where the map, its child tickets, blocking, and frontier queries physically live is tracker-specific.** Consult the tracker doc's "Wayfinding operations" section for how _this_ repo expresses them. If `docs/agents/issue-tracker.md` is missing, use the local-markdown tracker (files in `.scratch/`) and tell the user so once; `/setup-dotskills` connects GitHub, GitLab or Azure DevOps.
+**Where the map, its child tickets, blocking, and frontier queries physically live is tracker-specific.** Consult the tracker doc's "Wayfinding operations" section for how _this_ repo expresses them. If `docs/agents/issue-tracker.md` is missing, use the local-markdown tracker (files in `.scratch/`) and tell the user so once; `/setup-dotskills` connects GitHub, GitLab or Azure DevOps. The local tracker's doc, including its "Wayfinding operations" section, is `issue-tracker-local.md` in the `setup-dotskills` skill folder (the sibling of this skill folder's real path). Follow its file layout exactly; don't invent one.
 
 ### The map body
 

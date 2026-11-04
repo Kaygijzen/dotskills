@@ -11,7 +11,7 @@ Two-axis review of the diff between `HEAD` and a fixed point the user supplies:
 
 Both axes run as **parallel sub-agents** so they don't pollute each other's context, then this skill aggregates their findings. Start every sub-agent with a fresh context window.
 
-If `docs/agents/issue-tracker.md` is missing, use the local-markdown tracker (files in `.scratch/`) and tell the user so once; `/setup-dotskills` connects GitHub, GitLab or Azure DevOps.
+If `docs/agents/issue-tracker.md` is missing, use the local-markdown tracker (files in `.scratch/`) and tell the user so once; `/setup-dotskills` connects GitHub, GitLab or Azure DevOps. The local tracker's doc is `issue-tracker-local.md` in the `setup-dotskills` skill folder (the sibling of this skill folder's real path).
 
 ## Process
 
