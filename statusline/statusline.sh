@@ -12,9 +12,6 @@
 #   CLAUDE_STATUSLINE_POWERLINE=1 啟用 Powerline 分隔符（預設跟隨 NERDFONT）
 #   COLORTERM=truecolor|24bit     系統自動設定，啟用真彩色漸層
 
-# Vendored from https://github.com/kcchien/claude-code-statusline (MIT, see LICENSE).
-# Local changes: portable file mtime (GNU and BSD stat) and a git cache that is
-# keyed per working directory instead of one shared /tmp file.
 
 set -euo pipefail
 
@@ -54,7 +51,9 @@ fi
 # 符號集
 if [[ "$USE_ASCII" == "1" ]]; then
   S_BRAND="<>"
-  S_BRANCH=">"
+  S_BRANCH="git:"
+  S_AHEAD="^"
+  S_BEHIND="v"
   S_WARN="!"
   S_PROMPT=">"
   S_TIME=""
@@ -62,7 +61,9 @@ if [[ "$USE_ASCII" == "1" ]]; then
   SEP=" | "
 elif [[ "$USE_NERDFONT" == "1" ]]; then
   S_BRAND="◆"
-  S_BRANCH=" "
+  S_BRANCH=$'\xee\x82\xa0 '  # U+E0A0 powerline branch glyph
+  S_AHEAD="↑"
+  S_BEHIND="↓"
   S_WARN=" 󰀦"
   S_PROMPT="❯"
   S_TIME="󰔟 "
@@ -74,7 +75,9 @@ elif [[ "$USE_NERDFONT" == "1" ]]; then
   fi
 else
   S_BRAND="◆"
-  S_BRANCH="⎇"
+  S_BRANCH="git:"
+  S_AHEAD="↑"
+  S_BEHIND="↓"
   S_WARN=" ⚠"
   S_PROMPT="❯"
   S_TIME=""
@@ -199,14 +202,15 @@ else pct_color="$GREEN"; fi
 ctx_warn=""
 if (( pct_int >= 90 )); then ctx_warn="${RED}${S_WARN}${RST}"; fi
 
-# 上下文視窗大小（僅在 model display_name 不包含 context 資訊時才顯示）
+# Context window size right after the percentage, in the same usage colour.
 ctx_size_int=${ctx_size:-0}
 ctx_label=""
-if [[ "$model" != *context* && "$model" != *Context* ]]; then
-  if (( ctx_size_int >= 1000000 )); then ctx_label=" ${GRAY}1M${RST}"
-  elif (( ctx_size_int >= 200000 )); then ctx_label=" ${GRAY}200k${RST}"
-  fi
+if (( ctx_size_int >= 1000000 )); then
+  ctx_label=$(awk -v n="$ctx_size_int" 'BEGIN { s = sprintf("%.1f", n / 1000000); sub(/\.0$/, "", s); print s "M" }')
+elif (( ctx_size_int >= 1000 )); then
+  ctx_label="$(( ctx_size_int / 1000 ))k"
 fi
+if [[ -n "$ctx_label" ]]; then ctx_label="${pct_color}/${ctx_label}${RST}"; fi
 
 # ═══════════════════════════════════════════════════════════════
 # 費用
@@ -221,6 +225,12 @@ if (( cost_int >= 10 )); then cost_color="$RED"
 elif (( cost_int >= 5 )); then cost_color="$YELLOW"
 elif [[ "$cost_fmt" == "0.00" ]]; then cost_color="$GRAY"
 else cost_color="$YELLOW"; fi
+
+# Spend rate in $/h, shown once the session has run for a minute.
+spend_rate=""
+if (( ${duration_ms:-0} >= 60000 )) && [[ "$cost_fmt" != "0.00" ]]; then
+  spend_rate=$(awk -v c="$cost_val" -v ms="$duration_ms" 'BEGIN { printf "%.2f", c * 3600000 / ms }')
+fi
 
 # ═══════════════════════════════════════════════════════════════
 # 經過時間（零值智慧隱藏）
@@ -248,6 +258,9 @@ GIT_CACHE_MAX_AGE=5
 
 git_branch="${branch:-}"
 dirty=""
+ahead=0
+behind=0
+git_wt=""
 
 git_cache_is_stale() {
   [[ ! -f "$GIT_CACHE" ]] && return 0
@@ -259,7 +272,16 @@ git_cache_is_stale() {
 
 if [[ -n "${cwd_full:-}" && -d "${cwd_full:-}" ]]; then
   if git_cache_is_stale; then
-    if git -C "$cwd_full" rev-parse --git-dir &>/dev/null; then
+    if git_paths=$(git -C "$cwd_full" rev-parse --path-format=absolute --git-dir --git-common-dir --show-toplevel 2>/dev/null); then
+      { IFS= read -r git_dir; IFS= read -r git_common; IFS= read -r git_top; } <<< "$git_paths"
+      # A linked worktree (git worktree add) has its own git-dir under the common one.
+      cached_wt=""
+      if [[ "$git_dir" != "$git_common" ]]; then cached_wt="${git_top##*/}"; fi
+      cached_ahead=0
+      cached_behind=0
+      if counts=$(git -C "$cwd_full" rev-list --left-right --count '@{upstream}...HEAD' 2>/dev/null); then
+        read -r cached_behind cached_ahead <<< "$counts"
+      fi
       cached_branch="${git_branch}"
       if [[ -z "$cached_branch" ]]; then
         cached_branch=$(git -C "$cwd_full" -c core.useBuiltinFSMonitor=false branch --show-current 2>/dev/null) || true
@@ -272,16 +294,19 @@ if [[ -n "${cwd_full:-}" && -d "${cwd_full:-}" ]]; then
          ! git -C "$cwd_full" -c core.useBuiltinFSMonitor=false diff --cached --quiet 2>/dev/null; then
         cached_dirty="*"
       fi
-      echo "${cached_branch}|${cached_dirty}" > "$GIT_CACHE"
+      echo "${cached_branch}|${cached_dirty}|${cached_ahead}|${cached_behind}|${cached_wt}" > "$GIT_CACHE"
     else
-      echo "|" > "$GIT_CACHE"
+      echo "||0|0|" > "$GIT_CACHE"
     fi
   fi
 
   if [[ -f "$GIT_CACHE" ]]; then
-    IFS='|' read -r cached_br cached_dt < "$GIT_CACHE"
+    IFS='|' read -r cached_br cached_dt cached_ah cached_bh cached_wt < "$GIT_CACHE"
     if [[ -z "$git_branch" ]]; then git_branch="${cached_br}"; fi
     dirty="${cached_dt}"
+    ahead="${cached_ah:-0}"
+    behind="${cached_bh:-0}"
+    git_wt="${cached_wt}"
   fi
 fi
 
@@ -331,8 +356,9 @@ else prompt_color="$GREEN"; fi
 # ═══════════════════════════════════════════════════════════════
 
 line1="${PURPLE}${S_BRAND}${RST} ${CYAN}${model}${RST}"
-line1+="${SEP}${bar} ${pct_color}${pct_int}%${RST}${ctx_warn}${ctx_label}"
+line1+="${SEP}${bar} ${pct_color}${pct_int}%${RST}${ctx_label}${ctx_warn}"
 line1+="${SEP}${cost_color}${S_COST}\$${cost_fmt}${RST}"
+if [[ -n "$spend_rate" ]]; then line1+=" ${GRAY}\$${spend_rate}/h${RST}"; fi
 line1+="${dur_section}"
 line1+="${rate_section}"
 
@@ -342,7 +368,10 @@ line1+="${rate_section}"
 
 parts=()
 if [[ -n "$git_branch" ]]; then
-  parts+=("${GRAY}${S_BRANCH}${git_branch}${dirty}${RST}")
+  upstream=""
+  if (( ahead > 0 )); then upstream+=" ${GREEN}${S_AHEAD}${ahead}${RST}"; fi
+  if (( behind > 0 )); then upstream+=" ${YELLOW}${S_BEHIND}${behind}${RST}"; fi
+  parts+=("${GRAY}${S_BRANCH}${git_branch}${dirty}${RST}${upstream}")
 fi
 if [[ -n "$lines_section" ]]; then
   parts+=("${lines_section}")
@@ -350,6 +379,7 @@ fi
 parts+=("${BLUE}${dir}${RST}")
 
 # Agent / Worktree 指示器（僅在非主 session 時顯示）
+wt_name="${wt_name:-$git_wt}"
 if [[ -n "${wt_name:-}" ]]; then
   parts+=("${YELLOW}⚙ worktree:${wt_name}${RST}")
 elif [[ -n "${agent_name:-}" ]]; then

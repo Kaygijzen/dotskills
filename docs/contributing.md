@@ -15,7 +15,7 @@ dotskills/
 ├── agents/<domain>/<name>.md     subagents
 ├── hooks/<domain>/               hooks.json + scripts/ (plugin installs only)
 ├── mcp/<domain>/.mcp.json        optional MCP configs, env vars only (planned, none yet)
-├── statusline/                   vendored statusline script (MIT, licence kept)
+├── statusline/                   statusline script and its test
 ├── templates/SKILL.md            skeleton for new skills
 ├── upstream.json                 provenance of imported skills
 ├── THIRD_PARTY_NOTICES.md        licences of imported and vendored code
