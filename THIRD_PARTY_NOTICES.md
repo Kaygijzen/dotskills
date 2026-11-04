@@ -38,34 +38,6 @@ The four coding principles in `conventions/AGENTS.md` (Think Before Coding, Simp
 
 The full upstream `CLAUDE.md` text is reproduced in `docs/karpathy-guidelines.md`, unmodified except for its title line. The upstream repo declares MIT in its skill frontmatter but has no `LICENSE` file in its root (checked on `main`), so no licence text or copyright line is available to copy. The attribution above is the credit.
 
-## kcchien/claude-code-statusline
-
-`statusline/statusline.sh` started as a copy of <https://github.com/kcchien/claude-code-statusline> and has since been changed. The original licence is kept in `statusline/LICENSE`.
-
-```text
-MIT License
-
-Copyright (c) 2026 KC Chien
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
-
 ## luchasarie/bro-skill
 
 `skills/productivity/bro` is imported from <https://github.com/luchasarie/bro-skill> at commit `6c08e7e`. Only `SKILL.md` and `LICENSE` were copied; provenance and local edits are recorded in `upstream.json`. The upstream licence is kept in `skills/productivity/bro/LICENSE`.
