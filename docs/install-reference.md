@@ -28,11 +28,13 @@ powershell -ExecutionPolicy Bypass -File .\install.ps1
 
 A full install (no `--uninstall`, `--check`, `--help` or `--target codex`) warns if `jq` is missing and ends with next steps. A missing `jq` does not fail the install. The next steps suggest `--conventions` only when the block is not installed yet.
 
+A regular file at `~/.claude/statusline.sh` that is a copy of the dotskills statusline (made by the `setup-statusline` skill) counts as the installer's own: a full install replaces it with a link, and `--uninstall` removes it.
+
 Without a terminal to answer on (CI, piped input), neither script installs OpenSpec or rtk unless you pass the matching `--with-…` / `-With…` option, and neither runs `rtk init -g`, since it can ask its own questions. In those cases the script prints how to do it yourself.
 
 On Windows, `install.ps1` takes these options as PowerShell switches: `-Uninstall`, `-Check`, `-WithOpenSpec`, `-NoOpenSpec`, `-WithRtk`, `-NoRtk` and `-Help`. It differs from `install.sh` in these ways:
 
-- It links skills only. Agents, the statusline, `--domain`, `--all`, `--conventions`, `--init-project`, `--statusline-settings` and `--target` have no PowerShell equivalent; run them with `install.sh` from WSL or Git Bash.
+- It links skills only. Agents, the statusline, `--domain`, `--all`, `--conventions`, `--init-project`, `--statusline-settings` and `--target` have no PowerShell equivalent; run them with `install.sh` from WSL or Git Bash. With the plugin, `/dotskills:setup-statusline` installs the statusline instead (it needs bash and `jq`, for example from Git Bash).
 - Its next steps point to `install.sh --conventions` instead of running it.
 - It links with directory junctions, which need no admin rights or Developer Mode. Junctions can't point at network paths, so the repo has to be on a local drive. If junctions fail, it falls back to a symlink, which needs Developer Mode.
 - It installs rtk with `winget install rtk-ai.rtk` instead of rtk's shell script.

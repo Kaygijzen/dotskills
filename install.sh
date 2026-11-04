@@ -39,6 +39,7 @@ CONFIG_DIR="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 DEST_DIR="${CLAUDE_SKILLS_DIR:-$CONFIG_DIR/skills}"
 AGENTS_DEST="${CLAUDE_AGENTS_DIR:-$CONFIG_DIR/agents}"
 STATUSLINE_DEST="$CONFIG_DIR/statusline.sh"
+STATUSLINE_MARKER="Claude Code session status line"  # in the vendored script's header
 CLAUDE_SETTINGS="$CONFIG_DIR/settings.json"
 MEMORY_FILE="$CONFIG_DIR/CLAUDE.md"
 BLOCK_START="# >>> dotskills conventions >>>"
@@ -49,9 +50,15 @@ usage() {
 }
 
 # True if $1 is a symlink this script created, i.e. it points into this repo's
-# skills/ or agents/ folder.
+# skills/ or agents/ folder. A regular file at $STATUSLINE_DEST counts too when
+# it is a copy of our statusline (the setup-statusline skill copies it there for
+# plugin installs), so a later full install can replace it with a link and
+# --uninstall removes it.
 is_ours() {
-  [[ -L "$1" ]] || return 1
+  if [[ ! -L "$1" ]]; then
+    [[ "$1" == "$STATUSLINE_DEST" && -f "$1" ]] && grep -qF "$STATUSLINE_MARKER" "$1"
+    return
+  fi
   local t
   t="$(readlink "$1")"
   [[ "$t" == "$SRC_DIR/"* || "$t" == "$AGENTS_SRC/"* || "$t" == "$STATUSLINE_SRC" ]]
@@ -88,6 +95,12 @@ link_one() {
     fi
     echo "WARN    $name: $dest is a symlink to $(readlink "$dest"), not this repo; skipping"
     return 1
+  fi
+
+  if is_ours "$dest"; then
+    rm "$dest" && ln -s "$src" "$dest"
+    echo "relink  $name (replaced a copy)"
+    return 0
   fi
 
   if [[ -e "$dest" ]]; then
@@ -253,6 +266,13 @@ statusline_value() {
   jq -cn --arg c "$STATUSLINE_DEST" '{type: "command", command: $c, timeout: 10}'
 }
 
+# Prints the statusLine command in settings.json. Ours is recognised by its command
+# alone: Claude Code drops `timeout` when it rewrites settings.json (e.g. on a
+# plugin install), so comparing the whole object would miss it.
+statusline_command() {
+  jq -r '.statusLine.command? // empty' "$CLAUDE_SETTINGS" 2>/dev/null
+}
+
 # Writes stdin to $CLAUDE_SETTINGS via a temp file. The caller makes the
 # one-time backup (see install_statusline).
 write_settings() {
@@ -278,7 +298,7 @@ install_statusline_settings() {
     echo "WARN    statusLine: $CLAUDE_SETTINGS is not a valid JSON object; leaving it alone"; return 1
   fi
   current="$(jq -c '.statusLine // empty' "$CLAUDE_SETTINGS")"
-  if [[ "$current" == "$want" ]]; then
+  if [[ "$(statusline_command)" == "$STATUSLINE_DEST" ]]; then
     echo "ok      statusLine in $CLAUDE_SETTINGS"; return 0
   fi
   if [[ -n "$current" ]]; then
@@ -290,11 +310,11 @@ install_statusline_settings() {
   echo "added   statusLine to $CLAUDE_SETTINGS (backup: $CLAUDE_SETTINGS.dotskills.bak)"
 }
 
-# Removes statusLine only if it is still exactly what install_statusline_settings wrote.
+# Removes statusLine only if it still runs our script (see statusline_command).
 uninstall_statusline_settings() {
   [[ -f "$CLAUDE_SETTINGS" ]] || return 0
   jq -e 'type == "object"' "$CLAUDE_SETTINGS" >/dev/null 2>&1 || return 0
-  if [[ "$(jq -c '.statusLine // empty' "$CLAUDE_SETTINGS")" == "$(statusline_value)" ]]; then
+  if [[ "$(statusline_command)" == "$STATUSLINE_DEST" ]]; then
     jq 'del(.statusLine)' "$CLAUDE_SETTINGS" | write_settings || return 1
     echo "removed statusLine from $CLAUDE_SETTINGS"
   fi

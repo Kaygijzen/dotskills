@@ -27,7 +27,9 @@ Create `skills/<domain>/` and add a first skill with `scripts/new-skill.sh <doma
 ## Subagents, hooks and MCP
 
 - **Subagents** (`agents/<domain>/<name>.md`) use Claude Code frontmatter (`name`, `description`, `tools`, optionally `model`). They are linked into `~/.claude/agents/`. Codex has no equivalent wired up yet.
-- **Hooks** ship only through the plugin. The `core` hook blocks reads and edits of `.env*`, `*.pem`, `id_rsa*`, `*.pfx` and `secrets.*`; it fails open if `jq` is missing. Test: `hooks/core/scripts/test-block-secrets.sh`.
+- **Hooks** ship only through the plugin. The `core` hooks:
+  - block reads and edits of `.env*`, `*.pem`, `id_rsa*`, `*.pfx` and `secrets.*` (fails open if `jq` is missing; `cat .env` through Bash is not checked). Test: `hooks/core/scripts/test-block-secrets.sh`.
+  - load `conventions/AGENTS.md` at session start, unless `~/.claude/CLAUDE.md` already has the `--conventions` block. Test: `hooks/core/scripts/test-load-conventions.sh`.
 - **MCP** configs are optional and none are included. Reference every secret as `${ENV_VAR}`; the validator rejects literal tokens. A starting point for `mcp/<domain>/.mcp.json`:
 
   ```json

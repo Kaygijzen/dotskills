@@ -41,19 +41,23 @@ cd dotskills
 
 Every flag is listed in the [install reference](install-reference.md).
 
-Then add the personal conventions, which plugins cannot ship. Plugin installs need a clone for this too:
+Then add the personal conventions:
 
-```bash
-./install.sh --conventions
-```
+- **Plugin:** nothing to do. A hook loads `conventions/AGENTS.md` at the start of every session.
+- **Symlinks:** run `./install.sh --conventions`. It adds a clearly marked block to `~/.claude/CLAUDE.md` that imports `conventions/AGENTS.md`. `./install.sh --uninstall` removes this block, along with the links; the rest of `CLAUDE.md` stays as it is.
 
-This adds a clearly marked block to `~/.claude/CLAUDE.md` that imports `conventions/AGENTS.md`. `./install.sh --uninstall` removes only that block.
+If both are present, the block wins and the hook stays silent, so the conventions never load twice. If the block points at a clone that no longer exists, the hook loads them instead.
 
 ## 4. Recommended personal settings
 
-The installer edits `settings.json` only when you pass `--statusline-settings` (see the statusline below). Paste everything else in yourself.
+The installer edits `settings.json` only when you pass `--statusline-settings`, and the `setup-statusline` skill only when you run it (see the statusline below). Paste everything else in yourself.
 
-**Statusline** with model, a context-use bar, cost, session time, git branch and rate limits. `./install.sh` links `statusline/statusline.sh` (vendored from [kcchien/claude-code-statusline](https://github.com/kcchien/claude-code-statusline), MIT) to `~/.claude/statusline.sh`. Run `./install.sh --statusline-settings` to set `statusLine` for you (backs up `settings.json` first, and never overwrites a `statusLine` you already have), or add it yourself:
+**Statusline** with model, a context-use bar, cost, session time, git branch and rate limits. The script is `statusline/statusline.sh` (vendored from [kcchien/claude-code-statusline](https://github.com/kcchien/claude-code-statusline), MIT). Plugins cannot set a statusline, so install it one of these ways:
+
+- **Plugin:** run `/dotskills:setup-statusline`. It copies the script to `~/.claude/statusline.sh` and sets `statusLine`. Run it again after a plugin update to refresh the copy.
+- **Symlinks:** `./install.sh` links the script to `~/.claude/statusline.sh`. Run `./install.sh --statusline-settings` to set `statusLine`.
+
+Both back up `settings.json` first and never overwrite a `statusLine` you already have. Or add it yourself:
 
 ```json
 {
@@ -82,7 +86,7 @@ Optional env vars: `CLAUDE_STATUSLINE_NERDFONT=1`, `CLAUDE_STATUSLINE_POWERLINE=
 ## 5. Smoke test
 
 1. Run `/dotskills:hello-skill` (plugin) or `/hello-skill` (symlinks). It prints where it loaded from.
-2. Run `/memory` and check that `~/.claude/CLAUDE.md` is listed. Then ask Claude "what are my commit message conventions?" to confirm the import resolves.
+2. Ask Claude "what are my commit message conventions?". With symlinks, also run `/memory` and check that `~/.claude/CLAUDE.md` is listed.
 3. Ask Claude to read a `.env` file. The secret hook (plugin installs only; the symlink installer does not ship hooks) should block it and explain why.
 
 Per project: run `/dotskills:setup-dotskills` once (or `/setup-dotskills` with symlinks). It sets the issue tracker and domain docs for the engineering skills, and connects the tracker's MCP server where there is one.

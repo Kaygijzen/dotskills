@@ -1,6 +1,16 @@
 {
-  "description": "Blocks reads and edits of obvious secret files",
+  "description": "Blocks reads and edits of obvious secret files, and loads the personal conventions at session start",
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/core/scripts/load-conventions.sh\""
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Read|Edit|Write|MultiEdit|NotebookEdit",
