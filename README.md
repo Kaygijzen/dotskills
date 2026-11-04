@@ -14,6 +14,14 @@ New here? Start with the [setup guide](docs/setup.md), then read [model selectio
 
 Pick **one** install path per machine.
 
+| | Clone + symlink | Plugin |
+| --- | --- | --- |
+| Editable copy | Yes, the clone is live | No |
+| Hooks / secret blocker | No | Yes |
+| Conventions | `./install.sh --conventions` | Also needs a clone to run `./install.sh --conventions` |
+| Skill names | `/grill-spec` | `/dotskills:grill-spec` |
+| How to update | `git pull && ./install.sh` | `/plugin marketplace update dotskills` |
+
 **Clone and symlink** (macOS, Linux, WSL). Skill names have no prefix (`/grill-spec`) and you get a working copy to edit:
 
 ```bash
@@ -30,9 +38,7 @@ cd dotskills
 /plugin install dotskills@dotskills
 ```
 
-Plugin skills are namespaced (`/dotskills:grill-spec`). Update with `/plugin marketplace update dotskills`.
-
-Windows, the optional OpenSpec and rtk installs, and every other flag are in the [install reference](docs/install-reference.md). Only the plugin ships hooks (including the secret-file blocker) and MCP configs; only `install.sh --conventions` adds conventions.
+Windows, the optional OpenSpec and rtk installs, and every flag are in the [install reference](docs/install-reference.md).
 
 ## Skills
 

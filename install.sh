@@ -176,6 +176,24 @@ install() {
   return $failed
 }
 
+# --- jq check and next steps ----------------------------------------------
+
+# Warns (never fails) when jq is missing. Linking doesn't need it.
+check_jq() {
+  command -v jq >/dev/null 2>&1 && return 0
+  echo "WARN    jq not found. The statusline, the .env secret hook and --statusline-settings need it. Install it with: brew install jq (macOS), sudo apt install jq (Debian/Ubuntu), winget install jqlang.jq (Windows)"
+}
+
+# Printed after a full install run. Suggests --conventions only when the block is missing.
+print_next_steps() {
+  echo
+  echo "Next steps:"
+  echo "  - Restart Claude Code if it is running."
+  echo "  - Run /hello-skill to check the install."
+  has_block || echo "  - Run ./install.sh --conventions to add the conventions block to $MEMORY_FILE."
+  echo "  - Hooks, including the .env secret blocker, ship only with the plugin install."
+}
+
 # --- conventions: a managed block in ~/.claude/CLAUDE.md ------------------
 
 conventions_block() {
@@ -525,15 +543,18 @@ main() {
 
   case "$mode" in
     install)
-      local failed=0
+      local failed=0 linked=0
+      check_jq
       # With only --conventions, skip linking.
       if [[ ( $conventions -eq 0 && $sl_settings -eq 0 ) || ${#names[@]} -gt 0 || ${#DOMAINS[@]} -gt 0 ]]; then
         install ${names[@]+"${names[@]}"} || failed=1
         install_openspec "$openspec" || failed=1
         install_rtk "$rtk" || failed=1
+        linked=1
       fi
       if [[ $conventions -eq 1 ]]; then install_conventions || failed=1; fi
       if [[ $sl_settings -eq 1 ]]; then install_statusline_settings || failed=1; fi
+      if [[ $linked -eq 1 ]]; then print_next_steps; fi
       return $failed
       ;;
     uninstall) uninstall ${names[@]+"${names[@]}"} ;;
