@@ -111,7 +111,7 @@ statusline_settings() {
     echo "ok      statusLine in $SETTINGS"; return 0
   fi
   if [[ "$have" != "$DEST" && -n "$current" ]]; then
-    echo "WARN    $SETTINGS already sets statusLine to $current; not overwriting (remove it first to use this one)"; return 1
+    echo "skip    statusLine: $SETTINGS already sets $current; not overwriting (remove it first to use this one)"; return 0
   fi
   backup_settings
   if [[ "$have" == "$DEST" ]]; then

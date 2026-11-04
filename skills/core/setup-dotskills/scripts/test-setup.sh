@@ -34,9 +34,9 @@ echo "# old" >> "$tmp/c/statusline.sh"
 rm -rf "$tmp/c"; mkdir -p "$tmp/c"; echo '{"model":"sonnet"}' > "$tmp/c/settings.json"
 [[ "$(run)" == 0 ]] && [[ "$(jq -r .model "$tmp/c/settings.json")" == sonnet && "$(sl)" == "$want" && -f "$tmp/c/settings.json.dotskills.bak" ]] && ok "merges into settings with backup" || bad "merges into settings with backup"
 
-# A different statusLine is left alone.
+# A different statusLine is left alone, and that is not a failure (same as install.sh).
 rm -rf "$tmp/c"; mkdir -p "$tmp/c"; echo '{"statusLine":{"type":"command","command":"mine.sh"}}' > "$tmp/c/settings.json"
-[[ "$(run)" == 1 ]] && [[ "$(jq -r .statusLine.command "$tmp/c/settings.json")" == mine.sh ]] && ok "keeps a different statusLine" || bad "keeps a different statusLine"
+[[ "$(run)" == 0 ]] && [[ "$(jq -r .statusLine.command "$tmp/c/settings.json")" == mine.sh ]] && grep -q "^skip    statusLine" "$tmp/out" && ok "keeps a different statusLine" || bad "keeps a different statusLine"
 
 # Someone else's statusline.sh is not replaced.
 rm -rf "$tmp/c"; mkdir -p "$tmp/c"; echo 'echo mine' > "$tmp/c/statusline.sh"
@@ -134,6 +134,15 @@ installer --statusline-settings && [[ -L "$tmp/c/settings.json" && "$(jq -c .sta
   && ok "install.sh --statusline-settings writes through a symlinked settings.json" || bad "install.sh --statusline-settings writes through a symlinked settings.json"
 installer --uninstall statusline && [[ -L "$tmp/c/settings.json" && -z "$(jq -c '.statusLine // empty' "$tmp/dot/settings.json")" ]] \
   && ok "install.sh --uninstall keeps a symlinked settings.json" || bad "install.sh --uninstall keeps a symlinked settings.json"
+# A plain install turns the statusline on, like the skill.
+rm -rf "$tmp/c"
+installer && [[ -L "$tmp/c/statusline.sh" && "$(sl)" == "$want" ]] && ok "install.sh turns the statusline on by default" || bad "install.sh turns the statusline on by default"
+rm -rf "$tmp/c"
+installer --no-statusline-settings && [[ -L "$tmp/c/statusline.sh" && -z "$(sl)" ]] && ok "install.sh --no-statusline-settings skips statusLine" || bad "install.sh --no-statusline-settings skips statusLine"
+# A different statusLine is kept, and that does not fail the install.
+rm -rf "$tmp/c"; mkdir -p "$tmp/c"; echo '{"statusLine":{"type":"command","command":"mine.sh"}}' > "$tmp/c/settings.json"
+installer && [[ "$(jq -r .statusLine.command "$tmp/c/settings.json")" == mine.sh ]] && grep -q "^skip    statusLine" "$tmp/out" \
+  && ok "install.sh keeps a different statusLine" || bad "install.sh keeps a different statusLine"
 # ...but still leaves a foreign regular file alone.
 rm -rf "$tmp/c"; mkdir -p "$tmp/c"; echo 'echo mine' > "$tmp/c/statusline.sh"
 installer --uninstall statusline; [[ -f "$tmp/c/statusline.sh" ]] && ok "install.sh --uninstall keeps a foreign file" || bad "install.sh --uninstall keeps a foreign file"
