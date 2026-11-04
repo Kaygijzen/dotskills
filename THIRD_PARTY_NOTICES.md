@@ -40,7 +40,7 @@ The full upstream `CLAUDE.md` text is reproduced in `docs/karpathy-guidelines.md
 
 ## kcchien/claude-code-statusline
 
-`statusline/statusline.sh` is vendored from <https://github.com/kcchien/claude-code-statusline>. The upstream licence is kept in `statusline/LICENSE`.
+`statusline/statusline.sh` started as a copy of <https://github.com/kcchien/claude-code-statusline> and has since been changed. The original licence is kept in `statusline/LICENSE`.
 
 ```text
 MIT License

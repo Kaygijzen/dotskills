@@ -12,9 +12,6 @@
 #   CLAUDE_STATUSLINE_POWERLINE=1 啟用 Powerline 分隔符（預設跟隨 NERDFONT）
 #   COLORTERM=truecolor|24bit     系統自動設定，啟用真彩色漸層
 
-# Vendored from https://github.com/kcchien/claude-code-statusline (MIT, see LICENSE).
-# Local changes: portable file mtime (GNU and BSD stat) and a git cache that is
-# keyed per working directory instead of one shared /tmp file.
 
 set -euo pipefail
 
