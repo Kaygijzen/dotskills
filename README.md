@@ -70,10 +70,11 @@ Windows, the optional OpenSpec and rtk installs, and every other flag are in the
 </details>
 
 <details>
-<summary><strong>productivity</strong> (5)</summary>
+<summary><strong>productivity</strong> (6)</summary>
 
 | Skill | What it does | Trigger |
 | --- | --- | --- |
+| `bro` | Re-explain the previous assistant message, or any text typed after the command, in a much simpler way. | `/bro`, or automatically when relevant |
 | `grill-me` | A relentless interview to sharpen a plan or design. | `/grill-me` only (never auto-invoked) |
 | `grilling` | Grill the user relentlessly about a plan, decision, or idea. | `/grilling`, or automatically when the user wants to stress-test their thinking, or uses any 'grill' trigger phrases. |
 | `handoff` | Compact the current conversation into a handoff document for another agent to pick up. | `/handoff` only (never auto-invoked) |
