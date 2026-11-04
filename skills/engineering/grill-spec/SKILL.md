@@ -109,7 +109,7 @@ Invoke the `openspec-propose` skill with the Skill tool. Pass the change name an
 
 - **No new questions.** Skip propose's opening "what do you want to build?" question; the intent summary answers it. Where propose would ask the user for missing context, stop generating instead. Grill that single branch in one short round, update the intent summary, get it confirmed again, and resume. A gap found here means the grilling missed something; do not fill it with a guess.
 - **Trace everything to intent.** Every decision, requirement and non-goal in the summary must land in an artifact: proposal (why/what, non-goals), delta specs (requirements with scenarios), design (decisions, rationale, alternatives considered, open risks), tasks. Do not add scope the summary does not contain.
-- **Link the source issue.** If there is one, put a line `Source: <reference>` at the top of `proposal.md`, using the reference as the user gave it. `to-tracker` reads this line to reuse the issue as the parent of its mirror.
+- **Link the source issue.** If there is one, put a line `Source: <reference>` at the top of `proposal.md`, using the reference as the user gave it.
 - **Follow the schema.** The `instruction`, `template`, `context` and `rules` from `openspec instructions` are authoritative for each artifact's structure; the overrides here only govern content and cadence.
 - **Write tasks for a coding agent.** Each task should be small enough for one focused session, name the files or modules it touches (from the codebase facts), and state how to verify it (a test, a command, or an observable behaviour). Put spike tasks for open risks first.
 - **Do not end the way propose normally ends.** Where it would tell the user to run `/opsx:apply`, continue to Phase 3 instead.

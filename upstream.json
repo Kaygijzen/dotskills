@@ -46,9 +46,7 @@
     "source_path": "skills/engineering/code-review",
     "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
     "local_changes": [
-      "SKILL.md: tracker-not-configured pointer to /setup-dotskills removed (external trackers need a hand-written docs/agents/issue-tracker.md)",
-      "SKILL.md: without a tracker doc, falls back to the local-markdown tracker instead of stopping",
-      "SKILL.md: tracker-not-configured sentence also names Azure DevOps"
+      "SKILL.md: without docs/agents/issue-tracker.md, skips issue references instead of pointing to a setup skill"
     ]
   },
   {
@@ -108,19 +106,6 @@
     "source_path": "skills/engineering/retro",
     "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
     "local_changes": []
-  },
-  {
-    "skill": "wayfinder",
-    "domain": "engineering",
-    "source_repo": "https://github.com/mattpocock/skills",
-    "source_path": "skills/engineering/wayfinder",
-    "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
-    "local_changes": [
-      "SKILL.md: tracker-not-configured pointer to /setup-dotskills removed (external trackers need a hand-written docs/agents/issue-tracker.md)",
-      "SKILL.md: tracker-not-configured sentence unified with to-tracker and code-review (local-markdown fallback, said once)",
-      "SKILL.md: blocking is a soft Blocked by: line on every tracker, not the tracker's native dependency link",
-      "SKILL.md: tracker-not-configured sentence also names Azure DevOps"
-    ]
   },
   {
     "skill": "wizard",

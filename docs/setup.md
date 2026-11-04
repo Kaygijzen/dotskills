@@ -102,8 +102,6 @@ Optional env vars: `CLAUDE_STATUSLINE_NERDFONT=1`, `CLAUDE_STATUSLINE_POWERLINE=
 2. Ask Claude "what are my commit message conventions?". With symlinks, also run `/memory` and check that `~/.claude/CLAUDE.md` is listed.
 3. Ask Claude to read a `.env` file. The secret hook (plugin installs only; the symlink installer does not ship hooks) should block it and explain why.
 
-Per project, the engineering skills (`to-tracker`, `wayfinder`, `code-review`, `ralph-tickets`) keep issues as markdown files under `.scratch/` unless the repo has a `docs/agents/issue-tracker.md`. To use GitHub, GitLab or Azure DevOps instead, write that file yourself and connect the tracker's MCP server (for example `claude mcp add`). `skills/engineering/to-tracker/issue-tracker-local.md` shows the shape the file takes. The `gh` and `glab` CLIs are optional.
-
 ## 6. Before using it on a client project
 
 - Check that the client allows AI coding tools, and which data may be shared.
