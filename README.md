@@ -22,6 +22,8 @@ The statusline is the bar Claude Code draws below the input box, filled by a scr
 
 ### Skills
 
+Skills are instruction sets Claude loads when a task calls for them. Some trigger on their own when your request matches their description; others run only when you type their slash command. They are grouped by domain.
+
 - **core:** checks that the install works and sets up the statusline.
 - **engineering:** specifying, building, reviewing and shipping code.
 - **productivity:** sharpening plans, getting a second opinion, handing off work and explaining things more simply.
