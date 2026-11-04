@@ -24,7 +24,16 @@ Check it with `/model`. Sonnet is the default because it is the best balance of 
 
 Prerequisites: `git` and `jq` (used by the installer, the secret hook and the statusline). Node 20.19+ with npm is needed only for the optional OpenSpec install.
 
-Pick **one** of these. Using both duplicates every skill.
+Pick **one** of these per machine. Using both duplicates every skill. Clone and symlink if you want to edit the skills; install the plugin if you just want to use them.
+
+| | Clone + symlink | Plugin |
+| --- | --- | --- |
+| Editable copy | Yes, the clone is live | No |
+| Hooks / secret blocker | No | Yes |
+| Conventions | `./install.sh --conventions` | Loaded by a hook at session start |
+| Statusline | `./install.sh` links it; `--statusline-settings` turns it on | `/dotskills:setup-statusline` copies it and turns it on |
+| Skill names | `/grill-spec` | `/dotskills:grill-spec` |
+| How to update | `git pull && ./install.sh` | `claude plugin marketplace update dotskills`, then `claude plugin update dotskills@dotskills`, then restart ([details](#7-updating)) |
 
 **Plugin marketplace** (no clone needed, installs every domain):
 
@@ -43,12 +52,14 @@ cd dotskills
 
 Every flag is listed in the [install reference](install-reference.md).
 
-Then add the personal conventions:
+Then add the personal conventions. They are written once in an `AGENTS.md`: Claude reads it through a `CLAUDE.md` containing `@AGENTS.md`, and Codex reads `AGENTS.md` natively. This repo's own rules are in `AGENTS.md` at the root; the personal ones for your machines are in `conventions/AGENTS.md`.
 
-- **Plugin:** nothing to do. A hook loads `conventions/AGENTS.md` at the start of every session.
-- **Symlinks:** run `./install.sh --conventions`. It adds a clearly marked block to `~/.claude/CLAUDE.md` that imports `conventions/AGENTS.md`. `./install.sh --uninstall` removes this block, along with the links; the rest of `CLAUDE.md` stays as it is.
+- **Plugin:** nothing to do. A SessionStart hook loads `conventions/AGENTS.md` at the start of every session.
+- **Symlinks:** run `./install.sh --conventions`. It adds a block to `~/.claude/CLAUDE.md` that imports `conventions/AGENTS.md`, marked `# >>> dotskills conventions >>>`. `./install.sh --uninstall` removes this block, along with the links; the rest of `CLAUDE.md` stays as it is.
 
 If both are present, the block wins and the hook stays silent, so the conventions never load twice. If the block points at a clone that no longer exists, the hook loads them instead.
+
+For a single project, `./install.sh --init-project <path>` copies `conventions/project-template/` into it without overwriting anything. See [section 6](#6-before-using-it-on-a-client-project).
 
 ## 4. Recommended personal settings
 

@@ -55,7 +55,20 @@ defaulting to the system preference.
 - **THEN** the app switches to dark mode and persists the choice
 ```
 
-`/grill-spec` reads `openspec/specs/` first, so a new change is checked against current behaviour. Setup is in the [README](../README.md#requirements-for-grill-spec-and-ralph-apply).
+`/grill-spec` reads `openspec/specs/` first, so a new change is checked against current behaviour. Setup is in [Requirements](#requirements).
+
+### Requirements
+
+Most skills work out of the box. `grill-spec` and `ralph-apply` need [OpenSpec](https://github.com/Fission-AI/OpenSpec):
+
+- The `openspec` CLI on your `PATH`. If it's missing, the installer offers to run `npm install -g @fission-ai/openspec@latest`. Pass `--with-openspec` (`-WithOpenSpec` on Windows) to skip the prompt and install, or `--no-openspec` (`-NoOpenSpec`) to skip the question. See the [install reference](install-reference.md).
+- `openspec init` run in the project you're specifying. It creates `openspec/` and installs the `/opsx:*` commands and the `openspec-explore` and `openspec-propose` skills that `grill-spec` invokes.
+
+`ralph-apply` also needs:
+
+- The `claude` CLI on your `PATH`, since the loop runs `claude -p` once per task.
+- An approved change on its own branch or worktree. The script refuses to run on `main` or `master`.
+- A terminal for the loop itself. `/ralph-apply <change>` checks the change and prints the exact `scripts/ralph.sh` command to run.
 
 ### Choosing a flow
 

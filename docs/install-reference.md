@@ -52,3 +52,9 @@ CLAUDE_CONFIG_DIR=/tmp/test-claude ./install.sh --conventions
 - It is a symlink to somewhere else.
 
 When a skill is skipped this way, the script exits with status 1. Uninstall leaves both kinds of entry alone.
+
+## Saving tokens with rtk
+
+[rtk](https://github.com/rtk-ai/rtk) is a single Rust binary plus a Claude Code `PreToolUse` hook. The hook rewrites Bash commands such as `git status`, `git diff` and test runs to `rtk` equivalents that filter, group and truncate the output before Claude reads it; the project reports 60-90% less output on common dev commands. It only touches Bash tool calls, not the built-in `Read`, `Grep` and `Glob` tools, and it trims Bash output only, so the saving on your total bill is smaller than that.
+
+`./install.sh` offers to install it and run `rtk init -g`; `--with-rtk` or `--no-rtk` skips the prompt (see the table above). `rtk gain` shows what it has saved. It is optional; nothing in this repo depends on it.
