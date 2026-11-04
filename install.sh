@@ -181,7 +181,7 @@ install() {
 # Warns (never fails) when jq is missing. Linking doesn't need it.
 check_jq() {
   command -v jq >/dev/null 2>&1 && return 0
-  echo "WARN    jq not found. The statusline, the .env secret hook and --statusline-settings need it. Install it with: brew install jq (macOS), sudo apt install jq (Debian/Ubuntu), winget install jqlang.jq (Windows)"
+  echo "WARN    jq not found. The statusline, the .env secret hook and --statusline-settings need it. Install it with: brew install jq (macOS), sudo apt install jq (Debian/Ubuntu or WSL)"
 }
 
 # Printed after a full install run. Suggests --conventions only when the block is missing.
