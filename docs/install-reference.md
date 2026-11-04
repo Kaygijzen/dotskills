@@ -18,7 +18,8 @@ powershell -ExecutionPolicy Bypass -File .\install.ps1
 | `./install.sh --init-project <path>` | Copies the project template into `<path>`, skipping existing files and reporting them. |
 | `./install.sh --uninstall [NAME...]` | Removes only what this script created, including the conventions block. |
 | `./install.sh --check` | Runs `scripts/validate.sh`. |
-| `./install.sh --statusline-settings` | Sets `statusLine` in `settings.json`. Backs up the file first and never overwrites an existing `statusLine`. Writes through a symlinked `settings.json` and quotes the command path, so spaces work (an unquoted path from an older version is updated). Needs `jq`. |
+| `./install.sh --no-statusline-settings` | Skips the default step that sets `statusLine` in `settings.json`. That step runs on every linking run, backs the file up first and never overwrites a `statusLine` you already have. It writes through a symlinked `settings.json` and quotes the command path, so spaces work (an unquoted path from an older version is updated). Needs `jq`. `--uninstall` removes it. |
+| `./install.sh --statusline-settings` | Only turns the statusline on (links the script and sets `statusLine`), without linking skills. |
 | `./install.sh --no-model-setting` | Skips the default step that sets `"model": "sonnet"` in `settings.json`. That step runs on every linking run, only when no `model` is set (an existing one is never overwritten), backs the file up first, needs `jq`, and is not undone by `--uninstall`. |
 | `./install.sh --target codex` | Placeholder: prints "not implemented yet" and exits 0. |
 | `./install.sh --with-openspec` | Installs the OpenSpec CLI with npm if it's missing, without asking. Needs Node.js 20.19.0 or newer. |
@@ -35,7 +36,7 @@ Without a terminal to answer on (CI, piped input), neither script installs OpenS
 
 On Windows, `install.ps1` takes these options as PowerShell switches: `-Uninstall`, `-Check`, `-WithOpenSpec`, `-NoOpenSpec`, `-WithRtk`, `-NoRtk` and `-Help`. It differs from `install.sh` in these ways:
 
-- It links skills only. Agents, the statusline, `--domain`, `--all`, `--conventions`, `--init-project`, `--statusline-settings` and `--target` have no PowerShell equivalent; run them with `install.sh` from WSL or Git Bash. With the plugin, `/dotskills:setup-dotskills` installs the statusline, the model default, OpenSpec and rtk instead (it needs bash and `jq`, for example from Git Bash).
+- It links skills only. Agents, the statusline, `--domain`, `--all`, `--conventions`, `--init-project`, the statusline settings and `--target` have no PowerShell equivalent; run them with `install.sh` from WSL or Git Bash. With the plugin, `/dotskills:setup-dotskills` installs the statusline, the model default, OpenSpec and rtk instead (it needs bash and `jq`, for example from Git Bash).
 - Its next steps point to `install.sh --conventions` instead of running it.
 - It links with directory junctions, which need no admin rights or Developer Mode. Junctions can't point at network paths, so the repo has to be on a local drive. If junctions fail, it falls back to a symlink, which needs Developer Mode.
 - It installs rtk with `winget install rtk-ai.rtk` instead of rtk's shell script.

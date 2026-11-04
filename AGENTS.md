@@ -17,7 +17,7 @@ A public repo of Claude Code skills, subagents, hooks and conventions, shared li
 
 ## Rules
 - The repo is public. No personal, client or secret data. Ever.
-- `install.sh` only creates, updates or removes symlinks into this repo and its managed block in `~/.claude/CLAUDE.md`. It edits `settings.json` only with `--statusline-settings` (the `statusLine` key) and, on a linking run, to set `model` when unset (`--no-model-setting` skips it). It also replaces or removes a copy of the statusline that the `setup-dotskills` skill made.
+- `install.sh` only creates, updates or removes symlinks into this repo and its managed block in `~/.claude/CLAUDE.md`. It edits `settings.json` only on a linking run, to set `statusLine` and `model` when unset (`--no-statusline-settings` and `--no-model-setting` skip them). It also replaces or removes a copy of the statusline that the `setup-dotskills` skill made.
 - The `setup-dotskills` skill (plugin installs) follows the same rules: it runs only when the user invokes it, edits only the `statusLine` key and, when unset, `model`, backs up `settings.json` once and never overwrites a different `statusLine`, a different `model` or someone else's `statusline.sh`. It runs `npm install -g @fission-ai/openspec` or rtk's install script only for a tool the user agreed to, and never runs `rtk init -g`.
 - Versioning is `head`: manifests have no `version`.
 

@@ -108,6 +108,8 @@ cd dotskills
 /plugin install dotskills@dotskills
 ```
 
+Then run `/dotskills:setup-dotskills` once. Plugins can't change settings or install tools, so this skill installs the statusline, sets the default model to sonnet if none is set, and offers to install OpenSpec (for `/grill-spec` and `/ralph-apply`) and rtk. Run it again after each plugin update.
+
 Run `/hello-skill` (or `/dotskills:hello-skill`) to check it works.
 
 The [setup guide](docs/setup.md) has the full walkthrough: conventions, statusline, updating and per-project setup. The [install reference](docs/install-reference.md) has every flag, Windows, OpenSpec and rtk. Stuck? See [troubleshooting](docs/troubleshooting.md).

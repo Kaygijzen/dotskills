@@ -31,7 +31,7 @@ Pick **one** of these per machine. Using both duplicates every skill. Clone and 
 | Editable copy | Yes, the clone is live | No |
 | Hooks / secret blocker | No | Yes |
 | Conventions | `./install.sh --conventions` | Loaded by a hook at session start |
-| Statusline | `./install.sh` links it; `--statusline-settings` turns it on | `/dotskills:setup-dotskills` copies it and turns it on |
+| Statusline | `./install.sh` links it and turns it on | `/dotskills:setup-dotskills` copies it and turns it on |
 | Skill names | `/grill-spec` | `/dotskills:grill-spec` |
 | How to update | `git pull && ./install.sh` | `claude plugin marketplace update dotskills`, then `claude plugin update dotskills@dotskills`, then restart ([details](#7-updating)) |
 
@@ -63,12 +63,12 @@ For a single project, `./install.sh --init-project <path>` copies `conventions/p
 
 ## 4. Recommended personal settings
 
-The installer edits `settings.json` when you pass `--statusline-settings`, and sets `model` to `sonnet` on a linking run if none is set (`--no-model-setting` skips it), and the `setup-dotskills` skill only when you run it (see the statusline below). Paste everything else in yourself.
+The installer edits `settings.json` on a linking run: it sets `statusLine` and sets `model` to `sonnet`, each only if none is set (`--no-statusline-settings` and `--no-model-setting` skip them). The `setup-dotskills` skill does the same, only when you run it (see the statusline below). Paste everything else in yourself.
 
 **Statusline** with model, a context-use bar, cost, session time, git branch and rate limits. The script is `statusline/statusline.sh` (vendored from [kcchien/claude-code-statusline](https://github.com/kcchien/claude-code-statusline), MIT). Plugins cannot set a statusline, so install it one of these ways:
 
 - **Plugin:** run `/dotskills:setup-dotskills`. It copies the script to `~/.claude/statusline.sh` and sets `statusLine`, sets `model` to `sonnet` if none is set, and offers to install OpenSpec and rtk (then you run `rtk init -g` yourself). It is a copy because the plugin folder changes with every version, so run it again after a [plugin update](#7-updating).
-- **Symlinks:** `./install.sh` links the script to `~/.claude/statusline.sh`. Run `./install.sh --statusline-settings` to set `statusLine`.
+- **Symlinks:** `./install.sh` links the script to `~/.claude/statusline.sh` and sets `statusLine`. `--no-statusline-settings` skips the setting.
 
 Both back up `settings.json` first and never overwrite a `statusLine` you already have. Or add it yourself:
 
