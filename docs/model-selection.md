@@ -27,7 +27,9 @@ Set the model with `/model <alias>`, `claude --model <alias>`, or the `model` ke
 
 ## Subagents
 
-A subagent can set its own `model:` in its frontmatter. Use Haiku for search and exploration agents, Sonnet for implementation agents, and Opus only for review or planning agents. The `code-reviewer` agent in this repo uses `opus`.
+A subagent can set its own `model:` in its frontmatter. Use Haiku for search and exploration agents, Sonnet for implementation agents, and Opus only for review, planning or consulting agents. The `code-reviewer` agent in this repo uses `opus`.
+
+`ask-opus` lets a Sonnet session ask Opus one hard question without switching models. It is cheaper than `/model opus` because Opus gets only a short briefing, not the whole session: the question, the answer type, file:line pointers and what was tried. It reads at most about 6 targeted lookups, checks the claim its answer rests on, and replies with an answer, confidence and evidence. `maxTurns` is a hard stop in case the soft budget is ignored. `effort: high` is parsed by recent Claude Code versions but not yet listed in the official sub-agents docs.
 
 ## The skills in this repo
 
