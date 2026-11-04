@@ -96,7 +96,7 @@ Each project makes two separate choices. (user) means the skill runs only when y
 | Local markdown | — (the change is already local) | files in `.scratch/`, the default without setup |
 | GitHub, GitLab, Azure DevOps | optional mirror: `/to-tracker <change>` pushes the change as a parent issue with one child per task group, and later runs update their status | issues, pushed by `to-tracker` |
 
-Run `/dotskills:setup-dotskills` (user) once per project to pick the tracker. `/ralph-tickets` then implements the pushed tickets one by one, each in a fresh session.
+With the local-markdown tracker, or a `docs/agents/issue-tracker.md` you wrote for an external one, `/ralph-tickets` then implements the pushed tickets one by one, each in a fresh session.
 
 These skills work alongside either flow:
 

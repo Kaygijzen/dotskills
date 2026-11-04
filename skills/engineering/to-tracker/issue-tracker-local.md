@@ -17,7 +17,7 @@ Issues and specs for this repo live as markdown files in `.scratch/`.
   Blocked by: 01, 02
   ```
 
-  `Status:` holds a role string from `triage-labels.md`, or `closed`. `Blocked by:` lists ticket numbers, or `none`.
+  `Status:` holds a label (`ready-for-agent` for tickets to implement), or `closed`. `Blocked by:` lists ticket numbers, or `none`.
 - Comments and conversation history append to the bottom of the file under a `## Comments` heading
 
 ## Operations

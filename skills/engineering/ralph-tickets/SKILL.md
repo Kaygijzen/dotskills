@@ -31,7 +31,7 @@ Input: $ARGUMENTS
 Report these as a short list. Stop at the first hard failure.
 
 1. **Feature.** `.scratch/<feature-slug>/.tracker.json` exists. If no slug was given, list the `.scratch/*/.tracker.json` files and ask which one.
-2. **Tracker.** `docs/agents/issue-tracker.md` names the tracker, or the feature uses the local tracker. For an external tracker, run the doc's **Check the connection** operation. If the MCP server isn't connected, stop and point to `/setup-dotskills`.
+2. **Tracker.** `docs/agents/issue-tracker.md` names the tracker, or the feature uses the local tracker. For an external tracker, run the doc's **Check the connection** operation. If the MCP server isn't connected, stop and tell the user to connect it.
 3. **Work left.** Compute the frontier as above and report how many tickets are open, how many are ready now, and how many are blocked. If none are ready, say why (all closed, all blocked, or none labelled `ready-for-agent`) and stop.
 4. **Branch.** The current branch is not `main` or `master`. If it is, suggest `git switch -c feature/<feature-slug>` or a worktree, and don't continue until the user picks one.
 5. **Clean tree.** `git status --porcelain` is empty, so each ticket's commit holds only its own work.

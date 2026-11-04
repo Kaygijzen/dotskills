@@ -14,7 +14,8 @@
 #   ./install.sh --uninstall [NAME..]  remove only what this script created (links, conventions block)
 #   ./install.sh --check               validate the repo (same as scripts/validate.sh)
 #   ./install.sh --target codex        not implemented yet; prints a note and exits 0
-#   ./install.sh --statusline-settings set `statusLine` in settings.json (the only key this script edits)
+#   ./install.sh --statusline-settings set `statusLine` in settings.json (backed up first)
+#   ./install.sh --no-model-setting    don't set `"model": "sonnet"` in settings.json (done by default when no model is set)
 #   ./install.sh --with-openspec       also install the OpenSpec CLI without asking
 #   ./install.sh --no-openspec         never ask about the OpenSpec CLI
 #   ./install.sh --with-rtk            also install rtk and run `rtk init -g` without asking
@@ -23,8 +24,9 @@
 # CLAUDE_SKILLS_DIR / CLAUDE_AGENTS_DIR / CLAUDE_CONFIG_DIR override ~/.claude/skills,
 # ~/.claude/agents and ~/.claude. Existing folders or foreign symlinks with the same
 # name are never touched. Hooks and MCP servers ship through the plugin only; this
-# script edits settings.json only with --statusline-settings, and then only the
-# `statusLine` key (backed up first, never overwriting a different statusLine). On Windows, use install.ps1 instead.
+# script edits settings.json only with --statusline-settings (the `statusLine` key) and,
+# when linking, to set `model` if unset (skip with --no-model-setting). Both back up
+# first and never overwrite a different value. On Windows, use install.ps1 instead.
 # If the openspec CLI (needed by grill-spec) is missing, install asks whether to
 # install it with npm; likewise for rtk (token-saving Bash hook), installed with
 # its official script. Without a terminal to ask on, both only print a hint.
@@ -46,12 +48,12 @@ BLOCK_START="# >>> dotskills conventions >>>"
 BLOCK_END="# <<< dotskills conventions <<<"
 
 usage() {
-  sed -n '2,30s/^# \{0,1\}//p' "$0"
+  sed -n '2,32s/^# \{0,1\}//p' "$0"
 }
 
 # True if $1 is a symlink this script created, i.e. it points into this repo's
 # skills/ or agents/ folder. A regular file at $STATUSLINE_DEST counts too when
-# it is a copy of our statusline (the setup-statusline skill copies it there for
+# it is a copy of our statusline (the setup-dotskills skill copies it there for
 # plugin installs), so a later full install can replace it with a link and
 # --uninstall removes it.
 is_ours() {
@@ -194,7 +196,7 @@ install() {
 # Warns (never fails) when jq is missing. Linking doesn't need it.
 check_jq() {
   command -v jq >/dev/null 2>&1 && return 0
-  echo "WARN    jq not found. The statusline, the .env secret hook and --statusline-settings need it. Install it with: brew install jq (macOS), sudo apt install jq (Debian/Ubuntu or WSL)"
+  echo "WARN    jq not found. The statusline, the .env secret hook and --statusline-settings and the default model setting need it. Install it with: brew install jq (macOS), sudo apt install jq (Debian/Ubuntu or WSL)"
 }
 
 # Printed after a full install run. Suggests --conventions only when the block is missing.
@@ -301,7 +303,7 @@ write_settings() {
       mv "$tmp" "$CLAUDE_SETTINGS" && return 0
     fi
   fi
-  rm -f "$tmp"; echo "WARN    statusLine: could not write $CLAUDE_SETTINGS"; return 1
+  rm -f "$tmp"; echo "WARN    could not write $CLAUDE_SETTINGS"; return 1
 }
 
 install_statusline_settings() {
@@ -351,6 +353,31 @@ uninstall_statusline_settings() {
     write_settings 'del(.statusLine)' "$CLAUDE_SETTINGS" || return 1
     echo "removed statusLine from $CLAUDE_SETTINGS"
   fi
+}
+
+# --- model: the other key we may set in settings.json ----------------------
+
+# Sets "model": "sonnet" on a linking run unless settings.json already has a model. Never uninstalled:
+# it can't be told apart from a model the user chose themselves.
+install_model_setting() {
+  local current
+  command -v jq >/dev/null 2>&1 || { echo "skip    model: jq not found"; return 0; }
+  mkdir -p "$(dirname "$CLAUDE_SETTINGS")"
+  if [[ ! -e "$CLAUDE_SETTINGS" ]]; then
+    write_settings -n '{model: "sonnet"}' || return 1
+    echo "added   model to $CLAUDE_SETTINGS (new file)"; return 0
+  fi
+  if ! jq -e 'type == "object"' "$CLAUDE_SETTINGS" >/dev/null 2>&1; then
+    echo "WARN    model: $CLAUDE_SETTINGS is not a valid JSON object; leaving it alone"; return 1
+  fi
+  current="$(jq -c '.model // empty' "$CLAUDE_SETTINGS")"
+  if [[ "$current" == '"sonnet"' ]]; then echo "ok      model in $CLAUDE_SETTINGS"; return 0; fi
+  if [[ -n "$current" ]]; then
+    echo "skip    model: $CLAUDE_SETTINGS already sets $current"; return 0
+  fi
+  [[ -e "$CLAUDE_SETTINGS.dotskills.bak" ]] || cp -p "$CLAUDE_SETTINGS" "$CLAUDE_SETTINGS.dotskills.bak"
+  write_settings '.model = "sonnet"' "$CLAUDE_SETTINGS" || return 1
+  echo "added   model to $CLAUDE_SETTINGS (backup: $CLAUDE_SETTINGS.dotskills.bak)"
 }
 
 # --- init-project ---------------------------------------------------------
@@ -552,7 +579,7 @@ uninstall() {
 }
 
 main() {
-  local mode=install openspec=ask rtk=ask conventions=0 sl_settings=0 init_path="" target=claude
+  local mode=install openspec=ask rtk=ask conventions=0 sl_settings=0 model_setting=1 init_path="" target=claude
   local -a names=()
   DOMAINS=()
 
@@ -565,6 +592,7 @@ main() {
                    DOMAINS+=("$1") ;;
       --conventions) conventions=1 ;;
       --statusline-settings) sl_settings=1 ;;
+      --no-model-setting) model_setting=0 ;;
       --init-project) shift; [[ $# -gt 0 ]] || { echo "--init-project needs a path" >&2; return 2; }
                    mode=init; init_path="$1" ;;
       --target)    shift; [[ $# -gt 0 ]] || { echo "--target needs claude or codex" >&2; return 2; }
@@ -604,6 +632,7 @@ main() {
         install_openspec "$openspec" || failed=1
         install_rtk "$rtk" || failed=1
         linked=1
+        if [[ $model_setting -eq 1 ]]; then install_model_setting || failed=1; fi
       fi
       if [[ $conventions -eq 1 ]]; then install_conventions || failed=1; fi
       if [[ $sl_settings -eq 1 ]]; then install_statusline_settings || failed=1; fi
