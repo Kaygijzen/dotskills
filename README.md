@@ -33,12 +33,12 @@ Shows the model, a context-use bar, cost, session time, git branch and rate limi
 | Skill | What it does | Trigger |
 | --- | --- | --- |
 | `hello-skill` | Greets the user and confirms the dotskills setup is working. | `/hello-skill`, or automatically when the user says "hello skill", asks to test their dotskills install, or invokes /hello-skill. |
-| `setup-statusline` | Installs the dotskills statusline (model, context bar, cost, time, git branch, rate limits) into ~/.claude and turns it on in settings.json. | `/setup-statusline` only (never auto-invoked) |
+| `setup-dotskills` | Installs the dotskills statusline, sets the default model to sonnet, and optionally installs the OpenSpec CLI and rtk, for plugin installs that cannot do it themselves. | `/setup-dotskills` only (never auto-invoked) |
 
 </details>
 
 <details>
-<summary><strong>engineering</strong> (15)</summary>
+<summary><strong>engineering</strong> (11)</summary>
 
 | Skill | What it does | Trigger |
 | --- | --- | --- |
@@ -50,12 +50,8 @@ Shows the model, a context-use bar, cost, session time, git branch and rate limi
 | `pr` | Write a pull request body. | `/pr`, or automatically when writing a PR body. |
 | `prototype` | Build a throwaway prototype to answer a design question. | `/prototype`, or automatically when the user wants to sanity-check whether a state model or logic feels right, or explore what a UI should look like. |
 | `ralph-apply` | Apply an approved OpenSpec change with a Ralph loop - a bash loop that runs a fresh headless Claude session per task, so context never piles up. | `/ralph-apply` only (never auto-invoked) |
-| `ralph-tickets` | Implement the tickets that to-tracker pushed, one at a time, with a Ralph loop - a bash loop that runs a fresh headless Claude session per ticket, always taking the next unblocked ready-for-agent ticket. | `/ralph-tickets` only (never auto-invoked) |
 | `research` | Investigate a question against high-trust primary sources and capture the findings as a Markdown file in the repo. | `/research`, or automatically when the user wants a topic researched, docs or API facts gathered, or reading legwork delegated to a background agent. |
 | `retro` | Conduct a retrospective on a coding session. | `/retro` only (never auto-invoked) |
-| `setup-dotskills` | Configure this repo for dotskills' engineering skills: set up its issue tracker and its MCP server, the label vocabulary, and the domain doc layout. | `/setup-dotskills` only (never auto-invoked) |
-| `to-tracker` | Turn the current conversation, or a spec or issue you pass, into a spec plus tracer-bullet tickets and push both to the configured issue tracker; or mirror an OpenSpec change there. | `/to-tracker` only (never auto-invoked) |
-| `wayfinder` | Plan a huge chunk of work (more than one agent session can hold) as a shared map of decision tickets on your issue tracker, and resolve them one at a time until the way to the destination is clear. | `/wayfinder` only (never auto-invoked) |
 | `wizard` | Generate an interactive bash wizard that walks a human through steps only they can perform. | `/wizard`, or automatically when provisioning infrastructure, setting up credentials or CI secrets, walking an unfamiliar third-party dashboard, or running a one-off migration or cutover. Don't invoke this for steps the agent can perform itself. |
 
 </details>
@@ -135,7 +131,7 @@ flowchart LR
     pr --> done(["Pull request"])
 ```
 
-The full loop, folder layout and the issue-tracker alternative are in [best practices](docs/best-practices.md#1-spec-driven-development). What `grill-spec` and `ralph-apply` need is in [Requirements](docs/best-practices.md#requirements).
+The full loop and folder layout are in [best practices](docs/best-practices.md#1-spec-driven-development). What `grill-spec` and `ralph-apply` need is in [Requirements](docs/best-practices.md#requirements).
 
 ## Docs
 

@@ -31,7 +31,7 @@ Pick **one** of these per machine. Using both duplicates every skill. Clone and 
 | Editable copy | Yes, the clone is live | No |
 | Hooks / secret blocker | No | Yes |
 | Conventions | `./install.sh --conventions` | Loaded by a hook at session start |
-| Statusline | `./install.sh` links it; `--statusline-settings` turns it on | `/dotskills:setup-statusline` copies it and turns it on |
+| Statusline | `./install.sh` links it; `--statusline-settings` turns it on | `/dotskills:setup-dotskills` copies it and turns it on |
 | Skill names | `/grill-spec` | `/dotskills:grill-spec` |
 | How to update | `git pull && ./install.sh` | `claude plugin marketplace update dotskills`, then `claude plugin update dotskills@dotskills`, then restart ([details](#7-updating)) |
 
@@ -63,11 +63,11 @@ For a single project, `./install.sh --init-project <path>` copies `conventions/p
 
 ## 4. Recommended personal settings
 
-The installer edits `settings.json` only when you pass `--statusline-settings`, and the `setup-statusline` skill only when you run it (see the statusline below). Paste everything else in yourself.
+The installer edits `settings.json` when you pass `--statusline-settings`, and sets `model` to `sonnet` on a linking run if none is set (`--no-model-setting` skips it), and the `setup-dotskills` skill only when you run it (see the statusline below). Paste everything else in yourself.
 
 **Statusline** with model, a context-use bar, cost, session time, git branch and rate limits. The script is `statusline/statusline.sh` (vendored from [kcchien/claude-code-statusline](https://github.com/kcchien/claude-code-statusline), MIT). Plugins cannot set a statusline, so install it one of these ways:
 
-- **Plugin:** run `/dotskills:setup-statusline`. It copies the script to `~/.claude/statusline.sh` and sets `statusLine`. It is a copy because the plugin folder changes with every version, so run it again after a [plugin update](#7-updating).
+- **Plugin:** run `/dotskills:setup-dotskills`. It copies the script to `~/.claude/statusline.sh` and sets `statusLine`, sets `model` to `sonnet` if none is set, and offers to install OpenSpec and rtk (then you run `rtk init -g` yourself). It is a copy because the plugin folder changes with every version, so run it again after a [plugin update](#7-updating).
 - **Symlinks:** `./install.sh` links the script to `~/.claude/statusline.sh`. Run `./install.sh --statusline-settings` to set `statusLine`.
 
 Both back up `settings.json` first and never overwrite a `statusLine` you already have. Or add it yourself:
@@ -102,17 +102,6 @@ Optional env vars: `CLAUDE_STATUSLINE_NERDFONT=1`, `CLAUDE_STATUSLINE_POWERLINE=
 2. Ask Claude "what are my commit message conventions?". With symlinks, also run `/memory` and check that `~/.claude/CLAUDE.md` is listed.
 3. Ask Claude to read a `.env` file. The secret hook (plugin installs only; the symlink installer does not ship hooks) should block it and explain why.
 
-Per project: run `/dotskills:setup-dotskills` once (or `/setup-dotskills` with symlinks). It sets the issue tracker and domain docs for the engineering skills, and connects the tracker's MCP server where there is one.
-
-| Tracker | What you need | Notes |
-| --- | --- | --- |
-| Local markdown | Nothing else | Issues are files in the repo. |
-| GitHub | A personal access token | Connects the GitHub MCP server. |
-| GitLab | GitLab 19.5 or newer | Connects the GitLab MCP server. |
-| Azure DevOps | Either a custom Microsoft Entra app registration with admin consent, or Node 20+ and `az login` | The app registration is for the remote server; the organization must be backed by an Entra tenant. Node and `az login` are for the local server. |
-
-The `gh` and `glab` CLIs are optional. The skills fall back to them only for a few steps, and `wayfinder` still uses them.
-
 ## 6. Before using it on a client project
 
 - Check that the client allows AI coding tools, and which data may be shared.
@@ -129,7 +118,7 @@ The `gh` and `glab` CLIs are optional. The skills fall back to them only for a f
   claude plugin update dotskills@dotskills     # update the installed plugin
   ```
 
-  Then restart Claude Code. If you use the statusline, rerun `/dotskills:setup-statusline` to refresh its copy. In a session, the **Installed** tab of `/plugin` has the same **Update now** action.
+  Then restart Claude Code. If you use the statusline, rerun `/dotskills:setup-dotskills` to refresh its copy. In a session, the **Installed** tab of `/plugin` has the same **Update now** action.
 
 You need both: `marketplace update` alone only refreshes the catalog, so the installed plugin stays on the old version, even in a new session; `plugin update` alone checks against the old catalog and reports that it is already up to date.
 

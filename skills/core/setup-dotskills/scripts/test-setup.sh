@@ -1,15 +1,17 @@
 #!/usr/bin/env bash
-# Tests install-statusline.sh. Usage: skills/core/setup-statusline/scripts/test-install-statusline.sh
+# Tests setup.sh. Usage: skills/core/setup-dotskills/scripts/test-setup.sh
 set -uo pipefail
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
-SCRIPT="$DIR/install-statusline.sh"
+SCRIPT="$DIR/setup.sh"
 SRC="$(cd "$DIR/../../../.." && pwd -P)/statusline/statusline.sh"
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 fail=0
 
-run() { CLAUDE_CONFIG_DIR="$tmp/c" "$SCRIPT" >"$tmp/out" 2>&1; echo $?; }
+# The statusline tests skip the model step; the model tests call runm.
+run() { CLAUDE_CONFIG_DIR="$tmp/c" "$SCRIPT" --no-model-setting >"$tmp/out" 2>&1; echo $?; }
+runm() { CLAUDE_CONFIG_DIR="$tmp/c" "$SCRIPT" "$@" >"$tmp/out" 2>&1; echo $?; }
 ok()  { echo "ok   $1"; }
 bad() { echo "FAIL $1: $(cat "$tmp/out")"; fail=1; }
 sl()  { jq -c '.statusLine // empty' "$tmp/c/settings.json"; }
@@ -49,8 +51,8 @@ rm -rf "$tmp/c"; mkdir -p "$tmp/c"; echo 'not json' > "$tmp/c/settings.json"
 [[ "$(run)" == 1 ]] && [[ "$(cat "$tmp/c/settings.json")" == "not json" ]] && ok "keeps invalid settings.json" || bad "keeps invalid settings.json"
 
 # Run through a symlinked skill dir, as ./install.sh links it to ~/.claude/skills/.
-rm -rf "$tmp/c"; mkdir -p "$tmp/h/skills"; ln -s "$(dirname "$DIR")" "$tmp/h/skills/setup-statusline"
-CLAUDE_CONFIG_DIR="$tmp/c" "$tmp/h/skills/setup-statusline/scripts/install-statusline.sh" >"$tmp/out" 2>&1 \
+rm -rf "$tmp/c"; mkdir -p "$tmp/h/skills"; ln -s "$(dirname "$DIR")" "$tmp/h/skills/setup-dotskills"
+CLAUDE_CONFIG_DIR="$tmp/c" "$tmp/h/skills/setup-dotskills/scripts/setup.sh" --no-model-setting >"$tmp/out" 2>&1 \
   && cmp -s "$SRC" "$tmp/c/statusline.sh" && ok "works through a symlinked skill dir" || bad "works through a symlinked skill dir"
 
 # A dangling symlink (clone deleted without --uninstall) is replaced by a copy.
@@ -67,7 +69,7 @@ rm -rf "$tmp/c"; mkdir -p "$tmp/c"; echo '{"a":1}' > "$tmp/c/settings.json"; ech
 
 # Without jq nothing is written.
 rm -rf "$tmp/c"
-CLAUDE_CONFIG_DIR="$tmp/c" PATH=/nonexistent /bin/bash "$SCRIPT" >"$tmp/out" 2>&1; rc=$?
+CLAUDE_CONFIG_DIR="$tmp/c" PATH=/nonexistent /bin/bash "$SCRIPT" --no-model-setting >"$tmp/out" 2>&1; rc=$?
 [[ $rc -eq 1 && ! -e "$tmp/c" ]] && grep -q "jq not found" "$tmp/out" && ok "stops without jq" || bad "stops without jq"
 
 # A symlinked settings.json (dotfiles repo) stays a link; its target is updated and keeps its mode.
@@ -81,20 +83,20 @@ chmod 644 "$tmp/dot/settings.json"; ln -s "$tmp/dot/settings.json" "$tmp/c/setti
 rm -rf "$tmp/c" "$tmp/fakebin"; mkdir -p "$tmp/c" "$tmp/fakebin"; echo '{"model":"sonnet"}' > "$tmp/c/settings.json"
 realjq="$(command -v jq)"
 printf '#!/bin/sh\nfor a; do [ "$a" = ".statusLine = \\$v" ] && exit 5; done\nexec "%s" "$@"\n' "$realjq" > "$tmp/fakebin/jq"; chmod +x "$tmp/fakebin/jq"
-CLAUDE_CONFIG_DIR="$tmp/c" PATH="$tmp/fakebin:$PATH" "$SCRIPT" >"$tmp/out" 2>&1; rc=$?
+CLAUDE_CONFIG_DIR="$tmp/c" PATH="$tmp/fakebin:$PATH" "$SCRIPT" --no-model-setting >"$tmp/out" 2>&1; rc=$?
 [[ $rc -eq 1 && "$(cat "$tmp/c/settings.json")" == '{"model":"sonnet"}' ]] && grep -q "could not write" "$tmp/out" \
   && [[ -z "$(find "$tmp/c" -name 'settings.json.??????')" ]] && ok "failed write keeps settings.json" || bad "failed write keeps settings.json"
 
 # A config dir with a space: the command is quoted and runs through a shell.
 sp="$tmp/with space/c"; rm -rf "$tmp/with space"
-CLAUDE_CONFIG_DIR="$sp" "$SCRIPT" >"$tmp/out" 2>&1 \
+CLAUDE_CONFIG_DIR="$sp" "$SCRIPT" --no-model-setting >"$tmp/out" 2>&1 \
   && [[ "$(jq -r .statusLine.command "$sp/settings.json")" == "\"$sp/statusline.sh\"" ]] \
   && echo '{}' | sh -c "$(jq -r .statusLine.command "$sp/settings.json")" >/dev/null 2>&1 \
   && ok "quotes a command path with a space" || bad "quotes a command path with a space"
 
 # A path the quotes can't protect is refused before anything is written.
 rm -rf "$tmp/c\$x"
-CLAUDE_CONFIG_DIR="$tmp/c\$x" "$SCRIPT" >"$tmp/out" 2>&1; rc=$?
+CLAUDE_CONFIG_DIR="$tmp/c\$x" "$SCRIPT" --no-model-setting >"$tmp/out" 2>&1; rc=$?
 [[ $rc -eq 1 && ! -e "$tmp/c\$x" ]] && grep -q "can't quote it" "$tmp/out" && ok "refuses an unquotable path" || bad "refuses an unquotable path"
 
 # The bare path older versions wrote is ours: a rerun quotes it, keeping other keys.
@@ -136,4 +138,46 @@ installer --uninstall statusline && [[ -L "$tmp/c/settings.json" && -z "$(jq -c 
 rm -rf "$tmp/c"; mkdir -p "$tmp/c"; echo 'echo mine' > "$tmp/c/statusline.sh"
 installer --uninstall statusline; [[ -f "$tmp/c/statusline.sh" ]] && ok "install.sh --uninstall keeps a foreign file" || bad "install.sh --uninstall keeps a foreign file"
 
-[[ $fail -eq 0 ]] && echo "All install-statusline tests passed." || { echo "install-statusline tests failed."; exit 1; }
+# --- model ---
+# Fresh config: both keys, one file.
+rm -rf "$tmp/c"
+[[ "$(runm)" == 0 ]] && [[ "$(jq -r .model "$tmp/c/settings.json")" == sonnet && "$(sl)" == "$want" ]] && ok "sets model on a fresh config" || bad "sets model on a fresh config"
+# Rerun is a no-op.
+[[ "$(runm)" == 0 ]] && grep -q "^ok      model" "$tmp/out" && ok "model rerun is a no-op" || bad "model rerun is a no-op"
+# Existing settings keep their keys, get a backup.
+rm -rf "$tmp/c"; mkdir -p "$tmp/c"; echo '{"theme":"dark"}' > "$tmp/c/settings.json"
+[[ "$(runm)" == 0 ]] && [[ "$(jq -r .theme "$tmp/c/settings.json")" == dark && "$(jq -r .model "$tmp/c/settings.json")" == sonnet && -f "$tmp/c/settings.json.dotskills.bak" ]] && ok "adds model next to other keys" || bad "adds model next to other keys"
+# A different model is kept, and that is not a failure.
+rm -rf "$tmp/c"; mkdir -p "$tmp/c"; echo '{"model":"opus"}' > "$tmp/c/settings.json"
+[[ "$(runm)" == 0 ]] && [[ "$(jq -r .model "$tmp/c/settings.json")" == opus ]] && grep -q "^skip    model" "$tmp/out" && ok "keeps a different model" || bad "keeps a different model"
+# --no-model-setting leaves the model unset.
+rm -rf "$tmp/c"
+[[ "$(runm --no-model-setting)" == 0 ]] && [[ -z "$(jq -r '.model // empty' "$tmp/c/settings.json")" ]] && ok "--no-model-setting skips the model" || bad "--no-model-setting skips the model"
+# A failed statusline step does not stop the model step, but the exit code says so.
+rm -rf "$tmp/c"; mkdir -p "$tmp/c"; echo 'echo mine' > "$tmp/c/statusline.sh"
+[[ "$(runm)" == 1 ]] && [[ "$(jq -r .model "$tmp/c/settings.json")" == sonnet ]] && ok "model still set when the statusline step fails" || bad "model still set when the statusline step fails"
+# Unknown option.
+[[ "$(runm --bogus)" == 2 ]] && ok "rejects an unknown option" || bad "rejects an unknown option"
+
+# --- openspec and rtk (blockers only; nothing is installed from the network) ---
+rm -rf "$tmp/c" "$tmp/nobin"; mkdir -p "$tmp/nobin"
+for t in jq cat cp chmod cmp grep mkdir mktemp rm sed dirname readlink uname; do ln -s "$(command -v $t)" "$tmp/nobin/$t" 2>/dev/null; done
+CLAUDE_CONFIG_DIR="$tmp/c" PATH="$tmp/nobin" HOME="$tmp/h" /bin/bash "$SCRIPT" --no-model-setting --openspec >"$tmp/out" 2>&1; rc=$?
+[[ $rc -eq 1 ]] && grep -q "WARN    openspec: Node.js/npm not found" "$tmp/out" && ok "openspec without node warns" || bad "openspec without node warns"
+CLAUDE_CONFIG_DIR="$tmp/c" PATH="$tmp/nobin" HOME="$tmp/h" /bin/bash "$SCRIPT" --no-model-setting --rtk >"$tmp/out" 2>&1; rc=$?
+[[ $rc -eq 1 ]] && grep -q "WARN    rtk: curl not found" "$tmp/out" && ok "rtk without curl warns" || bad "rtk without curl warns"
+# An rtk that is not rtk-ai/rtk is not used.
+rm -rf "$tmp/c" "$tmp/fakertk"; mkdir -p "$tmp/fakertk"; printf '#!/bin/sh\nexit 1\n' > "$tmp/fakertk/rtk"; chmod +x "$tmp/fakertk/rtk"
+CLAUDE_CONFIG_DIR="$tmp/c" PATH="$tmp/fakertk:$PATH" "$SCRIPT" --no-model-setting --rtk >"$tmp/out" 2>&1; rc=$?
+[[ $rc -eq 1 ]] && grep -q "is not rtk-ai/rtk" "$tmp/out" && ok "rtk rejects a different rtk" || bad "rtk rejects a different rtk"
+# A working rtk with no hook: the script tells the user to run rtk init -g.
+printf '#!/bin/sh\n[ "$1" = gain ] && exit 0\necho "rtk 0.0.1"\n' > "$tmp/fakertk/rtk"
+rm -rf "$tmp/c"
+CLAUDE_CONFIG_DIR="$tmp/c" PATH="$tmp/fakertk:$PATH" "$SCRIPT" --no-model-setting --rtk >"$tmp/out" 2>&1; rc=$?
+[[ $rc -eq 0 ]] && grep -q "the user runs: rtk init -g" "$tmp/out" && ok "rtk hands rtk init -g to the user" || bad "rtk hands rtk init -g to the user"
+# An openspec that is already installed is left alone.
+printf '#!/bin/sh\necho 1.0.0\n' > "$tmp/fakertk/openspec"; chmod +x "$tmp/fakertk/openspec"
+CLAUDE_CONFIG_DIR="$tmp/c" PATH="$tmp/fakertk:$PATH" "$SCRIPT" --no-model-setting --openspec >"$tmp/out" 2>&1; rc=$?
+[[ $rc -eq 0 ]] && grep -q "^ok      openspec 1.0.0" "$tmp/out" && ok "openspec already installed is a no-op" || bad "openspec already installed is a no-op"
+
+[[ $fail -eq 0 ]] && echo "All setup tests passed." || { echo "setup tests failed."; exit 1; }
