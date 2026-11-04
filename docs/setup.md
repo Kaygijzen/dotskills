@@ -56,7 +56,7 @@ The installer edits `settings.json` only when you pass `--statusline-settings`, 
 
 **Statusline** with model, a context-use bar, cost, session time, git branch and rate limits. The script is `statusline/statusline.sh` (vendored from [kcchien/claude-code-statusline](https://github.com/kcchien/claude-code-statusline), MIT). Plugins cannot set a statusline, so install it one of these ways:
 
-- **Plugin:** run `/dotskills:setup-statusline`. It copies the script to `~/.claude/statusline.sh` and sets `statusLine`. Run it again after a plugin update to refresh the copy.
+- **Plugin:** run `/dotskills:setup-statusline`. It copies the script to `~/.claude/statusline.sh` and sets `statusLine`. It is a copy because the plugin folder changes with every version, so run it again after a [plugin update](#7-updating).
 - **Symlinks:** `./install.sh` links the script to `~/.claude/statusline.sh`. Run `./install.sh --statusline-settings` to set `statusLine`.
 
 Both back up `settings.json` first and never overwrite a `statusLine` you already have. Or add it yourself:
@@ -110,8 +110,17 @@ The `gh` and `glab` CLIs are optional. The skills fall back to them only for a f
 
 ## 7. Updating
 
-- Plugin: `/plugin marketplace update dotskills`
 - Symlinks: `git pull && ./install.sh`
+- Plugin: run in your shell:
+
+  ```bash
+  claude plugin marketplace update dotskills   # refresh the catalog
+  claude plugin update dotskills@dotskills     # update the installed plugin
+  ```
+
+  Then restart Claude Code. If you use the statusline, rerun `/dotskills:setup-statusline` to refresh its copy. In a session, the **Installed** tab of `/plugin` has the same **Update now** action.
+
+You need both: `marketplace update` alone only refreshes the catalog, so the installed plugin stays on the old version, even in a new session; `plugin update` alone checks against the old catalog and reports that it is already up to date.
 
 ## Codex (later)
 

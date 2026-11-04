@@ -27,6 +27,12 @@ Common causes:
 
 **A skill shows up twice.** A skill of the same name also comes from somewhere else, such as a plugin (`/dotskills:<name>` or another plugin's namespace) or a synced skill. Don't install this repo both ways on one machine.
 
+**A plugin update didn't take effect.** A new skill is missing or the old behaviour stays after `marketplace update`. That command only refreshes the catalog. Update the plugin itself and restart Claude Code:
+
+```bash
+claude plugin update dotskills@dotskills
+```
+
 ## Behind a TLS-inspecting proxy
 
 Some corporate networks decrypt and re-sign HTTPS traffic with their own root CA (Zscaler is one example). Tools that don't trust that CA fail.
