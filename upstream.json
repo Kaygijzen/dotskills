@@ -46,7 +46,9 @@
     "source_path": "skills/engineering/code-review",
     "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
     "local_changes": [
-      "/setup-matt-pocock-skills -> /setup-dotskills"
+      "/setup-matt-pocock-skills -> /setup-dotskills",
+      "SKILL.md: without a tracker doc, falls back to the local-markdown tracker instead of stopping",
+      "SKILL.md: tracker-not-configured sentence also names Azure DevOps"
     ]
   },
   {
@@ -108,32 +110,16 @@
     "local_changes": []
   },
   {
-    "skill": "setup-dotskills",
-    "domain": "engineering",
-    "source_repo": "https://github.com/mattpocock/skills",
-    "source_path": "skills/engineering/setup-matt-pocock-skills",
-    "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
-    "local_changes": [
-      "renamed from setup-matt-pocock-skills; name, title, description and openai.yaml display strings say dotskills",
-      "issue-tracker-github.md and triage-labels.md name Kaygijzen/dotskills / dotskills instead of mattpocock/skills",
-      "SKILL.md: added Section D (agent conventions from conventions/project-template) and Section E (OpenSpec check)",
-      "domain.md: dropped the pointer to the grill-with-docs skill (not imported)",
-      "issue-tracker-github.md, issue-tracker-gitlab.md: \"/triage reads this flag\" -> \"a triage skill, if installed, reads this flag\"",
-      "issue-tracker-github.md: Conventions rewritten as github MCP tool map, gh only as fallback; PR and Wayfinding sections marked CLI-only",
-      "issue-tracker-gitlab.md: Conventions rewritten as GitLab MCP tool map with glab fallbacks and a Tier flag; MR and Wayfinding sections marked CLI-only",
-      "issue-tracker-local.md: fixed ticket file format (Parent/Status/Blocked by lines) and added an Operations list",
-      "SKILL.md: Section A explainer names to-tracker, wayfinder and code-review instead of to-tickets, triage and to-spec"
-    ],
-    "renamed_from": "setup-matt-pocock-skills"
-  },
-  {
     "skill": "wayfinder",
     "domain": "engineering",
     "source_repo": "https://github.com/mattpocock/skills",
     "source_path": "skills/engineering/wayfinder",
     "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
     "local_changes": [
-      "/setup-matt-pocock-skills -> /setup-dotskills"
+      "/setup-matt-pocock-skills -> /setup-dotskills",
+      "SKILL.md: tracker-not-configured sentence unified with to-tracker and code-review (local-markdown fallback, said once)",
+      "SKILL.md: blocking is a soft Blocked by: line on every tracker, not the tracker's native dependency link",
+      "SKILL.md: tracker-not-configured sentence also names Azure DevOps"
     ]
   },
   {

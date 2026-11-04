@@ -64,15 +64,26 @@ defaulting to the system preference.
 | Small | Plan mode (`/plan`) |
 | A feature | [OpenSpec](https://github.com/Fission-AI/OpenSpec) with the `grill-spec` skill |
 | A long approved change | `ralph-apply`, which runs one fresh session per task |
+| A spec with tickets | `ralph-tickets`, which runs one fresh session per ready ticket |
 
-Two spec flows. Pick one per project. (user) means the skill runs only when you type it, (model) means Claude may also invoke it on its own.
+Each project makes two separate choices. (user) means the skill runs only when you type it, (model) means Claude may also invoke it on its own.
 
-| Project type | Flow |
+**How the spec is written:**
+
+| Spec flow | Skills |
 | --- | --- |
 | OpenSpec | `grill-spec` (user) → `ralph-apply` (user) |
-| Issue tracker | `grill-me` (user) → `to-tracker` (user), with `wayfinder` (user) for work bigger than one session |
+| Spec plus tickets | `grill-me` (user) → `to-tracker` (user) → `ralph-tickets` (user), with `wayfinder` (user) for work bigger than one session |
 
-Run `/dotskills:setup-dotskills` (user) once per project before the issue-tracker flow. The issue-tracker flow currently ends at the tickets: skills for implementing them are still in progress.
+**Where the work is visible:**
+
+| Tracker | With OpenSpec | With spec plus tickets |
+| --- | --- | --- |
+| None | the change folder in the repo | — |
+| Local markdown | — (the change is already local) | files in `.scratch/`, the default without setup |
+| GitHub, GitLab, Azure DevOps | optional mirror: `/to-tracker <change>` pushes the change as a parent issue with one child per task group, and later runs update their status | issues, pushed by `to-tracker` |
+
+Run `/dotskills:setup-dotskills` (user) once per project to pick the tracker. `/ralph-tickets` then implements the pushed tickets one by one, each in a fresh session.
 
 These skills work alongside either flow:
 

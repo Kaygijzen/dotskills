@@ -33,6 +33,7 @@ A subagent can set its own `model:` in its frontmatter. Use Haiku for search and
 
 - `grill-spec`: your session model runs the interview, so switch to **Opus** for it. Its fact-finder sub-agents use `sonnet` and its spec reviewers use `opus`.
 - `ralph-apply`: **Sonnet**. `ralph.sh` already passes `--model` (default `sonnet`, override with `RALPH_MODEL`), so the loop model is enforced.
+- `ralph-tickets`: **Sonnet**, enforced the same way by `ralph-tickets.sh`.
 
 ### Imported skills (from mattpocock/skills)
 
