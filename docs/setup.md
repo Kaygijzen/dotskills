@@ -39,7 +39,9 @@ cd dotskills
 ./install.sh                 # every domain; or: ./install.sh --domain engineering
 ```
 
-Then add the personal conventions, which plugins cannot ship. This applies to plugin installs too, so run it from a clone either way:
+Every flag is listed in the [install reference](install-reference.md).
+
+Then add the personal conventions, which plugins cannot ship. Plugin installs need a clone for this too:
 
 ```bash
 ./install.sh --conventions
@@ -83,7 +85,16 @@ Optional env vars: `CLAUDE_STATUSLINE_NERDFONT=1`, `CLAUDE_STATUSLINE_POWERLINE=
 2. Run `/memory` and check that `~/.claude/CLAUDE.md` is listed. Then ask Claude "what are my commit message conventions?" to confirm the import resolves.
 3. Ask Claude to read a `.env` file. The secret hook (plugin installs only; the symlink installer does not ship hooks) should block it and explain why.
 
-Per project: run `/dotskills:setup-dotskills` once (or `/setup-dotskills` with symlinks) to set the issue tracker and domain docs for the engineering skills. The tracker can be local markdown files in the repo, which needs nothing else. For GitHub, GitLab or Azure DevOps, setup also connects the tracker's MCP server: GitHub needs a personal access token, GitLab needs version 19.5 or newer, and Azure DevOps needs either a custom Microsoft Entra app registration with admin consent (the remote server; the organization must be backed by an Entra tenant) or Node 20+ and `az login` (the local server). The `gh`/`glab` CLIs are optional; the skills fall back to them only for a few steps, and `wayfinder` still uses them.
+Per project: run `/dotskills:setup-dotskills` once (or `/setup-dotskills` with symlinks). It sets the issue tracker and domain docs for the engineering skills, and connects the tracker's MCP server where there is one.
+
+| Tracker | What you need | Notes |
+| --- | --- | --- |
+| Local markdown | Nothing else | Issues are files in the repo. |
+| GitHub | A personal access token | Connects the GitHub MCP server. |
+| GitLab | GitLab 19.5 or newer | Connects the GitLab MCP server. |
+| Azure DevOps | Either a custom Microsoft Entra app registration with admin consent, or Node 20+ and `az login` | The app registration is for the remote server; the organization must be backed by an Entra tenant. Node and `az login` are for the local server. |
+
+The `gh` and `glab` CLIs are optional. The skills fall back to them only for a few steps, and `wayfinder` still uses them.
 
 ## 6. Before using it on a client project
 

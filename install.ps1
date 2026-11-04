@@ -322,6 +322,27 @@ function Install-Rtk([string]$Choice) {
   $true
 }
 
+# Warns (never fails) when jq is missing. Linking doesn't need it.
+function Test-Jq {
+  if (Get-CommandPath 'jq') { return }
+  Write-Host 'WARN    jq not found. The statusline and the .env secret hook need it. Install it with: winget install jqlang.jq (Windows), brew install jq (macOS), sudo apt install jq (Debian/Ubuntu)'
+}
+
+# Printed after a full install run. Suggests conventions only when the block is missing.
+function Write-NextSteps {
+  $configDir = if ($env:CLAUDE_CONFIG_DIR) { $env:CLAUDE_CONFIG_DIR } else { Join-Path $HOME '.claude' }
+  $memory = Join-Path $configDir 'CLAUDE.md'
+  $hasBlock = (Test-Path -LiteralPath $memory) -and (Select-String -LiteralPath $memory -SimpleMatch -Pattern '# >>> dotskills conventions >>>' -Quiet)
+  Write-Host ''
+  Write-Host 'Next steps:'
+  Write-Host '  - Restart Claude Code if it is running.'
+  Write-Host '  - Run /hello-skill to check the install.'
+  if (-not $hasBlock) {
+    Write-Host "  - Conventions need bash. Run ./install.sh --conventions from Git Bash or WSL to add the block to $memory."
+  }
+  Write-Host '  - Hooks, including the .env secret blocker, ship only with the plugin install.'
+}
+
 if ($Help) { Show-Usage; exit 0 }
 $Names = @($Names | ForEach-Object { $_.TrimEnd('\', '/') })
 $openSpecChoice = if ($WithOpenSpec) { 'yes' } elseif ($NoOpenSpec) { 'no' } else { 'ask' }
@@ -342,7 +363,9 @@ if ($Uninstall) {
   exit 0
 }
 
+Test-Jq
 $ok = Install-Skills $Names
 if (-not (Install-OpenSpec $openSpecChoice)) { $ok = $false }
 if (-not (Install-Rtk $rtkChoice)) { $ok = $false }
+Write-NextSteps
 if ($ok) { exit 0 } else { exit 1 }
