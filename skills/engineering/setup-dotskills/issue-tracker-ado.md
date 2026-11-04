@@ -1,6 +1,6 @@
 # Issue tracker: Azure DevOps
 
-> **Partly tested.** The operations below were run on 2026-11-03 against the local server (`@azure-devops/mcp` 2.11.0, `--authentication azcli`) in a project on the Agentic SDLC process. The remote server, other process templates and the dependent skills are not yet tested. See `verification.md` in the dotskills repo.
+> **Partly tested.** The operations below were run on 2026-11-03 against the local server (`@azure-devops/mcp` 2.11.0, `--authentication azcli`) in a project on the Agentic SDLC process. The remote server, other process templates and the dependent skills are not yet tested.
 
 Issues and specs for this repo live as Azure DevOps **work items**, reached through the Azure DevOps MCP server. Tools are named by short name: `wit_work_item_write` means `mcp__ado__wit_work_item_write`. Most tools are dispatchers: one tool plus an `action` parameter. Pass the organization's **project** on every call that takes one.
 
