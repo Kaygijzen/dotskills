@@ -46,6 +46,8 @@ done < <({ git ls-files '*.json' '*.mcp.json'; git ls-files --others --exclude-s
 
 step "hook tests"
 ./hooks/core/scripts/test-block-secrets.sh || fail "hook tests"
+./hooks/core/scripts/test-load-conventions.sh || fail "load-conventions tests"
+./skills/core/setup-statusline/scripts/test-install-statusline.sh || fail "install-statusline tests"
 
 step "claude plugin validate"
 if command -v claude >/dev/null 2>&1; then
