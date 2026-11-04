@@ -325,7 +325,7 @@ function Install-Rtk([string]$Choice) {
 # Warns (never fails) when jq is missing. Linking doesn't need it.
 function Test-Jq {
   if (Get-CommandPath 'jq') { return }
-  Write-Host 'WARN    jq not found. The statusline and the .env secret hook need it. Install it with: winget install jqlang.jq (Windows), brew install jq (macOS), sudo apt install jq (Debian/Ubuntu)'
+  Write-Host 'WARN    jq not found. The statusline and the .env secret hook need it. Install it with: winget install jqlang.jq'
 }
 
 # Printed after a full install run. Suggests conventions only when the block is missing.
