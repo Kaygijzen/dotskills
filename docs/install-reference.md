@@ -46,6 +46,7 @@ To link into different folders (handy for testing), set `CLAUDE_SKILLS_DIR`, `CL
 
 ```bash
 CLAUDE_CONFIG_DIR=/tmp/test-claude ./install.sh --conventions
+# or, for one run: ./install.sh --config-dir /tmp/test-claude --conventions
 ```
 
 **Name conflicts:** the script only creates, updates or removes symlinks that point into this repo's `skills/` and `agents/` folders. It prints a `WARN` line and skips the skill in two cases:
