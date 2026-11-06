@@ -55,8 +55,8 @@ Resolve `<skill-dir>` to this skill's real folder (run `cd "$(dirname <this SKIL
 
 Then tell them:
 - **Max iterations** defaults to the number of open tasks + 5.
-- **Optional env vars:** `RALPH_MODEL` picks the model for the iterations (default `sonnet`; set `RALPH_MODEL=opus` for a change with hard tasks), and `RALPH_MAX_TURNS` caps the turns per iteration (default 60).
-- **Logs** for each iteration go to `.ralph/<change>/iter-N.log`.
+- **Optional env vars:** `RALPH_MODEL` picks the model for the iterations (default `sonnet`; set `RALPH_MODEL=opus` for a change with hard tasks), `RALPH_MAX_TURNS` caps the turns per iteration (default 60), and `RALPH_TOOLS` sets the built-in tools each iteration gets (default `Bash,Read,Edit,Write,Glob,Grep`, which keeps the unused tool definitions out of every turn; add more only if the project needs them).
+- **Logs** for each iteration go to `.ralph/<change>/iter-N.json` (Claude's JSON result). After each iteration the loop prints turns, cost estimate and token counts, then the result. Nothing prints while an iteration runs. The cost is a list-price estimate, not billing.
 - **When it stops** on a `.ralph-stop`, run `/ralph-apply <change>` again: preflight step 6 handles the question, then the loop resumes where it left off.
 - **When all tasks are ticked,** do the manual checks the loop skips (for example a simulator or browser walkthrough), then run `/opsx:archive <change>`.
 

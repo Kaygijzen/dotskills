@@ -2,7 +2,8 @@ You are one iteration of a Ralph loop applying the OpenSpec change `{{CHANGE}}`.
 You have a fresh context. Everything you know comes from files. Do exactly ONE task, then exit.
 
 1. Orient. Read, in this order:
-   - AGENTS.md and/or CLAUDE.md (project rules and verification commands)
+   - AGENTS.md, only if it is not already in your context (CLAUDE.md is loaded automatically); it holds
+     the project rules and verification commands
    - openspec/changes/{{CHANGE}}/proposal.md, design.md, specs/**, tasks.md
    - openspec/changes/{{CHANGE}}/notes.md if it exists: what earlier iterations learned
    Then look at only the code the task needs.
