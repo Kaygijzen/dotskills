@@ -13,6 +13,7 @@
 #   ./install.sh --init-project PATH   copy conventions/project-template/ into PATH (never overwrites)
 #   ./install.sh --uninstall [NAME..]  remove only what this script created (links, conventions block)
 #   ./install.sh --check               validate the repo (same as scripts/validate.sh)
+#   ./install.sh --config-dir PATH     use PATH instead of ~/.claude (same as CLAUDE_CONFIG_DIR=PATH)
 #   ./install.sh --target codex        not implemented yet; prints a note and exits 0
 #   ./install.sh --statusline-settings only turn on the statusline (link it, set `statusLine`)
 #   ./install.sh --no-statusline-settings don't set `statusLine` in settings.json (done by default when none is set)
@@ -38,13 +39,17 @@ REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 SRC_DIR="$REPO_DIR/skills"
 AGENTS_SRC="$REPO_DIR/agents"
 STATUSLINE_SRC="$REPO_DIR/statusline/statusline.sh"
-CONFIG_DIR="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
-DEST_DIR="${CLAUDE_SKILLS_DIR:-$CONFIG_DIR/skills}"
-AGENTS_DEST="${CLAUDE_AGENTS_DIR:-$CONFIG_DIR/agents}"
-STATUSLINE_DEST="$CONFIG_DIR/statusline.sh"
 STATUSLINE_MARKER="Claude Code session status line"  # in the statusline script's header
-CLAUDE_SETTINGS="$CONFIG_DIR/settings.json"
-MEMORY_FILE="$CONFIG_DIR/CLAUDE.md"
+# Derives every destination from $1; CLAUDE_SKILLS_DIR / CLAUDE_AGENTS_DIR still win.
+set_config_dir() {
+  CONFIG_DIR="$1"
+  DEST_DIR="${CLAUDE_SKILLS_DIR:-$CONFIG_DIR/skills}"
+  AGENTS_DEST="${CLAUDE_AGENTS_DIR:-$CONFIG_DIR/agents}"
+  STATUSLINE_DEST="$CONFIG_DIR/statusline.sh"
+  CLAUDE_SETTINGS="$CONFIG_DIR/settings.json"
+  MEMORY_FILE="$CONFIG_DIR/CLAUDE.md"
+}
+set_config_dir "${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 BLOCK_START="# >>> dotskills conventions >>>"
 BLOCK_END="# <<< dotskills conventions <<<"
 
@@ -598,6 +603,8 @@ main() {
       --no-model-setting) model_setting=0 ;;
       --init-project) shift; [[ $# -gt 0 ]] || { echo "--init-project needs a path" >&2; return 2; }
                    mode=init; init_path="$1" ;;
+      --config-dir) shift; [[ $# -gt 0 ]] || { echo "--config-dir needs a path" >&2; return 2; }
+                   set_config_dir "${1%/}" ;;
       --target)    shift; [[ $# -gt 0 ]] || { echo "--target needs claude or codex" >&2; return 2; }
                    target="$1" ;;
       --with-openspec) openspec=yes ;;
