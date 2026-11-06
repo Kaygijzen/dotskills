@@ -100,14 +100,6 @@
     "local_changes": []
   },
   {
-    "skill": "retro",
-    "domain": "engineering",
-    "source_repo": "https://github.com/mattpocock/skills",
-    "source_path": "skills/engineering/retro",
-    "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
-    "local_changes": []
-  },
-  {
     "skill": "wizard",
     "domain": "engineering",
     "source_repo": "https://github.com/mattpocock/skills",
