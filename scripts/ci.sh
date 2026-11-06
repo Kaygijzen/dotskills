@@ -50,6 +50,7 @@ step "hook tests"
 ./skills/core/setup-dotskills/scripts/test-setup.sh || fail "setup tests"
 ./statusline/test-statusline.sh || fail "statusline tests"
 ./skills/engineering/ralph-apply/scripts/test-ralph.sh || fail "ralph tests"
+./skills/engineering/retro/scripts/test-session-digest.sh || fail "session-digest tests"
 
 step "claude plugin validate"
 if command -v claude >/dev/null 2>&1; then
