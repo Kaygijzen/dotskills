@@ -12,6 +12,7 @@
   ],
   "agents": [
     "./agents/engineering/code-reviewer.md",
+    "./agents/engineering/spec-impact-reviewer.md",
     "./agents/productivity/ask-opus.md"
   ],
   "hooks": [
