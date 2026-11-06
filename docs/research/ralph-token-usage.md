@@ -16,6 +16,24 @@ Researched 2026-11-06 against Claude Code 2.1.319 and the official docs at code.
 
 Smaller levers, measured: `--disable-slash-commands` saved roughly 5-7k tokens of skill listing; `--setting-sources project` saved roughly 6k (drops user-level CLAUDE.md, skills, plugins and hooks, so it also drops rtk's output filtering and your conventions; not recommended without checking); `CLAUDE_CODE_DISABLE_AUTO_MEMORY=1` plus `CLAUDE_CODE_DISABLE_GIT_INSTRUCTIONS=1` saved about 1k. `--strict-mcp-config` saved nothing here (no MCP servers configured).
 
+## Implementation status
+
+Status as of 2026-11-06. Items 1, 2 and the logging half of 3 were implemented in commit `a5ac00d` on branch `ralph-token-savings`; the measured result is in "Verification of the implemented changes" below. The rest were decided against for now, mostly to avoid hurting task quality.
+
+| # | Recommendation | Status | Why / where |
+| --- | --- | --- | --- |
+| 1 | Restrict tools with `--tools` | Done | `ralph.sh`; override with `RALPH_TOOLS` |
+| 2 | Drop the redundant CLAUDE.md/AGENTS.md read | Done | `prompt.md` step 1: read AGENTS.md only if not already in context |
+| 3 | JSON output per iteration, usage summary | Done | `ralph.sh` writes `iter-N.json` and prints turns, cost and tokens |
+| 3 | `--max-budget-usd` cap | Not done | Overshoots by one response and stops mid-task, leaving a dirty tree the loop does not handle; add only as an opt-in |
+| 4 | Trim spec/design reads | Skipped | The specs are the acceptance criteria and a partial read can miss a constraint; the reads cost about $0.03 per iteration on Sonnet 5.5 |
+| 5 | Cap verify output (`BASH_MAX_OUTPUT_LENGTH`) | Skipped | Risk of cutting the failure output the agent needs; rtk already filters where installed |
+| 6 | `--effort low`/`medium` | Skipped | Quality effect unverified; try as an A/B once logs show output dominating cost |
+| 7 | Change the model default | No change | Sonnet stays the default; Haiku suitability unverified |
+| 8 | TTL and `--exclude-dynamic-system-prompt-sections` | No change | Back-to-back iterations fit the 5-minute TTL; the flag measured slightly worse |
+| 9 | `--bare` | Not adopted | API-key only, untested here, and it removes rtk's hooks |
+| | Smaller levers (`--disable-slash-commands`, `--setting-sources`, etc.) | Not adopted | Small saving, or they drop user-level conventions and hooks |
+
 ## 1. Prompt caching across separate `claude -p` runs
 
 - Claude Code requests caching automatically; the cache is server-side and keyed by exact prefix match (system prompt + tool definitions, then CLAUDE.md/auto memory, then conversation). Source: <https://code.claude.com/docs/en/prompt-caching>.
