@@ -119,6 +119,28 @@ Estimate: about 1M cache-read tokens and 10k output per iteration, $0.30-1.00.
 - **On a subscription** the dollar figure is a list-price estimate; actual use counts against plan limits (<https://code.claude.com/docs/en/costs>), and the main conversation gets the 1-hour TTL (writes at 2x input price in the estimate).
 - Expected effect of recommendation 1: about -28k per turn of prefix. At 30 turns that is about 0.84M fewer cache reads ($0.08 at the Sonnet 5.5 read price) plus a smaller prefix write ($0.05-0.10 at 5m/1h rates). Savings are about 20-30% of the $0.40 baseline in my setup; measure with item 3 before relying on this.
 
+## Verification of the implemented changes
+
+Measured 2026-11-06 after implementing recommendations 1 (`--tools`), 2 (conditional AGENTS.md read) and the logging half of 3 (JSON output). One machine, subscription login, Sonnet 5.5 (`claude-sonnet-5-5` in the result JSON), cache writes at the 1-hour tier. Costs are the `total_cost_usd` list-price estimate.
+
+**Setup.** A toy OpenSpec change in a fresh git repo on a feature branch: a short `AGENTS.md` naming a `./check.sh` verify command, a one-line proposal and design, a two-line spec, and two trivial tasks (create `hello.txt`, create `world.txt`). "Old" is `main`'s `ralph.sh` and `prompt.md` with only `--output-format json` added so cost was readable. "New" is the branch's script. Each side ran twice on a fresh copy of the repo, same allowed tools otherwise.
+
+| Run | Iterations | Turns | Cost | Input | Cache read | Cache write | Output |
+|---|---|---|---|---|---|---|---|
+| Old 1 | 1 | 4 | $0.217 | 10,543 | 118,744 | 43,920 | 807 |
+| Old 2 | 1 | 4 | $0.218 | 10,881 | 118,869 | 44,156 | 772 |
+| New 1 | 1 | 12 | $0.087 | 1,900 | 96,215 | 12,886 | 2,160 |
+| New 2 | 2 | 4 + 4 | $0.077 | 2,225 + 1,892 | 43,747 + 46,121 | 6,909 + 4,502 | 622 + 745 |
+
+Every run ticked both tasks, committed, and `./check.sh` printed `OK`.
+
+- **Saving: about 60-65% per run** in both pairs. The largest drop is cache write (about 44k to 5-13k tokens per iteration) and uncached input (about 10.5k to about 2k), which is the smaller prefix. This agrees in direction with the prediction in "Corrections to the estimate".
+- **It is larger than the 20-30% predicted above.** On a toy task the fixed prefix is most of each iteration, so removing it matters more; a real change with larger reads and more turns will show a smaller share. Treat it as an upper bound, not an expected figure.
+- **Turn count does not track cost.** New 1 took 3x the turns of Old 1 and still cost 60% less, because each turn re-read a smaller prefix.
+- **Not isolated.** Rec 1 is the expected driver, but the three changes were measured together; the prompt change is too small to matter and none was ablated.
+- **Quality was only checked at the level "tasks ticked, check passes".** No hard tasks, no multi-file change, no reviewer comparison. Run one real change with the new script and compare `num_turns`, `total_cost_usd` and tasks completed before relying on it.
+- Sample is two runs per side on one machine; run-to-run spread within a side was small (old: $0.217 and $0.218).
+
 ## Not verified
 
 - Token size of the system prompt and tool definitions (not documented; only my local measurement).
