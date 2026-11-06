@@ -3,6 +3,7 @@ name: grill-spec
 description: Grill the user until intent is shared, then generate a complete OpenSpec change (proposal, delta specs, design, tasks) and review it with fresh-context sub-agents before handing it to a coding agent. Use when the user invokes /grill-spec or asks to grill-and-spec a change.
 argument-hint: "[rough description of the change, or an issue number or URL]"
 disable-model-invocation: true
+model: sonnet
 ---
 
 # Grill → Spec → Review
@@ -40,6 +41,7 @@ Ground rules for the whole run:
    - Which existing specs in `openspec/specs/` cover this area, and which requirements are relevant?
    - Are there active changes in `openspec/changes/` (not `archive/`) that overlap?
    - What conventions apply here (patterns, test setup, error handling, config)?
+   - What depends on the touched code? Every caller, including production and live paths, and any recorded fixture, cassette or snapshot that encodes today's behaviour.
 5. Summarise the recon in five lines or fewer and seed the design tree with what it found.
 
 **Scope check.** If recon or the first round shows the tree spans several independent capabilities, or more than one reviewable change's worth of work, propose splitting it into multiple OpenSpec changes before grilling further. Then grill and spec them one at a time. A session heading past ~40 questions is a sign the scope is too big.
@@ -79,7 +81,7 @@ The user may answer briefly ("Q1 yes, Q2 option B") or just accept recommendatio
 
 Treat "I don't know" as a real answer. Record it as an open risk, or suggest a spike task, rather than guessing. Push back when an answer conflicts with a finding or an earlier decision.
 
-Branches worth checking before you call the tree done: success criteria, error and edge cases, data/migration impact, backwards compatibility, security and permissions, observability, testing approach, and what is explicitly out of scope.
+Branches worth checking before you call the tree done: success criteria, error and edge cases, data/migration impact, backwards compatibility, blast radius (every caller including production paths, and fixtures or snapshots that encode current behaviour), ordering against active changes, security and permissions, observability, testing approach, and what is explicitly out of scope.
 
 The interview is done when the frontier is empty: every branch has been visited and nothing is silently assumed.
 
@@ -119,9 +121,9 @@ Invoke the `openspec-propose` skill with the Skill tool. Pass the change name an
 The context that wrote the artifacts is the worst one to review them, so the review runs in fresh sub-agents.
 
 1. Run `openspec validate <change-name> --strict` and fix any errors yourself first.
-2. In **one message**, dispatch two parallel `general-purpose` sub-agents with `model: "opus"` using the reviewer prompts (Appendix B). (Not `Explore`: it locates code but doesn't review it.)
-   - **Reviewer A, intent and consistency.** Give it the intent summary and the change path.
-   - **Reviewer B, codebase impact.** Give it the change path only, so it judges the artifacts against reality rather than against the conversation.
+2. Read [REVIEWERS.md](REVIEWERS.md). In **one message**, dispatch two parallel sub-agents using its reviewer prompts: reviewer A as `general-purpose`, reviewer B as `spec-impact-reviewer`. (Not `Explore`: it locates code but doesn't review it.)
+   - **Reviewer A, intent and consistency** (`model: "sonnet"`). Give it the intent summary and the change path.
+   - **Reviewer B, codebase impact** (the read-only `spec-impact-reviewer` agent, `dotskills:spec-impact-reviewer` in a plugin install; it runs on Opus). Give it the change path only, so it judges the artifacts against reality rather than against the conversation.
 3. Merge the findings, drop duplicates, and sort by severity. Then route each one:
    - **Artifact defect** (inconsistency, a missing scenario, a vague task, a missed file): fix it in the artifacts yourself.
    - **Needs a decision** (a new trade-off, a conflict with an existing spec, a breaking change nobody discussed): ask a short grilling round, update the intent summary, then fix the artifacts.
@@ -168,83 +170,6 @@ Reply in this format, under 200 words:
 **Also relevant:** anything you noticed that the planners would likely want to know, such as conflicting patterns, an overlapping active change, an existing spec requirement, or a surprising caller. Write "none" if there is nothing.
 
 Do not speculate beyond the evidence. If the answer depends on a choice nobody has made yet, say so. Do not pick an answer.
-
----
-
-## Appendix B: Reviewer sub-agent prompts
-
-Phase 3 dispatches both reviewers in a single message.
-
-- Tool: the Agent tool, with `subagent_type: "general-purpose"` and `model: "opus"`. There are only two reviewers and they are the last check before a coding agent builds the change, so they get the strongest model.
-- Both reviewers are read-only and report findings; they never edit.
-- Both use the same finding format, so the results merge cleanly.
-
-### Shared finding format (paste into both prompts)
-
-```
-Report at most 12 findings, most severe first. For each:
-
-- **[severity] title**: blocker (a coding agent would build the wrong thing or break something) | major (likely rework or a defect) | minor (clarity, polish)
-- **Where**: artifact file + section, and/or `path/to/code.ext:line`
-- **Problem**: what is wrong, in one or two sentences
-- **Evidence**: quote or file reference
-- **Suggested fix**: concrete wording or change
-- **Route**: artifact-defect (fixable in the artifacts without asking anyone) | needs-decision (a trade-off or scope call the user must make)
-
-Only report issues you can point to evidence for. If you find nothing at a severity level, don't invent something. End with one line: "Verdict: ready | ready after fixes | not ready".
-```
-
----
-
-### Reviewer A: intent and consistency
-
-Fill in `<CHANGE_PATH>` and `<INTENT_SUMMARY>`.
-
-```
-You are reviewing an OpenSpec change before it is handed to a coding agent. Read-only: do not modify any file.
-
-Change folder: <CHANGE_PATH> (read every file in it, including specs/**)
-Confirmed intent (the contract the change must satisfy):
-
-<INTENT_SUMMARY>
-
-Check the artifacts on these axes:
-
-1. Faithfulness: every decision, in-scope item, non-goal and constraint in the intent appears in the artifacts. Nothing was added that the intent does not contain (scope creep). Non-goals are stated, not silently dropped.
-2. Spec quality: every requirement uses SHALL/MUST, is testable, and has at least one scenario (WHEN/THEN). Scenarios cover error and edge cases, not just the happy path. Delta operations (ADDED/MODIFIED/REMOVED/RENAMED) are used correctly; MODIFIED requirements contain the full updated text.
-3. Traceability: every requirement maps to at least one task, and every task traces back to a requirement or design decision. Flag orphans in both directions.
-4. Internal consistency: proposal, design, specs and tasks agree on names, behaviour, data shapes and scope. Terms are used consistently.
-5. Executability for a coding agent: each task is small enough for one focused session, names the files/modules it touches, and has a verification step. Task order respects dependencies. Open risks have spike tasks placed first.
-6. Ambiguity: anywhere a coding agent would have to guess (vague words like "handle", "support", "appropriate", undefined limits, unspecified error behaviour).
-
-<SHARED FINDING FORMAT>
-```
-
----
-
-### Reviewer B: codebase impact
-
-Fill in `<CHANGE_PATH>` only. Do **not** give this reviewer the intent summary or conversation. It should judge the artifacts against the codebase and existing specs, not against what was discussed.
-
-```
-You are reviewing an OpenSpec change against the actual codebase before a coding agent implements it. Read-only: do not modify any file.
-
-Change folder: <CHANGE_PATH> (read every file in it, including specs/**)
-
-Read the artifacts, then investigate the codebase and openspec/ to find defects and implications the authors may have missed:
-
-1. Blast radius: all callers, consumers and dependents of the code the tasks touch. Are any affected places missing from the tasks?
-2. Breaking changes: public APIs, data formats, DB schemas, config, CLI flags, events or file formats that change. Is migration, backwards compatibility or a rollout path covered?
-3. Conflicts with existing specs: requirements in openspec/specs/ that the delta contradicts or silently changes without a MODIFIED/REMOVED entry.
-4. Conflicts with active changes: other folders in openspec/changes/ (ignore archive/) touching the same capabilities or files.
-5. Wrong assumptions: places where the design or tasks assume something about the code that isn't true (wrong file, missing function, different pattern, different library version).
-6. Non-functionals: security and permissions, performance, concurrency, error handling, logging/observability, and test setup. Flag only where the change plausibly affects them.
-7. Convention fit: does the design follow the patterns the codebase already uses for this kind of thing? If not, is the deviation justified in design.md?
-
-Use sub-searches as needed. Cite file:line for every claim about the code.
-
-<SHARED FINDING FORMAT>
-```
 
 ---
 

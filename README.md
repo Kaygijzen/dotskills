@@ -88,6 +88,7 @@ Skills are instruction sets Claude loads when a task calls for them. Some trigge
 | Agent | Domain | What it does | Model | Tools |
 | --- | --- | --- | --- | --- |
 | `code-reviewer` | engineering | Read-only code reviewer | opus | Read, Grep, Glob, Bash |
+| `spec-impact-reviewer` | engineering | Read-only reviewer that checks an OpenSpec change against the real codebase (callers, breaking changes, conflicts with specs and active changes) before it is implemented | opus | Read, Grep, Glob |
 | `ask-opus` | productivity | Second opinion from Opus on one hard question, with small, guided research | opus | Read, Grep, Glob |
 <!-- agents-table:end -->
 

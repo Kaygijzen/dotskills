@@ -37,7 +37,7 @@ Chosen from what each skill does. Unless a skill is pinned, the session model ru
 
 | Skill | Model | Why |
 | --- | --- | --- |
-| `grill-spec` | **Opus** | The session model runs the interview. Its fact-finder sub-agents use `sonnet` and its spec reviewers use `opus` |
+| `grill-spec` | **Sonnet** (pinned in frontmatter) | The interview and spec writing run on Sonnet to keep the long session cheap. Fact-finder sub-agents and reviewer A use `sonnet`; reviewer B (the read-only `spec-impact-reviewer` agent), which judges the change against the codebase, uses `opus` |
 | `ralph-apply` | **Sonnet** (enforced) | `ralph.sh` passes `--model` to every loop session (default `sonnet`, override with `RALPH_MODEL`) |
 | `grill-me`, `grilling`, `improve-codebase-architecture` | **Opus** | Open-ended interviews and design judgement: a wrong plan costs more than the tokens |
 | `code-review` | **Opus** (pinned in frontmatter) | It fans out to sub-agents and aggregates their reports; judgement matters more than speed |
