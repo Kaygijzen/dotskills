@@ -49,6 +49,7 @@ step "hook tests"
 ./hooks/core/scripts/test-load-conventions.sh || fail "load-conventions tests"
 ./skills/core/setup-dotskills/scripts/test-setup.sh || fail "setup tests"
 ./statusline/test-statusline.sh || fail "statusline tests"
+./skills/engineering/ralph-apply/scripts/test-ralph.sh || fail "ralph tests"
 
 step "claude plugin validate"
 if command -v claude >/dev/null 2>&1; then
