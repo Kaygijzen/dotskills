@@ -117,5 +117,15 @@
       "Only SKILL.md and LICENSE copied; README.md, install.sh and examples/ omitted (upstream-status.sh will report this as locally changed)",
       "Added disable-model-invocation: true so it runs only on /bro"
     ]
+  },
+  {
+    "skill": "caveman-compress",
+    "domain": "productivity",
+    "source_repo": "https://github.com/juliusbrussee/caveman",
+    "source_path": "skills/caveman-compress",
+    "commit": "3dc497a7f858c774d6e15b25e8c6120ef3a0eda8",
+    "local_changes": [
+      "Only SKILL.md, scripts/ and the repo-root Apache-2.0 LICENSE copied; README.md and SECURITY.md omitted (upstream-status.sh will report this as locally changed)"
+    ]
   }
 ]
