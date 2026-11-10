@@ -84,6 +84,16 @@
     ]
   },
   {
+    "skill": "to-spec",
+    "domain": "engineering",
+    "source_repo": "https://github.com/mattpocock/skills",
+    "source_path": "skills/engineering/to-spec",
+    "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+    "local_changes": [
+      "SKILL.md: publishes via docs/agents/issue-tracker.md, or shows the spec in the conversation when that file is missing, instead of pointing to a setup skill and applying the ready-for-agent label"
+    ]
+  },
+  {
     "skill": "prototype",
     "domain": "engineering",
     "source_repo": "https://github.com/mattpocock/skills",

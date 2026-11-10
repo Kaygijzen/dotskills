@@ -47,7 +47,7 @@ Skills are instruction sets Claude loads when a task calls for them. Some trigge
 </details>
 
 <details>
-<summary><strong>engineering</strong> (11)</summary>
+<summary><strong>engineering</strong> (12)</summary>
 
 | Skill | What it does | Trigger |
 | --- | --- | --- |
@@ -61,6 +61,7 @@ Skills are instruction sets Claude loads when a task calls for them. Some trigge
 | `ralph-apply` | Apply an approved OpenSpec change with a Ralph loop - a bash loop that runs a fresh headless Claude session per task, so context never piles up. | `/ralph-apply` only (never auto-invoked) |
 | `research` | Investigate a question against high-trust primary sources and capture the findings as a Markdown file in the repo. | `/research`, or automatically when the user wants a topic researched, docs or API facts gathered, or reading legwork delegated to a background agent. |
 | `retro` | Conduct a retrospective on a coding session. | `/retro` only (never auto-invoked) |
+| `to-spec` | Turn the current conversation into a spec and publish it to the project issue tracker: no interview, just synthesis of what you've already discussed. | `/to-spec` only (never auto-invoked) |
 | `wizard` | Generate an interactive bash wizard that walks a human through steps only they can perform. | `/wizard`, or automatically when provisioning infrastructure, setting up credentials or CI secrets, walking an unfamiliar third-party dashboard, or running a one-off migration or cutover. Don't invoke this for steps the agent can perform itself. |
 
 </details>
