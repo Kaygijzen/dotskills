@@ -66,11 +66,12 @@ Skills are instruction sets Claude loads when a task calls for them. Some trigge
 </details>
 
 <details>
-<summary><strong>productivity</strong> (7)</summary>
+<summary><strong>productivity</strong> (8)</summary>
 
 | Skill | What it does | Trigger |
 | --- | --- | --- |
 | `bro` | Re-explain the previous assistant message, or any text typed after the command, in a much simpler way. | `/bro` only (never auto-invoked) |
+| `caveman-compress` | Compress a memory file such as CLAUDE.md or a todo list into caveman format to save input tokens, keeping a readable backup. | `/caveman-compress`, or automatically when relevant |
 | `grill-me` | A relentless interview to sharpen a plan or design. | `/grill-me` only (never auto-invoked) |
 | `grilling` | Grill the user relentlessly about a plan, decision, or idea. | `/grilling`, or automatically when the user wants to stress-test their thinking, or uses any 'grill' trigger phrases. |
 | `handoff` | Compact the current conversation into a handoff document for another agent to pick up. | `/handoff` only (never auto-invoked) |

@@ -65,3 +65,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+## juliusbrussee/caveman
+
+`skills/productivity/caveman-compress` is imported from <https://github.com/juliusbrussee/caveman> at commit `3dc497a`. Only `SKILL.md`, `scripts/` and `LICENSE` were copied; provenance and local edits are recorded in `upstream.json`. Copyright 2026 Julius Brussee. Licensed under the Apache License, Version 2.0; the full text is kept in `skills/productivity/caveman-compress/LICENSE`. The files are unmodified.
+
+The skill needs `python3`, and its scripts send the text of the file you compress to a model provider (the `claude` CLI, the Anthropic API or an OpenAI-compatible endpoint).
