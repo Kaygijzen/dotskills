@@ -2,12 +2,6 @@
 name: pr
 description: "Write a pull request body. Use when writing a PR body."
 model: sonnet
-metadata:
-  credits:
-    skill: show-me
-    author: Dex Horthy
-    organisation: Humanlayer
-    url: "https://github.com/humanlayer/skills/blob/main/plugins/show-me/skills/show-me/SKILL.md"
 ---
 
 Use this template for writing the PR body:
@@ -24,13 +18,11 @@ Use this template for writing the PR body:
 
 ## Merge Danger
 
-**Door:** <one-way or two-way>
+**Risk:** <Low, Medium or High>
 
-<optional: description>
+**Undo:** <the concrete steps to roll this back, and anything a revert does not restore>
 
-**Blast Radius:** <one-word description>
-
-<optional: potential ramifications of merge>
+**Effect:** <what the merge changes outside the diff (systems, consumers, data, infrastructure) and when; and who is hit if it is wrong: one page or feature, all users, or other teams and external callers>
 ```
 
 ## Sections
@@ -166,6 +158,24 @@ Execution-based evidence is A-tier. Test results, console output. Show the exact
 
 ### Merge Danger
 
-Describe whether it's a one-way or two-way door. You can walk back through two-way doors, but not one-way doors. A PR that is cheap to roll back is lower risk. Changes that involve destructive actions or hard-to-reverse decisions are one-way doors.
+Say how risky the merge is, how to undo it, and what it affects. Write the undo as concrete steps, not a metaphor: a reviewer should see from it what rolling back costs.
 
-The blast radius is the potential impact or scope of the changes introduced by this PR. Consider all possibilities. Examples are layout shift, breakages for consumers, mobile responsiveness, etc.
+Pick **Risk** with these criteria so the level means the same on every PR:
+
+| Level | Criteria |
+|---|---|
+| Low | Reverting the PR fully undoes it, no data, contract or infrastructure state changes, and a failure stays within the changed feature |
+| Medium | Reverting works but needs an extra step (an infrastructure apply, a redeploy, a config change), or a failure would reach all users, other teams or external callers |
+| High | Reverting does not fully undo it: data migrations, deleted resources, ids or contracts that other systems store or depend on |
+
+For **Effect**, consider everything the change can reach: consumers of an API or contract, deployed infrastructure, stored data, layout or mobile responsiveness for UI changes. Say "no runtime behaviour changes" when that is true. End with the reach of a failure: name who would notice if this breaks.
+
+Example:
+
+```markdown
+**Risk:** Medium
+
+**Undo:** Revert the PR and run the terraform pipeline. No data or state to restore.
+
+**Effect:** Updates the APIM API definition on the next `terraform apply` (response definitions and descriptions only). No runtime behaviour changes; if wrong, only the published API docs are affected.
+```
