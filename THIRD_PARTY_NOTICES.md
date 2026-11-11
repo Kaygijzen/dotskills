@@ -6,8 +6,6 @@ The skills listed below were copied from <https://github.com/mattpocock/skills> 
 
 Imported skills: grill-me, grilling, handoff, teach, writing-for-agents, code-review, codebase-design, domain-modeling, improve-codebase-architecture, pr, prototype, research, retro, to-spec, wizard.
 
-`skills/engineering/pr` also keeps its own `CREDITS.md`, which credits Dex Horthy's `show-me`.
-
 ```text
 MIT License
 

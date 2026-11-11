@@ -158,6 +158,6 @@ The full loop and folder layout are in [best practices](docs/best-practices.md#1
 
 ## Credits
 
-- Skills imported from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT). See `upstream.json` and `THIRD_PARTY_NOTICES.md`. `pr` credits Dex Horthy's [`show-me`](https://github.com/humanlayer/skills/blob/main/plugins/show-me/skills/show-me/SKILL.md) in its own `CREDITS.md`.
+- Skills imported from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT). See `upstream.json` and `THIRD_PARTY_NOTICES.md`.
 - `bro` is imported from [luchasarie/bro-skill](https://github.com/luchasarie/bro-skill) (MIT). Licence kept in `skills/productivity/bro/LICENSE`; see `upstream.json` and `THIRD_PARTY_NOTICES.md`.
 - Coding principles in the conventions are condensed from [andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) (MIT per its skill frontmatter); the full text is in `docs/karpathy-guidelines.md`.
