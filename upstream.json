@@ -82,7 +82,10 @@
     "local_changes": [
       "frontmatter: added model: sonnet; description now starts with 'Write a pull request body.' so the README table reads well",
       "Merge Danger: replaced Door and Blast Radius with Risk, Undo and Effect, plus criteria and an example",
-      "frontmatter: removed metadata.credits for show-me"
+      "frontmatter: removed metadata.credits for show-me",
+      "Sections: 4000-character body cap, one visual in Summary, only commands the reviewer can run",
+      "Evidence: static checks for infrastructure/config/deletion PRs; added optional Before merge / deploy section",
+      "added Deliver section: temp-dir file kept up to date, wc -c count, PR-create URL fallback"
     ]
   },
   {

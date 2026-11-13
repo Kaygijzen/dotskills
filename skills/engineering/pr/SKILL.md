@@ -16,6 +16,10 @@ Use this template for writing the PR body:
 - **Before:** <screenshot/output/failing test run>
   **After:** <screenshot/output/passing test run>
 
+## Before merge / deploy
+
+- [ ] <what to check> (stop if <result>)
+
 ## Merge Danger
 
 **Risk:** <Low, Medium or High>
@@ -27,7 +31,7 @@ Use this template for writing the PR body:
 
 ## Sections
 
-Skip all preambles and keep prose brief. Use the user's domain language from `GLOSSARY.md`.
+Skip all preambles and keep prose brief. Keep the whole body under 4000 characters: Azure DevOps rejects longer descriptions. Include only commands the reviewer can run. Use the user's domain language from `GLOSSARY.md`.
 
 ### Summary
 
@@ -146,7 +150,7 @@ function expandSkill(command: string): string {
 
 Place each visual next to the short text it supports. Keep only the calls, files, props, states, and boundaries needed to answer the user's current question or the options to resolve the current discussion point.
 
-You may use one of these, you may use several, it is unlikely you will use all of them. Use your judgement and don't overwhelm the user.
+Use one visual in Summary. A second view of the same change costs characters the cap can't spare.
 
 ### Evidence
 
@@ -155,6 +159,12 @@ Concrete evidence that the change works. Show a before and after.
 Screenshots are S-tier - when the environment is set up for it and the change is visual.
 
 Execution-based evidence is A-tier. Test results, console output. Show the exact test that now fails and passes, using pseudocode.
+
+For infrastructure, config or deletion PRs, static checks are the evidence: a repo-wide grep for leftovers (hits before, none after), validators such as `terraform validate` or `fmt -check` on the changed files, plan output. Name findings in files the PR doesn't touch as pre-existing.
+
+### Before merge / deploy
+
+Optional. Add it only when a check can't be run before merge, such as prod state the author can't see or the pipeline's plan. One item per check: what to check, and which result means stop.
 
 ### Merge Danger
 
@@ -179,3 +189,9 @@ Example:
 
 **Effect:** Updates the APIM API definition on the next `terraform apply` (response definitions and descriptions only). No runtime behaviour changes; if wrong, only the published API docs are affected.
 ```
+
+## Deliver
+
+Write the body to a file in the OS temp dir (`$TMPDIR`, else `/tmp`; `%TEMP%` on Windows). Treat it as a living file: when new facts arrive, such as a check the user ran or a review finding, update it there. After every write, measure it with `wc -c`, cut it back under the cap if needed, and report the path and the count.
+
+When the user asks you to open the PR, use the host's CLI with the file (`gh pr create --body-file <file>`). If the CLI can't create it, give the user the host's PR-create URL and the file path to paste from. For Azure DevOps: `<repo-url>/pullrequestcreate?sourceRef=<branch>&targetRef=<base>`.
