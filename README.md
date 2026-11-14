@@ -24,7 +24,7 @@ The statusline is the bar Claude Code draws below the input box, filled by a scr
 
 Two external tools round out the setup. I use both; the installers offer to install them, but neither is required.
 
-- **[OpenSpec](https://github.com/Fission-AI/OpenSpec)** keeps agreed requirements as Markdown specs in the repo, so the agent implements the spec, not the chat. `/grill-spec` and `/ralph-apply` build on it; see [How I use it](#how-i-use-it).
+- **[OpenSpec](https://github.com/Fission-AI/OpenSpec)** keeps agreed requirements as Markdown specs in the repo, so the agent implements the spec, not the chat. `/grill-spec` and `/ralph-apply` build on it; see [best practices](docs/best-practices.md#1-spec-driven-development).
 - **[rtk](https://github.com/rtk-ai/rtk)** is a hook that filters and truncates Bash output (git, tests, builds) before Claude reads it, so sessions use fewer tokens. See [Saving tokens with rtk](docs/install-reference.md#saving-tokens-with-rtk).
 
 ### Skills
@@ -125,27 +125,6 @@ cd dotskills
 Run `/hello-skill` (or `/dotskills:hello-skill`) to check it works.
 
 The [setup guide](docs/setup.md) has the full walkthrough: conventions, statusline, updating and per-project setup. The [install reference](docs/install-reference.md) has every flag, Windows, OpenSpec and rtk. Stuck? See [troubleshooting](docs/troubleshooting.md).
-
-## How I use it
-
-When requirements live only in chat history, AI-written code is unpredictable. [OpenSpec](https://github.com/Fission-AI/OpenSpec) keeps the agreed *what* in plain Markdown in the repo, so the spec, not the chat, is what the agent implements and a reviewer checks against. `/grill-spec` and `/ralph-apply` replace the propose and apply steps for large or fuzzy changes. The `/opsx:*` commands come from OpenSpec: `openspec init` installs them, not dotskills.
-
-For a feature too big for a single prompt, I chain the skills like this. Step details are in [docs/diagrams/example-flow.md](docs/diagrams/example-flow.md).
-
-```mermaid
-flowchart LR
-    idea(["Idea"]) --> grill["/grill-spec"]
-    grill --> review{"Spec approved?"}
-    review -- "no" --> grill
-    review -- "yes" --> ralph["/ralph-apply"]
-    ralph --> loop["scripts/ralph.sh"]
-    loop --> cr["/code-review"]
-    cr --> arch["/opsx:archive<br/>sync codebase specs"]
-    arch --> pr["/pr"]
-    pr --> done(["Pull request"])
-```
-
-The full loop and folder layout are in [best practices](docs/best-practices.md#1-spec-driven-development). What `grill-spec` and `ralph-apply` need is in [Requirements](docs/best-practices.md#requirements).
 
 ## Docs
 
