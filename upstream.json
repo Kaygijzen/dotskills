@@ -21,7 +21,9 @@
     "source_repo": "https://github.com/mattpocock/skills",
     "source_path": "skills/productivity/handoff",
     "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
-    "local_changes": []
+    "local_changes": [
+      "SKILL.md: saves to .claude/handoffs/ at the repo root when that folder exists, else the OS temp dir"
+    ]
   },
   {
     "skill": "teach",
