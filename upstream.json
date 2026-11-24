@@ -16,6 +16,14 @@
     "local_changes": []
   },
   {
+    "skill": "grill-with-docs",
+    "domain": "engineering",
+    "source_repo": "https://github.com/mattpocock/skills",
+    "source_path": "skills/engineering/grill-with-docs",
+    "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+    "local_changes": []
+  },
+  {
     "skill": "handoff",
     "domain": "productivity",
     "source_repo": "https://github.com/mattpocock/skills",

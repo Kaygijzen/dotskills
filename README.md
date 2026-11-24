@@ -47,7 +47,7 @@ Skills are instruction sets Claude loads when a task calls for them. Some trigge
 </details>
 
 <details>
-<summary><strong>engineering</strong> (12)</summary>
+<summary><strong>engineering</strong> (13)</summary>
 
 | Skill | What it does | Trigger |
 | --- | --- | --- |
@@ -55,6 +55,7 @@ Skills are instruction sets Claude loads when a task calls for them. Some trigge
 | `codebase-design` | Shared vocabulary for designing deep modules. | `/codebase-design`, or automatically when the user wants to design or improve a module's interface, find deepening opportunities, decide where a seam goes, make code more testable or AI-navigable, or when another skill needs the deep-module vocabulary. |
 | `domain-modeling` | Build and sharpen a project's domain model. | `/domain-modeling`, or automatically when discussing codebase terminology, writing or editing a GLOSSARY.md, or recording or editing an ADR. |
 | `grill-spec` | Grill the user until intent is shared, then generate a complete OpenSpec change (proposal, delta specs, design, tasks) and review it with fresh-context sub-agents before handing it to a coding agent. | `/grill-spec` only (never auto-invoked) |
+| `grill-with-docs` | A relentless interview to sharpen a plan or design, which also creates docs (ADR's and glossary) as we go. | `/grill-with-docs` only (never auto-invoked) |
 | `improve-codebase-architecture` | Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill through whichever one you pick. | `/improve-codebase-architecture` only (never auto-invoked) |
 | `pr` | Write a pull request body. | `/pr`, or automatically when writing a PR body. |
 | `prototype` | Build a throwaway prototype to answer a design question. | `/prototype`, or automatically when the user wants to sanity-check whether a state model or logic feels right, or explore what a UI should look like. |
