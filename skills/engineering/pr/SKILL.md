@@ -158,7 +158,7 @@ Concrete evidence that the change works. Show a before and after.
 
 Screenshots are S-tier - when the environment is set up for it and the change is visual.
 
-Execution-based evidence is A-tier. Test results, console output. Show the exact test that now fails and passes, using pseudocode.
+Execution-based evidence is A-tier. Test results, console output. Show the exact test that now fails and passes, using pseudocode. For a fix that blocks or rejects something, also show a test that the case which should still work still passes.
 
 For infrastructure, config or deletion PRs, static checks are the evidence: a repo-wide grep for leftovers (hits before, none after), validators such as `terraform validate` or `fmt -check` on the changed files, plan output. Name findings in files the PR doesn't touch as pre-existing.
 
